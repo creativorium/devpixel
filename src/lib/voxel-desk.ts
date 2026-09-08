@@ -66,21 +66,31 @@ export function createVoxelDesk() {
     emissiveIntensity: 0.25,
     roughness: 1,
   });
-  const screenPixels: THREE.Mesh[] = [];
-  for (let x = 0; x < 7; x++)
-    for (let y = 0; y < 5; y++) {
-      if (x === y || x + y === 6 || (x >= 2 && x <= 4 && y === 2)) {
+  // The same 32px PixelMark silhouette used in the site header, in 4px cells.
+  const logoRows = [
+    "11100111",
+    "11100111",
+    "11111111",
+    "00111100",
+    "00111100",
+    "11111111",
+    "11100111",
+    "11100111",
+  ];
+  const logoPixelSize = 0.13;
+  for (let y = 0; y < logoRows.length; y++)
+    for (let x = 0; x < logoRows[y].length; x++) {
+      if (logoRows[y][x] === "1") {
         const pixel = box(
-          -0.8 + x * 0.19,
-          2.98 - y * 0.19,
+          -0.23 + (x - 3.5) * logoPixelSize,
+          2.6 + (3.5 - y) * logoPixelSize,
           -0.99,
-          0.18,
-          0.18,
+          logoPixelSize,
+          logoPixelSize,
           0.02,
           "#d2d2d2",
         );
         pixel.material = glow;
-        screenPixels.push(pixel);
       }
     }
   for (let i = 0; i < 3; i++)
