@@ -1,11 +1,25 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import "@fontsource-variable/space-grotesk";
-import "@fontsource/press-start-2p/latin-400.css";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { site } from "@/lib/site";
+const sans = localFont({
+  src: "../../node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2",
+  variable: "--font-sans",
+  weight: "300 700",
+  display: "swap",
+  fallback: ["Arial", "sans-serif"],
+});
+const pixel = localFont({
+  src: "../../node_modules/@fontsource/press-start-2p/files/press-start-2p-latin-400-normal.woff2",
+  variable: "--font-pixel",
+  weight: "400",
+  display: "swap",
+  fallback: ["monospace"],
+  adjustFontFallback: false,
+});
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
@@ -27,7 +41,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${sans.variable} ${pixel.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <script
           dangerouslySetInnerHTML={{

@@ -4,8 +4,8 @@
   --ink: #1a1a1a;
   --muted: #696962;
   --line: #d8d8d1;
-  --pixel: "Press Start 2P", monospace;
-  --sans: "Space Grotesk Variable", Arial, sans-serif;
+  --pixel: var(--font-pixel), monospace;
+  --sans: var(--font-sans), Arial, sans-serif;
 }
 * {
   box-sizing: border-box;
