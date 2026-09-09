@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { PixelMark } from "./brand";
 import { ThemeToggle } from "./theme-toggle";
+import { WhatsAppButton } from "./whatsapp-button";
 export function Navigation() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -81,6 +82,23 @@ export function Navigation() {
           >
             Let’s talk <span>↗</span>
           </Link>
+        </div>
+        <div className="mobile-nav-extra">
+          <p className="eyebrow">INDEPENDENT MINDS.</p>
+          <p className="mobile-nav-motto">
+            Small studio.
+            <br />
+            Big possibilities.
+          </p>
+          <WhatsAppButton />
+          <div className="legal-links">
+            <Link href="/privacy" onClick={() => setOpen(false)}>
+              Privacy policy
+            </Link>
+            <Link href="/terms" onClick={() => setOpen(false)}>
+              Terms of use
+            </Link>
+          </div>
         </div>
       </nav>
     </header>

@@ -59,7 +59,7 @@ export default function About() {
         <div className="object-gallery">
           {(["frame", "steps", "cross"] as const).map((variant, i) => (
             <article key={variant}>
-              <Sculpture variant={variant} interactive electrons />
+              <Sculpture variant={variant} interactive />
               <div className="object-caption">
                 <h3>
                   {

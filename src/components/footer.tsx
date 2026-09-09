@@ -14,6 +14,10 @@ export function Footer() {
         <PixelMark className="footer-mark" />
       </div>
       <div className="footer-bottom">
+        <div className="legal-links">
+          <Link href="/privacy">Privacy policy</Link>
+          <Link href="/terms">Terms of use</Link>
+        </div>
         <span>© {new Date().getFullYear()} DevnPixel</span>
         <span>INDEPENDENT MINDS. INTENTIONAL PIXELS.</span>
         <Link href="/services">Our services ↗</Link>

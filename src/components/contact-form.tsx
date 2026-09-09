@@ -121,6 +121,10 @@ export function ContactForm({ enabled = false }: { enabled?: boolean }) {
             ? "We’ll use your details to respond to your enquiry."
             : "The form is being connected. Please email code@devnpixel.com directly for now.")}
       </p>
+      <p className="form-privacy">
+        Read our <a href="/privacy">privacy policy</a> for how we handle your
+        details.
+      </p>
     </form>
   );
 }

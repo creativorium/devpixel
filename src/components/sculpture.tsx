@@ -100,28 +100,7 @@ export function Sculpture({
     >
       <div className="stage-cross cross-one">+</div>
       <div className="stage-cross cross-two">+</div>
-      {electrons ? (
-        <div className="atom-orbits" aria-hidden="true">
-          {[-30, 35, 90].map((angle, index) => (
-            <div
-              className="atom-track"
-              key={angle}
-              style={
-                {
-                  "--orbit-angle": `${angle}deg`,
-                  "--orbit-duration": `${12 + index * 4}s`,
-                  "--orbit-delay": `${-index * 5}s`,
-                } as CSSProperties
-              }
-            >
-              <span className="atom-pixel" />
-              <span className="atom-pixel atom-pixel-opposite" />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="stage-orbit" />
-      )}
+      {!electrons && <div className="stage-orbit" />}
       <div className="sculpture-shadow" />
       {companions &&
         (["frame", "cross"] as const).map((shape, index) => (
@@ -154,6 +133,29 @@ export function Sculpture({
           </div>
         ))}
       <div className="sculpture-tilt" ref={ref}>
+        {electrons && (
+          <div className="atom-orbits" aria-hidden="true">
+            {[-30, 35, 90].map((angle, index) => (
+              <div
+                className="atom-track"
+                key={angle}
+                style={
+                  {
+                    "--orbit-angle": `${angle}deg`,
+                    "--orbit-duration": `${12 + index * 4}s`,
+                    "--orbit-delay": `${-index * 5}s`,
+                  } as CSSProperties
+                }
+              >
+                <div className="atom-spin">
+                  <span className="atom-pixel" />
+                  <span className="atom-pixel atom-pixel-opposite" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div
           className={`voxel-object ${paused ? "paused" : ""}`}
           role="img"

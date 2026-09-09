@@ -2990,65 +2990,118 @@ input:disabled {
   }
 }
 
-/* Pixel electrons follow the exact elliptical outlines around the studio objects. */
+/* Shared preserve-3d space lets electrons cross in front of and behind the nucleus. */
 .atom-orbits {
+  --orbit-diameter: clamp(280px, 38vw, 460px);
   position: absolute;
-  inset: 8%;
+  left: 22px;
+  top: 22px;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
   pointer-events: none;
 }
 .atom-track {
   position: absolute;
-  width: 90%;
-  height: 40%;
-  left: 5%;
-  top: 30%;
+  width: var(--orbit-diameter);
+  height: var(--orbit-diameter);
+  left: calc(var(--orbit-diameter) / -2);
+  top: calc(var(--orbit-diameter) / -2);
   border: 1px solid var(--line);
   border-radius: 50%;
-  transform: rotate(var(--orbit-angle));
+  transform: rotateZ(var(--orbit-angle)) rotateX(65deg);
+  transform-style: preserve-3d;
 }
-.atom-pixel {
+.atom-spin {
   position: absolute;
-  width: 12px;
-  height: 12px;
-  background: var(--ink);
-  border: 1px solid var(--bg);
-  box-shadow:
-    inset -3px -3px 0 #888,
-    2px 2px 0 var(--line);
-  offset-path: ellipse(50% 50% at 50% 50%);
-  offset-distance: 0%;
+  inset: 0;
+  transform-style: preserve-3d;
   animation: atom-travel var(--orbit-duration) linear infinite;
   animation-delay: var(--orbit-delay);
 }
-.atom-pixel-opposite {
-  animation-name: atom-travel-opposite;
+.atom-pixel {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  width: 15px;
+  height: 15px;
+  background: var(--ink);
+  border: 1px solid var(--bg);
+  box-shadow:
+    inset -4px -4px 0 #888,
+    2px 2px 0 var(--line);
+  transform: translate(-50%, -50%) rotateX(-65deg);
 }
-.sculpture-stage[data-paused="true"] .atom-pixel,
-.sculpture-stage[data-visible="false"] .atom-pixel {
+.atom-pixel-opposite {
+  left: 0;
+}
+.sculpture-stage[data-paused="true"] .atom-spin,
+.sculpture-stage[data-visible="false"] .atom-spin {
   animation-play-state: paused;
 }
 @keyframes atom-travel {
   from {
-    offset-distance: 0%;
+    transform: rotateZ(0deg);
   }
   to {
-    offset-distance: 100%;
-  }
-}
-@keyframes atom-travel-opposite {
-  from {
-    offset-distance: 50%;
-  }
-  to {
-    offset-distance: 150%;
+    transform: rotateZ(360deg);
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .atom-pixel {
+  .atom-spin {
     animation: none;
-    offset-distance: 15%;
+    transform: rotateZ(35deg);
   }
-  .atom-pixel-opposite {
-    offset-distance: 65%;
+}
+.mobile-nav-extra {
+  display: none;
+}
+.legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 12px;
+}
+.legal-links a:hover {
+  text-decoration: underline;
+}
+.legal-page {
+  max-width: 950px;
+  margin: auto;
+}
+.legal-page h1 {
+  font-size: clamp(40px, 7vw, 80px);
+}
+.legal-page section {
+  margin: 36px 0;
+}
+.legal-page h2 {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+.legal-page p {
+  line-height: 1.8;
+  max-width: 72ch;
+}
+.legal-page a {
+  text-decoration: underline;
+}
+@media (max-width: 760px) {
+  .mobile-nav-extra {
+    display: block;
+    margin-top: auto;
+    padding: 40px 15px 12px;
+  }
+  .mobile-nav-motto {
+    font-size: 26px;
+    line-height: 1.2;
+    margin: 15px 0 24px;
+  }
+  .mobile-nav-extra .whatsapp-contact {
+    margin-bottom: 24px;
+  }
+  .mobile-nav-extra .button {
+    padding: 14px 12px;
+    font-size: 12px;
   }
 }
