@@ -18,7 +18,7 @@ export default function About() {
         <span className="pixel-text">Bold by nature.</span>
       </h1>
       <div className="about-feature">
-        <Sculpture variant="diamond" interactive />
+        <Sculpture variant="diamond" interactive electrons />
         <div>
           <p className="eyebrow">DESIGNERS. DEVELOPERS. DETAIL PEOPLE.</p>
           <h2>
@@ -59,7 +59,7 @@ export default function About() {
         <div className="object-gallery">
           {(["frame", "steps", "cross"] as const).map((variant, i) => (
             <article key={variant}>
-              <Sculpture variant={variant} interactive />
+              <Sculpture variant={variant} interactive electrons />
               <div className="object-caption">
                 <h3>
                   {

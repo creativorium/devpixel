@@ -2989,3 +2989,66 @@ input:disabled {
     transform: scale(0.4);
   }
 }
+
+/* Pixel electrons follow the exact elliptical outlines around the studio objects. */
+.atom-orbits {
+  position: absolute;
+  inset: 8%;
+  pointer-events: none;
+}
+.atom-track {
+  position: absolute;
+  width: 90%;
+  height: 40%;
+  left: 5%;
+  top: 30%;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  transform: rotate(var(--orbit-angle));
+}
+.atom-pixel {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: var(--ink);
+  border: 1px solid var(--bg);
+  box-shadow:
+    inset -3px -3px 0 #888,
+    2px 2px 0 var(--line);
+  offset-path: ellipse(50% 50% at 50% 50%);
+  offset-distance: 0%;
+  animation: atom-travel var(--orbit-duration) linear infinite;
+  animation-delay: var(--orbit-delay);
+}
+.atom-pixel-opposite {
+  animation-name: atom-travel-opposite;
+}
+.sculpture-stage[data-paused="true"] .atom-pixel,
+.sculpture-stage[data-visible="false"] .atom-pixel {
+  animation-play-state: paused;
+}
+@keyframes atom-travel {
+  from {
+    offset-distance: 0%;
+  }
+  to {
+    offset-distance: 100%;
+  }
+}
+@keyframes atom-travel-opposite {
+  from {
+    offset-distance: 50%;
+  }
+  to {
+    offset-distance: 150%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .atom-pixel {
+    animation: none;
+    offset-distance: 15%;
+  }
+  .atom-pixel-opposite {
+    offset-distance: 65%;
+  }
+}

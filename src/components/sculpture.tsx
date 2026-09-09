@@ -56,10 +56,12 @@ export function Sculpture({
   variant = "core",
   interactive = false,
   companions = false,
+  electrons = false,
 }: {
   variant?: keyof typeof shapes;
   interactive?: boolean;
   companions?: boolean;
+  electrons?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
@@ -78,6 +80,7 @@ export function Sculpture({
     <div
       className={`sculpture-stage shape-${variant} ${expanded ? "is-expanded" : ""} ${companions ? "sculpture-constellation" : ""}`}
       ref={stage}
+      data-paused={paused}
       onPointerMove={(e) => {
         if (e.pointerType === "touch") return;
         const r = e.currentTarget.getBoundingClientRect();
@@ -97,7 +100,28 @@ export function Sculpture({
     >
       <div className="stage-cross cross-one">+</div>
       <div className="stage-cross cross-two">+</div>
-      <div className="stage-orbit" />
+      {electrons ? (
+        <div className="atom-orbits" aria-hidden="true">
+          {[-30, 35, 90].map((angle, index) => (
+            <div
+              className="atom-track"
+              key={angle}
+              style={
+                {
+                  "--orbit-angle": `${angle}deg`,
+                  "--orbit-duration": `${12 + index * 4}s`,
+                  "--orbit-delay": `${-index * 5}s`,
+                } as CSSProperties
+              }
+            >
+              <span className="atom-pixel" />
+              <span className="atom-pixel atom-pixel-opposite" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="stage-orbit" />
+      )}
       <div className="sculpture-shadow" />
       {companions &&
         (["frame", "cross"] as const).map((shape, index) => (
