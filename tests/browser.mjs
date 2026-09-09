@@ -100,10 +100,10 @@ await page
   .getByLabel("A little about your idea")
   .fill("A thoughtful new website for our studio.");
 await expect(page.getByRole("button", { name: "Send enquiry" })).toBeDisabled();
-await expect(page.locator('a[href="mailto:main@devnpixel.com"]')).toBeVisible();
+await expect(page.locator('a[href="mailto:code@devnpixel.com"]')).toBeVisible();
 await expect(
-  page.getByRole("button", { name: "WhatsApp", exact: true }),
-).toBeDisabled();
+  page.getByRole("link", { name: /Chat on WhatsApp/ }),
+).toHaveAttribute("href", /^https:\/\/wa.me\/6287760185018\?/);
 await page.goto(`${base}/invoice`);
 await page
   .getByLabel("Client / company", { exact: true })

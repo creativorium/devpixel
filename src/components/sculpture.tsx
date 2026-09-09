@@ -7,6 +7,24 @@ const lattice = Array.from({ length: 5 }, (_, x) =>
   ),
 ).flat(2);
 const shapes = {
+  dna: Array.from({ length: 25 }, (_, row) => {
+    const angle = (row * Math.PI) / 8;
+    const radius = 2.8;
+    const points = [-1, 1].map((side) => ({
+      x: 2 + Math.cos(angle) * radius * side,
+      y: 2 + (row - 12) * 0.65,
+      z: 2 + Math.sin(angle) * radius * side,
+    }));
+    if (row % 4 === 0) {
+      for (const step of [-0.6, -0.2, 0.2, 0.6])
+        points.push({
+          x: 2 + Math.cos(angle) * radius * step,
+          y: 2 + (row - 12) * 0.65,
+          z: 2 + Math.sin(angle) * radius * step,
+        });
+    }
+    return points;
+  }).flat(),
   core: lattice.filter(
     ({ x, y, z }) =>
       [x, y, z].filter((v) => v >= 1 && v <= 3).length >= 2 &&
@@ -27,6 +45,7 @@ const shapes = {
   ),
 };
 const labels = {
+  dna: "THE CREATIVE DNA",
   core: "THE BUILDING BLOCK",
   frame: "THE OPEN FRAME",
   steps: "THE NEXT STEP",
@@ -116,12 +135,35 @@ export function Sculpture({
           role="img"
           aria-label={`Three-dimensional pixel sculpture: ${labels[variant].toLowerCase()}`}
         >
-          {shapes[variant].map(({ x, y, z }) => (
+          {shapes[variant].map(({ x, y, z }, index) => (
             <div
               key={`${x}${y}${z}`}
               className="voxel"
               style={
-                { "--x": x - 2, "--y": y - 2, "--z": z - 2 } as CSSProperties
+                {
+                  "--x": x - 2,
+                  "--y": y - 2,
+                  "--z": z - 2,
+                  ...(variant === "dna" && expanded
+                    ? {
+                        "--x":
+                          Math.cos(index * 2.4) *
+                          Math.sqrt(
+                            1 -
+                              (1 - (2 * index) / (shapes.dna.length - 1)) ** 2,
+                          ) *
+                          6,
+                        "--y": (1 - (2 * index) / (shapes.dna.length - 1)) * 6,
+                        "--z":
+                          Math.sin(index * 2.4) *
+                          Math.sqrt(
+                            1 -
+                              (1 - (2 * index) / (shapes.dna.length - 1)) ** 2,
+                          ) *
+                          6,
+                      }
+                    : {}),
+                } as CSSProperties
               }
             >
               {["front", "back", "right", "left", "top", "bottom"].map(

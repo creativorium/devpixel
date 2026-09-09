@@ -19,28 +19,20 @@ export function useDarkTheme() {
 export function ThemeToggle() {
   const dark = useDarkTheme();
   useEffect(() => {
-    const media = matchMedia("(prefers-color-scheme: dark)");
     const sync = () => {
       let saved: string | null = null;
       try {
         saved = localStorage.getItem("devnpixel.theme");
       } catch {}
-      const value =
-        saved === "dark" || saved === "light"
-          ? saved
-          : media.matches
-            ? "dark"
-            : "light";
+      const value = saved === "dark" || saved === "light" ? saved : "light";
       document.documentElement.dataset.theme = value;
       document
         .querySelector('meta[name="theme-color"]')
-        ?.setAttribute("content", value === "dark" ? "#171717" : "#f5f5f0");
+        ?.setAttribute("content", value === "dark" ? "#171717" : "#ffffff");
     };
     sync();
-    media.addEventListener("change", sync);
     window.addEventListener("storage", sync);
     return () => {
-      media.removeEventListener("change", sync);
       window.removeEventListener("storage", sync);
     };
   }, []);
@@ -56,7 +48,7 @@ export function ThemeToggle() {
         document.documentElement.dataset.theme = theme;
         document
           .querySelector('meta[name="theme-color"]')
-          ?.setAttribute("content", dark ? "#f5f5f0" : "#171717");
+          ?.setAttribute("content", dark ? "#ffffff" : "#171717");
         try {
           localStorage.setItem("devnpixel.theme", theme);
         } catch {}

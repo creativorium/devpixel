@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image" },
 };
-export const viewport: Viewport = { themeColor: "#f5f5f0" };
+export const viewport: Viewport = { themeColor: "#ffffff" };
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -30,7 +30,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('devnpixel.theme');document.documentElement.dataset.theme=t==='dark'||t==='light'?t:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}catch(e){document.documentElement.dataset.theme='light'}})()`,
+            __html: `(function(){try{var t=localStorage.getItem('devnpixel.theme');document.documentElement.dataset.theme=t==='dark'||t==='light'?t:'light'}catch(e){document.documentElement.dataset.theme='light'}})()`,
           }}
         />
       </head>

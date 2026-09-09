@@ -5,7 +5,7 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Contact DevnPixel about your brand, website, or advertising campaign at main@devnpixel.com.",
+    "Contact DevnPixel about your brand, website, or advertising campaign at code@devnpixel.com.",
   alternates: { canonical: "/contact" },
 };
 export default function Contact() {

@@ -19,7 +19,7 @@ Open http://localhost:3000. For production locally, run `npm run build` followed
 - `src/lib/services.ts`: Brand strategy, Web design, Development, and Advertising descriptions, deliverables, processes, and FAQs. The former Digital Experiences URL redirects to Advertising.
 - `src/lib/voxel-desk.ts`: original desk geometry, monitor, creative tools, plants, and lamp. The supplied stock reference image is not included in this project.
 - `src/components/pixel-room-viewer.tsx`: fine-resolution homepage desk and interactive room preview. Homepage rendering pauses offscreen/in background tabs, reuses static shadows, and respects reduced motion.
-- `src/components/theme-toggle.tsx`: icon-only theme switch beside “Let’s talk”; remembers a browser preference and otherwise follows the system theme.
+- `src/components/theme-toggle.tsx`: icon-only theme switch beside “Let’s talk”; remembers a browser preference and otherwise defaults to white/light.
 - `src/app/page.tsx`, `src/app/about/page.tsx`: homepage and studio content.
 - `src/components/project-card.tsx`: original concept artwork; replace with your real projects.
 - `src/components/sculpture.tsx`: five CSS 3D voxel shapes with pointer tilt, pause, and assemble/explode controls.
@@ -29,7 +29,7 @@ The header remains visible while scrolling. The ticker spans the page and scroll
 
 ## Contact form and WhatsApp
 
-The destination is **main@devnpixel.com**. Direct email works through a mailto link; you need an active mailbox at that address to receive messages.
+The destination is **code@devnpixel.com**. Direct email works through a mailto link; you need an active mailbox at that address to receive messages.
 
 The form has a server-side Resend integration at `/api/contact`. It is deliberately disabled until both environment variables are supplied at build time. No live email delivery has been verified without those credentials. Unit tests mock the provider and never send real email.
 
@@ -41,13 +41,13 @@ To enable form delivery:
    - `RESEND_API_KEY`: the private sending key.
    - `CONTACT_FROM_EMAIL`: a verified sender, such as `DevnPixel <website@notify.devnpixel.com>`.
 4. Redeploy so the contact page enables its submit button. Keep these variables server-only; do not prefix them with `NEXT_PUBLIC_`.
-5. Send one genuine test enquiry and confirm arrival in `main@devnpixel.com`, including its spam folder. Provider acceptance is not a guarantee of inbox delivery.
+5. Send one genuine test enquiry and confirm arrival in `code@devnpixel.com`, including its spam folder. Provider acceptance is not a guarantee of inbox delivery.
 
 For local setup, copy `.env.example` to `.env.local` and fill values there. `.env.local` is ignored by Git. Never put real keys into `.env.example`, source files, chat messages, or commits.
 
 The endpoint has strict field validation, request-size limits, same-origin checks, a honeypot, timeouts, a fixed recipient, and plain-text messages. Visitor addresses are used only for Reply-To. It does not expose provider errors or log enquiry contents. Its bounded in-memory throttle allows five attempts per IP per 15 minutes **per server instance**; it is not a distributed bot defence. Before enabling the public form, add an edge-wide rule for POST `/api/contact` in the Vercel Firewall and monitor provider quotas and abuse.
 
-WhatsApp appears as a disabled placeholder until `site.whatsappNumber` is set. Use international digits only, with country code, without `+`, spaces, or a leading local zero. Once configured, the component links to `wa.me` in a new tab; it does not send messages automatically.
+WhatsApp is configured for +62 877-6018-5018 in `site.whatsappNumber`. Use international digits only, with country code, without `+`, spaces, or a leading local zero. Once configured, the component links to `wa.me` in a new tab; it does not send messages automatically.
 
 ## Invoice tool
 

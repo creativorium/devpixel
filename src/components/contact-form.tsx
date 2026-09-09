@@ -33,12 +33,12 @@ export function ContactForm({ enabled = false }: { enabled?: boolean }) {
           setStatus(
             typeof result.message === "string"
               ? result.message
-              : "Something went wrong. Please email main@devnpixel.com.",
+              : "Something went wrong. Please email code@devnpixel.com.",
           );
           if (response.ok) form.reset();
         } catch {
           setStatus(
-            "We could not confirm submission. Please email main@devnpixel.com directly.",
+            "We could not confirm submission. Please email code@devnpixel.com directly.",
           );
         } finally {
           setSending(false);
@@ -119,7 +119,7 @@ export function ContactForm({ enabled = false }: { enabled?: boolean }) {
         {status ||
           (enabled
             ? "We’ll use your details to respond to your enquiry."
-            : "The form is being connected. Please email main@devnpixel.com directly for now.")}
+            : "The form is being connected. Please email code@devnpixel.com directly for now.")}
       </p>
     </form>
   );

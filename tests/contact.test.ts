@@ -87,7 +87,7 @@ test("email delivery uses a fixed recipient and only confirms provider acceptanc
       calls++;
       assert.equal(String(url), "https://api.resend.com/emails");
       const payload = JSON.parse(String(options?.body));
-      assert.deepEqual(payload.to, ["main@devnpixel.com"]);
+      assert.deepEqual(payload.to, ["code@devnpixel.com"]);
       assert.equal(payload.reply_to, valid.email);
       assert.ok(payload.text.includes(valid.message));
       assert.equal(payload.html, undefined);

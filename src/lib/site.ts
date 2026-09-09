@@ -3,9 +3,9 @@ export const site = {
   url: "https://devnpixel.com",
   description:
     "Independent creative studio crafting distinctive brands, thoughtful websites, and advertising campaigns. Built with purpose. Down to the pixel.",
-  email: "main@devnpixel.com",
+  email: "code@devnpixel.com",
   // International digits only, without +, spaces, or a leading local zero.
-  whatsappNumber: "",
+  whatsappNumber: "6287760185018",
 };
 export const projects = [
   {

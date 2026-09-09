@@ -106,7 +106,7 @@ export async function POST(request: Request) {
   const from = process.env.CONTACT_FROM_EMAIL;
   if (!key || !from)
     return reply(
-      "The contact form is not connected yet. Please email main@devnpixel.com directly.",
+      "The contact form is not connected yet. Please email code@devnpixel.com directly.",
       503,
     );
   try {
@@ -128,13 +128,13 @@ export async function POST(request: Request) {
     });
     if (!response.ok)
       return reply(
-        "We could not send your enquiry. Please try again later or email main@devnpixel.com.",
+        "We could not send your enquiry. Please try again later or email code@devnpixel.com.",
         502,
       );
     const result = await response.json();
     if (typeof result?.id !== "string")
       return reply(
-        "We could not confirm submission. Please email main@devnpixel.com.",
+        "We could not confirm submission. Please email code@devnpixel.com.",
         502,
       );
     return reply(
@@ -143,7 +143,7 @@ export async function POST(request: Request) {
     );
   } catch {
     return reply(
-      "We could not send your enquiry. Please try again later or email main@devnpixel.com.",
+      "We could not send your enquiry. Please try again later or email code@devnpixel.com.",
       502,
     );
   }
