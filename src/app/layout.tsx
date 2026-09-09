@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "@fontsource-variable/space-grotesk";
 import "@fontsource/press-start-2p/latin-400.css";
 import "./globals.css";
@@ -41,6 +42,16 @@ export default function RootLayout({
         <Navigation />
         {children}
         <Footer />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-RELL4WL624"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-RELL4WL624');`}
+        </Script>
       </body>
     </html>
   );

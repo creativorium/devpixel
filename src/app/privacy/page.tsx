@@ -62,9 +62,17 @@ export default function Privacy() {
           invoice tool saves its draft locally in that browser; its invoice
           content is not submitted to us by the tool. Exports and printed copies
           are under your control. You can remove saved preferences and drafts by
-          clearing this site’s browser data. The site code does not include
-          advertising trackers or analytics cookies; hosting services may
-          process operational logs independently.
+          clearing this site’s browser data. We use Google Analytics to
+          understand visits and interactions, including pages viewed, referral
+          sources, and browser and device information. Google Analytics uses
+          cookies and processes usage data on Google’s infrastructure. We do not
+          deliberately send enquiry text or invoice contents to Analytics.
+          Hosting services may also process operational logs independently.
+          Learn more about Google’s data use at{" "}
+          <a href="https://policies.google.com/technologies/partner-sites">
+            Google’s partner-site privacy information
+          </a>
+          .
         </p>
       </section>
       <section>
