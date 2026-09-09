@@ -36,8 +36,8 @@ The form has a server-side Resend integration at `/api/contact`. It is deliberat
 To enable form delivery:
 
 1. Create a Resend account. Verify a sending domain (a subdomain such as `notify.devnpixel.com` keeps sending records separate from your existing mailbox).
-2. Add only the DNS records Resend supplies to Hostinger. Preserve the existing mailbox MX, SPF, DKIM, and DMARC records. Do not replace the receiving mail configuration.
-3. Create a sending API key and add these in **Vercel → Project → Settings → Environment Variables**:
+2. Add Resend's sending DNS records at your authoritative DNS provider (Vercel if your DNS is hosted there; otherwise your current DNS host). Keep Google Workspace's root-domain MX records and existing mailbox SPF, DKIM, and DMARC records. Leave Resend receiving disabled. Resend may request an MX record on a separate sending/return-path subdomain; that is separate from Google's root-domain inbox routing.
+3. In Resend's API Keys dashboard, create a **Sending access** key scoped to `notify.devnpixel.com`, then add these in **Vercel → Project → Settings → Environment Variables** for **Production** (and Preview only if you want preview deployments to send):
    - `RESEND_API_KEY`: the private sending key.
    - `CONTACT_FROM_EMAIL`: a verified sender, such as `DevnPixel <website@notify.devnpixel.com>`.
 4. Redeploy so the contact page enables its submit button. Keep these variables server-only; do not prefix them with `NEXT_PUBLIC_`.
