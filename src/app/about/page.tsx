@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Sculpture } from "@/components/sculpture";
+import { PixelRoomLoader } from "@/components/pixel-room-loader";
 import { services } from "@/lib/services";
 export const metadata: Metadata = {
   title: "The studio",
@@ -18,7 +19,7 @@ export default function About() {
         <span className="pixel-text">Bold by nature.</span>
       </h1>
       <div className="about-feature">
-        <Sculpture variant="diamond" interactive electrons />
+        <PixelRoomLoader hero />
         <div>
           <p className="eyebrow">DESIGNERS. DEVELOPERS. DETAIL PEOPLE.</p>
           <h2>

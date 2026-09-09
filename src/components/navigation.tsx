@@ -83,6 +83,9 @@ export function Navigation() {
             Let’s talk <span>↗</span>
           </Link>
         </div>
+        <div className="mobile-nav-logo">
+          <PixelMark />
+        </div>
         <div className="mobile-nav-extra">
           <p className="eyebrow">INDEPENDENT MINDS.</p>
           <p className="mobile-nav-motto">

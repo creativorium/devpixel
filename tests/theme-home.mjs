@@ -9,7 +9,7 @@ try {
   });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("http://localhost:3000");
+  await page.goto("http://localhost:3000/about");
   await expect(page.locator(".hero-room .room-canvas")).toHaveAttribute(
     "aria-busy",
     "false",
@@ -86,7 +86,7 @@ try {
       route,
     );
   }
-  await page.goto("http://localhost:3000");
+  await page.goto("http://localhost:3000/about");
   await page.screenshot({
     path: "test-results/home-dark-mobile.png",
     fullPage: true,

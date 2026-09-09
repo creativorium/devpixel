@@ -3135,3 +3135,35 @@ input:disabled {
     font-size: 12px;
   }
 }
+
+.mobile-nav-logo {
+  display: none;
+}
+@media (max-width: 760px) {
+  .mobile-nav-logo {
+    display: grid;
+    place-items: center;
+    flex: 1 0 150px;
+    padding: 24px;
+    color: var(--ink);
+  }
+  .mobile-nav-logo svg {
+    width: 120px;
+    height: 120px;
+  }
+  .mobile-nav-extra {
+    margin-top: 0;
+    padding-top: 12px;
+  }
+  .mobile-nav-motto {
+    font: inherit;
+    font-size: 12px;
+    line-height: 1.6;
+    margin: 10px 0 18px;
+  }
+  .mobile-nav-extra .eyebrow {
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 0;
+  }
+}

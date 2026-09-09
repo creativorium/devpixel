@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PixelRoomLoader } from "@/components/pixel-room-loader";
+import { Sculpture } from "@/components/sculpture";
 import { ProjectCard } from "@/components/project-card";
 import { PixelMark } from "@/components/brand";
 import { projects } from "@/lib/site";
@@ -39,7 +39,7 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <PixelRoomLoader hero />
+          <Sculpture variant="diamond" interactive electrons />
         </div>
         <div className="hero-bottom">
           <span>DESIGN WITH INTENT. BUILD WITH PRECISION.</span>
