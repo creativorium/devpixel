@@ -148,8 +148,21 @@ export function Sculpture({
                 }
               >
                 <div className="atom-spin">
-                  <span className="atom-pixel" />
-                  <span className="atom-pixel atom-pixel-opposite" />
+                  {[false, true].map((opposite) => (
+                    <span
+                      key={String(opposite)}
+                      className={`atom-pixel ${opposite ? "atom-pixel-opposite" : ""}`}
+                    >
+                      {["front", "back", "left", "right", "top", "bottom"].map(
+                        (face) => (
+                          <i
+                            key={face}
+                            className={`electron-face electron-${face}`}
+                          />
+                        ),
+                      )}
+                    </span>
+                  ))}
                 </div>
               </div>
             ))}

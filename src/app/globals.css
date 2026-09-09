@@ -3023,14 +3023,40 @@ input:disabled {
   position: absolute;
   left: 100%;
   top: 50%;
-  width: 15px;
-  height: 15px;
-  background: var(--ink);
-  border: 1px solid var(--bg);
-  box-shadow:
-    inset -4px -4px 0 #888,
-    2px 2px 0 var(--line);
-  transform: translate(-50%, -50%) rotateX(-65deg);
+  width: 18px;
+  height: 18px;
+  transform-style: preserve-3d;
+  transform: translate(-50%, -50%) rotateX(-25deg) rotateY(30deg);
+}
+.electron-face {
+  position: absolute;
+  inset: 0;
+  border: 1px solid #555;
+  backface-visibility: hidden;
+}
+.electron-front {
+  transform: translateZ(9px);
+  background: #777;
+}
+.electron-back {
+  transform: rotateY(180deg) translateZ(9px);
+  background: #666;
+}
+.electron-left {
+  transform: rotateY(-90deg) translateZ(9px);
+  background: #aaa;
+}
+.electron-right {
+  transform: rotateY(90deg) translateZ(9px);
+  background: #333;
+}
+.electron-top {
+  transform: rotateX(90deg) translateZ(9px);
+  background: #eee;
+}
+.electron-bottom {
+  transform: rotateX(-90deg) translateZ(9px);
+  background: #444;
 }
 .atom-pixel-opposite {
   left: 0;
@@ -3064,6 +3090,10 @@ input:disabled {
 }
 .legal-links a:hover {
   text-decoration: underline;
+}
+.footer-bottom .legal-links {
+  font: inherit;
+  letter-spacing: inherit;
 }
 .legal-page {
   max-width: 950px;
