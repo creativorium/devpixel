@@ -58,7 +58,7 @@ async function boundedBody(request: Request) {
   return JSON.parse(Buffer.concat(chunks).toString("utf8"));
 }
 export async function POST(request: Request) {
-  const origins = new Set([site.url, "https://www.devnpixel.com"]);
+  const origins = new Set([site.url, "https://devnpixel.com"]);
   for (const host of [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL])
     if (host) origins.add(`https://${host}`);
   if (!process.env.VERCEL) {

@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "test:browser": "node tests/browser.mjs",
     "test:room": "node tests/room.mjs",
-    "test:theme": "node tests/theme-home.mjs"
+    "test:theme": "node tests/theme-home.mjs",
+    "test:seo": "node tests/seo.mjs"
   },
   "dependencies": {
     "@fontsource-variable/space-grotesk": "5.3.0",

@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { services } from "@/lib/services";
 import { Sculpture } from "@/components/sculpture";
-export const metadata: Metadata = {
-  title: "Services",
-  description:
-    "Brand strategy, web design, development, and advertising creative from DevnPixel.",
-  alternates: { canonical: "/services" },
-};
+export const metadata = pageMetadata(
+  "Web Design, Development & Branding Services",
+  "Focused web design, custom development, brand strategy and advertising creative for small businesses in Bali, Australia, the US and Singapore.",
+  "/services",
+);
 export default function Services() {
   return (
     <main id="main" className="section inner-page">

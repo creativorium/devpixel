@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { ContactForm } from "@/components/contact-form";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { site } from "@/lib/site";
-export const metadata: Metadata = {
-  title: "Contact",
-  description:
-    "Contact DevnPixel about your brand, website, or advertising campaign at code@devnpixel.com.",
-  alternates: { canonical: "/contact" },
-};
+export const metadata = pageMetadata(
+  "Discuss Your Web Design or Development Project",
+  "Contact DevnPixel for web design, development and branding. Share your brief and budget for a small-business website in Bali or an international market.",
+  "/contact",
+);
 export default function Contact() {
   return (
     <main id="main" className="section inner-page">

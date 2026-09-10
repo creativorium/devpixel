@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { projects } from "@/lib/site";
 import { WorkGrid } from "@/components/work-grid";
 import { Sculpture } from "@/components/sculpture";
-export const metadata: Metadata = {
-  title: "Work",
-  description:
-    "Explore brand identity, web experience, and digital product concepts by DevnPixel.",
-  alternates: { canonical: "/work" },
-};
+export const metadata = pageMetadata(
+  "Web Design & Branding Portfolio Concepts",
+  "Explore DevnPixel web design, brand identity and digital product concepts. An independent studio focused on thoughtful design and purposeful development.",
+  "/work",
+);
 export default function Work() {
   return (
     <main id="main" className="section inner-page">

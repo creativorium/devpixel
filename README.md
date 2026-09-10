@@ -1,6 +1,6 @@
 ﻿# DevnPixel
 
-A monochrome agency website built with Next.js, React, TypeScript, and Three.js. The homepage features an original voxel desk with a slow automatic orbit and a lamp that follows the website theme. All fonts are served locally.
+A monochrome agency website built with Next.js, React, TypeScript, and Three.js. The homepage features a pixel atom sculpture; the Studio page has an original voxel desk with a lamp that follows the website theme. All fonts are served locally.
 
 ## Local development
 
@@ -73,7 +73,7 @@ Repository: https://github.com/creativorium/devpixel
 2. Use the repository root, the detected **Next.js** preset, and Node.js 22.x. Default build command: `npm run build`. No custom output directory is needed.
 3. Add the two email environment variables when ready. The website deploys without them, but form submission stays disabled.
 4. Deploy and review the generated `vercel.app` address.
-5. In **Project → Settings → Domains**, add `devnpixel.com` and `www.devnpixel.com`. Redirect `www` to the apex domain, matching the canonical URLs in the code.
+5. In **Project → Settings → Domains**, add `devnpixel.com` and `www.devnpixel.com`. Keep the apex domain redirecting to `www.devnpixel.com`, matching the live deployment and canonical URLs in the code.
 6. In **Hostinger → Domains → devnpixel.com → DNS / Nameservers**, update only the website records with the exact values Vercel displays: typically the apex (`@`) A record and `www` CNAME. Remove conflicting records for those same website hostnames when replacing them. Keep Hostinger nameservers and all email records. No domain transfer is necessary.
 7. Wait for Vercel to report a valid configuration and issue HTTPS. Verify both domain variants, all main pages, and email delivery after email setup.
 
@@ -106,3 +106,7 @@ npm run test:theme
 ```
 
 Tests cover navigation, mobile layouts, themes, WebGL controls/fallback, invoice math/persistence/import/export, contact validation and mocked email delivery. Browser outputs go in ignored `test-results/`. `npm run format` formats the source.
+
+## Search and journal
+
+See [SEO.md](SEO.md) for the keyword map, Search Console checklist, favicon setup, and project-credit guidance. The five initial articles live in `src/lib/posts.ts` and render statically at `/blog`. Run `npm run test:seo` against a running production server; override `TEST_BASE_URL` for a different address.

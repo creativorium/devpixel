@@ -3,6 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { services } from "@/lib/services";
 import { Sculpture } from "@/components/sculpture";
+import { pageMetadata } from "@/lib/seo";
+import { StructuredData } from "@/components/structured-data";
+import { site } from "@/lib/site";
 export function generateStaticParams() {
   return services.map((s) => ({ slug: s.slug }));
 }
@@ -13,11 +16,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const s = services.find((s) => s.slug === slug);
-  return {
-    title: s?.name ?? "Service not found",
-    description: s?.description,
-    alternates: { canonical: `/services/${slug}` },
-  };
+  if (!s) notFound();
+  return pageMetadata(
+    s.name === "Development"
+      ? "Web Development for Small Businesses"
+      : `${s.name} Services`,
+    s.description,
+    `/services/${slug}`,
+  );
 }
 export default async function Service({
   params,
@@ -29,6 +35,22 @@ export default async function Service({
   if (!service) notFound();
   return (
     <main id="main" className="section inner-page service-page">
+      <StructuredData
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Service",
+          name: service.name,
+          description: service.description,
+          url: `${site.url}/services/${slug}`,
+          provider: { "@id": `${site.url}/#organization` },
+          areaServed: [
+            "Bali, Indonesia",
+            "Australia",
+            "United States",
+            "Singapore",
+          ],
+        }}
+      />
       <Link href="/services" className="text-link">
         ← All services
       </Link>

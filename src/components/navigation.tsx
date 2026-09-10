@@ -58,6 +58,7 @@ export function Navigation() {
           ["/work", "Work"],
           ["/about", "Studio"],
           ["/services", "Services"],
+          ["/blog", "Journal"],
         ].map(([href, label]) => (
           <Link
             key={href}

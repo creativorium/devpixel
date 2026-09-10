@@ -1,8 +1,8 @@
 export const site = {
   name: "DevnPixel",
-  url: "https://devnpixel.com",
+  url: "https://www.devnpixel.com",
   description:
-    "Independent creative studio crafting distinctive brands, thoughtful websites, and advertising campaigns. Built with purpose. Down to the pixel.",
+    "Independent web design and development studio for small businesses in Bali, Australia, the US and Singapore. Thoughtful branding and websites with a focused scope.",
   email: "code@devnpixel.com",
   // International digits only, without +, spaces, or a leading local zero.
   whatsappNumber: "6287760185018",

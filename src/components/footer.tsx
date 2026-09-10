@@ -21,6 +21,7 @@ export function Footer() {
         <span>© {new Date().getFullYear()} DevnPixel</span>
         <span>INDEPENDENT MINDS. INTENTIONAL PIXELS.</span>
         <Link href="/services">Our services ↗</Link>
+        <Link href="/blog">Journal ↗</Link>
         <a href="#top">Back to top ↑</a>
       </div>
     </footer>

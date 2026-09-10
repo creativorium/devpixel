@@ -5,6 +5,7 @@ import "./globals.css";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { site } from "@/lib/site";
+import { StructuredData } from "@/components/structured-data";
 const sans = localFont({
   src: "../../node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2",
   variable: "--font-sans",
@@ -23,14 +24,18 @@ const pixel = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: "DevnPixel — Digital craft. Pixel by pixel.",
+    default: "Independent Web Design & Development Studio | DevnPixel",
     template: "%s — DevnPixel",
   },
   description: site.description,
+  icons: {
+    icon: [{ url: "/favicon.png", sizes: "96x96", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
   openGraph: {
     type: "website",
     siteName: site.name,
-    title: "DevnPixel — Digital craft. Pixel by pixel.",
+    title: "Independent Web Design & Development Studio | DevnPixel",
     description: site.description,
     images: ["/opengraph-image"],
   },
@@ -58,6 +63,42 @@ export default function RootLayout({
           Skip to content
         </a>
         <Navigation />
+        <StructuredData
+          data={{
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "Organization",
+                "@id": `${site.url}/#organization`,
+                name: site.name,
+                url: site.url,
+                logo: {
+                  "@type": "ImageObject",
+                  url: `${site.url}/logo.png`,
+                  width: 512,
+                  height: 512,
+                },
+                description: site.description,
+                email: site.email,
+                telephone: "+6287760185018",
+                areaServed: [
+                  "Bali, Indonesia",
+                  "Australia",
+                  "United States",
+                  "Singapore",
+                ],
+              },
+              {
+                "@type": "WebSite",
+                "@id": `${site.url}/#website`,
+                url: site.url,
+                name: site.name,
+                publisher: { "@id": `${site.url}/#organization` },
+                inLanguage: "en",
+              },
+            ],
+          }}
+        />
         {children}
         <Footer />
         <Script

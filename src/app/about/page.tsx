@@ -1,14 +1,13 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { Sculpture } from "@/components/sculpture";
 import { PixelRoomLoader } from "@/components/pixel-room-loader";
 import { services } from "@/lib/services";
-export const metadata: Metadata = {
-  title: "The studio",
-  description:
-    "Meet DevnPixel, an independent studio connecting thoughtful design and purposeful development.",
-  alternates: { canonical: "/about" },
-};
+export const metadata = pageMetadata(
+  "Independent Web Design Studio & Freelance Collaboration",
+  "Meet DevnPixel, an independent studio offering web design, development and branding for small businesses in Bali and international markets.",
+  "/about",
+);
 export default function About() {
   return (
     <main id="main" className="section inner-page">

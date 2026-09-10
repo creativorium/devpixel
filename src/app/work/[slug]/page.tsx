@@ -3,6 +3,7 @@ import Link from "next/link";
 import { projects } from "@/lib/site";
 import { ProjectArt } from "@/components/project-card";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 export function generateStaticParams() {
   return projects.map((p) => ({ slug: p.slug }));
 }
@@ -13,11 +14,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const p = projects.find((p) => p.slug === slug);
-  return {
-    title: p?.name ?? "Project not found",
-    description: p?.description,
-    alternates: { canonical: `/work/${slug}` },
-  };
+  if (!p) notFound();
+  return pageMetadata(
+    `${p.name} — ${p.category} Concept`,
+    p.description,
+    `/work/${slug}`,
+  );
 }
 export default async function Project({
   params,
