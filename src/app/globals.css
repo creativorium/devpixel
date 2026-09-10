@@ -3365,6 +3365,11 @@ input:disabled {
   line-height: 1.8;
   margin-bottom: 28px;
 }
+@media (min-width: 761px) {
+  .studio-details {
+    padding-top: clamp(150px, 10vw, 170px);
+  }
+}
 .studio-details .service-list > a {
   align-items: flex-start;
   gap: 24px;
