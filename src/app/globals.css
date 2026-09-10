@@ -3295,11 +3295,28 @@ input:disabled {
 }
 .market-section {
   border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 40px;
 }
-.market-section > p:not(.eyebrow) {
+.market-copy > p:not(.eyebrow) {
   max-width: 780px;
   line-height: 1.8;
   margin: 24px 0;
+}
+.market-section > .sculpture-stage {
+  height: 430px;
+  min-width: 0;
+}
+@media (max-width: 760px) {
+  .market-section {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .market-section > .sculpture-stage {
+    height: 320px;
+  }
 }
 .home-articles {
   display: grid;

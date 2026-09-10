@@ -114,26 +114,29 @@ export default function Home() {
         </div>
       </section>
       <section className="section market-section">
-        <p className="eyebrow">SMALL STUDIO / INTERNATIONAL PERSPECTIVE</p>
-        <h2>
-          Web design for Bali.
-          <br />
-          Built to reach beyond.
-        </h2>
-        <p>
-          We offer web design, development, and branding for small businesses
-          targeting Bali, Australia, the United States, and Singapore. Work
-          directly with an independent studio through a clear remote process,
-          from the first brief to launch.
-        </p>
-        <p>
-          Looking for affordable web design or a freelance web development
-          partner? Start with a focused scope: the right pages, useful content,
-          and a reliable way for customers to contact you.
-        </p>
-        <Link className="text-link" href="/services">
-          Find the right service ↗
-        </Link>
+        <div className="market-copy">
+          <p className="eyebrow">SMALL STUDIO / INTERNATIONAL PERSPECTIVE</p>
+          <h2>
+            Web design for Bali.
+            <br />
+            Built to reach beyond.
+          </h2>
+          <p>
+            We offer web design, development, and branding for small businesses
+            targeting Bali, Australia, the United States, and Singapore. Work
+            directly with an independent studio through a clear remote process,
+            from the first brief to launch.
+          </p>
+          <p>
+            Looking for affordable web design or a freelance web development
+            partner? Start with a focused scope: the right pages, useful
+            content, and a reliable way for customers to contact you.
+          </p>
+          <Link className="text-link" href="/services">
+            Find the right service ↗
+          </Link>
+        </div>
+        <Sculpture variant="frame" />
       </section>
       <section className="section">
         <div className="section-heading">
