@@ -3346,3 +3346,71 @@ input:disabled {
     padding: 20px;
   }
 }
+
+/* The studio introduction stays alongside the services, within this section. */
+.studio-section {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+  gap: clamp(40px, 6vw, 100px);
+  align-items: start;
+}
+.studio-heading {
+  align-self: start;
+}
+.studio-heading .studio-mark {
+  margin-top: 28px;
+  width: 80px;
+  height: 80px;
+}
+.studio-details > p {
+  line-height: 1.8;
+  margin-bottom: 28px;
+}
+.studio-details .service-list > a {
+  align-items: flex-start;
+  gap: 24px;
+  padding: 28px 0;
+}
+.studio-details .service-list strong {
+  font-size: 20px;
+  font-weight: 500;
+}
+.studio-details .service-list p {
+  margin: 12px 0 0;
+  line-height: 1.8;
+}
+@media (min-width: 761px) and (min-height: 700px) {
+  .studio-heading {
+    position: sticky;
+    top: 130px;
+  }
+}
+@media (max-width: 760px) {
+  .studio-section {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .studio-section > .studio-heading {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 22px;
+  }
+  .studio-heading .eyebrow {
+    grid-column: 1 / -1;
+  }
+  .studio-heading h2 {
+    grid-column: 1;
+  }
+  .studio-heading .studio-mark {
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    align-self: start;
+  }
+}
+
+@media (max-width: 760px) {
+ .studio-section { grid-template-columns: minmax(0, 1fr); }
+ .studio-section > .studio-heading { grid-template-columns: minmax(0, 1fr) 36px; }
+ .studio-heading, .studio-details { min-width: 0; }
+ .studio-heading h2 { overflow-wrap: anywhere; }
+}

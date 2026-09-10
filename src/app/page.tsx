@@ -83,11 +83,8 @@ export default function Home() {
         </div>
       </section>
       <section className="studio-section section">
-        <div>
+        <div className="studio-heading">
           <p className="eyebrow">02 / SMALL STUDIO. BIG PICTURE.</p>
-          <PixelMark className="studio-mark" />
-        </div>
-        <div>
           <h2>
             Good design is in the details.
             <br />
@@ -95,6 +92,9 @@ export default function Home() {
             <br />
             them <span className="serif">all together.</span>
           </h2>
+          <PixelMark className="studio-mark" />
+        </div>
+        <div className="studio-details">
           <p>
             We’re a digital studio at the intersection of design and
             development. From the first sketch to the final line of code, we
@@ -106,8 +106,11 @@ export default function Home() {
           <div className="service-list">
             {services.map((s) => (
               <Link href={`/services/${s.slug}`} key={s.slug}>
-                {s.name}
-                <span>↗</span>
+                <div>
+                  <strong>{s.name}</strong>
+                  <p>{s.description}</p>
+                </div>
+                <span aria-hidden="true">↗</span>
               </Link>
             ))}
           </div>
