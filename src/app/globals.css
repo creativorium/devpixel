@@ -3414,8 +3414,113 @@ input:disabled {
 }
 
 @media (max-width: 760px) {
- .studio-section { grid-template-columns: minmax(0, 1fr); }
- .studio-section > .studio-heading { grid-template-columns: minmax(0, 1fr) 36px; }
- .studio-heading, .studio-details { min-width: 0; }
- .studio-heading h2 { overflow-wrap: anywhere; }
+  .studio-section {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .studio-section > .studio-heading {
+    grid-template-columns: minmax(0, 1fr) 36px;
+  }
+  .studio-heading,
+  .studio-details {
+    min-width: 0;
+  }
+  .studio-heading h2 {
+    overflow-wrap: anywhere;
+  }
+}
+
+.mobile-nav-brand {
+  display: none;
+}
+@media (max-width: 760px) {
+  .mobile-nav-brand {
+    display: block;
+    padding: 8px 15px 24px;
+    margin-bottom: clamp(24px, 8dvh, 80px);
+    border-bottom: 1px solid var(--line);
+  }
+  .mobile-nav-brand a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink);
+    font-size: 25px;
+    font-weight: 650;
+    letter-spacing: -1.2px;
+  }
+  .mobile-nav-brand svg {
+    width: 28px;
+    height: 28px;
+    flex: none;
+  }
+  .mobile-nav-extra {
+    margin-top: auto;
+    padding-top: 32px;
+  }
+  body:has(.nav.open) .cookie-widget {
+    visibility: hidden;
+  }
+}
+.cookie-widget {
+  position: fixed;
+  left: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 40;
+  width: min(330px, calc(100vw - 32px));
+}
+.cookie-panel {
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  box-shadow: 4px 4px 0 #0002;
+  padding: 16px;
+}
+.cookie-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.cookie-heading h2 {
+  font: 500 15px var(--sans);
+  letter-spacing: 0;
+  margin: 0;
+}
+.cookie-heading > button {
+  background: transparent;
+  color: var(--ink);
+  border: 0;
+  min-width: 32px;
+  min-height: 32px;
+  font-size: 20px;
+}
+.cookie-panel p {
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 10px 0 14px;
+}
+.cookie-panel a {
+  text-decoration: underline;
+}
+.cookie-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.cookie-actions button,
+.cookie-settings {
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: var(--bg);
+  font: 12px var(--sans);
+  padding: 10px;
+  min-height: 40px;
+}
+.cookie-actions button:hover,
+.cookie-settings:hover {
+  border-color: var(--ink);
+}
+.cookie-settings {
+  box-shadow: 2px 2px 0 #0001;
+  font-size: 11px;
 }

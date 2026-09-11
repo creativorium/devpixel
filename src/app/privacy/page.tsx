@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function Privacy() {
   return (
     <main id="main" className="section inner-page legal-page">
-      <p className="eyebrow">THE DETAILS / UPDATED 9 SEPTEMBER 2026</p>
+      <p className="eyebrow">THE DETAILS / UPDATED 10 SEPTEMBER 2026</p>
       <h1>
         Privacy <span className="pixel-text">policy.</span>
       </h1>
@@ -55,24 +55,41 @@ export default function Privacy() {
           where required by law.
         </p>
       </section>
-      <section>
-        <h2>04 / Browser storage</h2>
+      <section id="cookies">
+        <h2>04 / Cookies and browser storage</h2>
         <p>
           The website saves your light or dark theme choice in your browser. The
           invoice tool saves its draft locally in that browser; its invoice
           content is not submitted to us by the tool. Exports and printed copies
           are under your control. You can remove saved preferences and drafts by
-          clearing this site’s browser data. We use Google Analytics to
-          understand visits and interactions, including pages viewed, referral
-          sources, and browser and device information. Google Analytics uses
-          cookies and processes usage data on Google’s infrastructure. We do not
-          deliberately send enquiry text or invoice contents to Analytics.
-          Hosting services may also process operational logs independently.
-          Learn more about Google’s data use at{" "}
+          clearing this site’s browser data. With your permission, we use Google
+          Analytics to understand visits and interactions, including pages
+          viewed, referral sources, and browser and device information. Google
+          Analytics uses cookies and processes usage data on Google’s
+          infrastructure. We do not deliberately send enquiry text or invoice
+          contents to Analytics. Hosting services may also process operational
+          logs independently. Learn more about Google’s data use at{" "}
           <a href="https://policies.google.com/technologies/partner-sites">
             Google’s partner-site privacy information
           </a>
           .
+        </p>
+        <p>
+          Analytics is off until you choose “Accept analytics.” Choose
+          “Essential only” to continue without it. You can reopen “Cookie
+          settings” at the bottom left to change your choice. Withdrawing
+          permission stops analytics, removes accessible Google Analytics
+          cookies for this site, and reloads the page to stop the previously
+          loaded tag. It does not undo information already collected.
+        </p>
+        <p>
+          We remember your cookie choice in local storage for up to 180 days,
+          then ask again. Google Analytics may set cookies named _ga and
+          _ga_RELL4WL624 to distinguish visitors and sessions; their configured
+          lifespan can be up to two years. Advertising storage and advertising
+          personalisation are disabled in our tag configuration. Your theme
+          choice and locally saved invoice draft remain separate from analytics
+          permission.
         </p>
       </section>
       <section>

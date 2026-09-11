@@ -110,3 +110,5 @@ Tests cover navigation, mobile layouts, themes, WebGL controls/fallback, invoice
 ## Search and journal
 
 See [SEO.md](SEO.md) for the keyword map, Search Console checklist, favicon setup, and project-credit guidance. The five initial articles live in `src/lib/posts.ts` and render statically at `/blog`. Run `npm run test:seo` against a running production server; override `TEST_BASE_URL` for a different address.
+
+Analytics loads only after acceptance through the compact cookie panel. Choices are stored for 180 days. Cookie settings allow visitors to withdraw permission; this clears accessible GA cookies and reloads to stop the tag. Run `node tests/consent.mjs` against a local production server (or set `TEST_BASE_URL`) to verify consent with a mocked Google tag.

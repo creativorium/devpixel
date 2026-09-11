@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
+import { CookieConsent } from "@/components/cookie-consent";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Navigation } from "@/components/navigation";
@@ -101,16 +101,7 @@ export default function RootLayout({
         />
         {children}
         <Footer />
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-RELL4WL624"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-RELL4WL624');`}
-        </Script>
+        <CookieConsent />
       </body>
     </html>
   );

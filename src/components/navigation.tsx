@@ -53,6 +53,16 @@ export function Navigation() {
         className={open ? "nav open" : "nav"}
         aria-label="Main navigation"
       >
+        <div className="mobile-nav-brand">
+          <Link
+            href="/"
+            onClick={() => setOpen(false)}
+            aria-label="DevnPixel home"
+          >
+            <PixelMark />
+            <span>devnpixel</span>
+          </Link>
+        </div>
         {[
           ["/", "Home"],
           ["/work", "Work"],
@@ -83,9 +93,6 @@ export function Navigation() {
           >
             Let’s talk <span>↗</span>
           </Link>
-        </div>
-        <div className="mobile-nav-logo">
-          <PixelMark />
         </div>
         <div className="mobile-nav-extra">
           <p className="eyebrow">INDEPENDENT MINDS.</p>
