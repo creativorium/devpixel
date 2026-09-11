@@ -2587,8 +2587,8 @@ html {
 html[data-theme="dark"] {
   color-scheme: dark;
   --bg: #171717;
-  --ink: #edede7;
-  --muted: #adada5;
+  --ink: #ffffff;
+  --muted: #ffffff;
   --line: #3b3b38;
 }
 .theme-toggle {
@@ -2617,7 +2617,7 @@ html[data-theme="dark"] .nav-contact {
   color: #111;
 }
 html[data-theme="dark"] .nav-contact:hover {
-  background: #deded8;
+  background: #ffffff;
   color: #111;
 }
 .site-footer {
