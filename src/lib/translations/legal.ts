@@ -16,7 +16,7 @@ export const legal: Record<
       ],
       [
         "Dienstleister",
-        "Vercel hostet die Website, Resend versendet Formularnachrichten und Google Workspace betreibt unser Postfach. Anbieter können Daten in anderen Ländern unter ihren vertraglichen und gesetzlichen Schutzmaßnahmen verarbeiten. WhatsApp unterliegt eigenen Datenschutzregeln. Gesetzlich erforderliche Offenlegungen bleiben möglich.",
+        "Netlify hostet die Website, Resend versendet Formularnachrichten und Google Workspace betreibt unser Postfach. Anbieter können Daten in anderen Ländern unter ihren vertraglichen und gesetzlichen Schutzmaßnahmen verarbeiten. WhatsApp unterliegt eigenen Datenschutzregeln. Gesetzlich erforderliche Offenlegungen bleiben möglich.",
       ],
       [
         "Cookies und Browserspeicher",
@@ -70,7 +70,7 @@ export const legal: Record<
       ],
       [
         "服务商",
-        "Vercel 托管网站，Resend 发送表单邮件，Google Workspace 管理邮箱。服务商可能根据其合同及法律保障在其他国家处理信息。WhatsApp 适用自己的隐私条款；法律要求时可能披露信息。",
+        "Netlify 托管网站，Resend 发送表单邮件，Google Workspace 管理邮箱。服务商可能根据其合同及法律保障在其他国家处理信息。WhatsApp 适用自己的隐私条款；法律要求时可能披露信息。",
       ],
       [
         "Cookie 与浏览器存储",
@@ -124,7 +124,7 @@ export const legal: Record<
       ],
       [
         "委託先",
-        "Vercel がホスティング、Resend がフォーム配信、Google Workspace がメールボックスを提供します。各社の契約上・法律上の保護措置により他国で処理される場合があります。WhatsApp には独自の条件が適用されます。法律上必要な開示を行うことがあります。",
+        "Netlify がホスティング、Resend がフォーム配信、Google Workspace がメールボックスを提供します。各社の契約上・法律上の保護措置により他国で処理される場合があります。WhatsApp には独自の条件が適用されます。法律上必要な開示を行うことがあります。",
       ],
       [
         "Cookie とブラウザー保存",
@@ -178,7 +178,7 @@ export const legal: Record<
       ],
       [
         "Penyedia layanan",
-        "Vercel menyediakan hosting, Resend mengirim email formulir, dan Google Workspace mengelola kotak surat. Data dapat diproses di negara lain sesuai perlindungan kontrak dan hukum penyedia. WhatsApp memiliki kebijakan tersendiri. Pengungkapan yang diwajibkan hukum tetap dapat dilakukan.",
+        "Netlify menyediakan hosting, Resend mengirim email formulir, dan Google Workspace mengelola kotak surat. Data dapat diproses di negara lain sesuai perlindungan kontrak dan hukum penyedia. WhatsApp memiliki kebijakan tersendiri. Pengungkapan yang diwajibkan hukum tetap dapat dilakukan.",
       ],
       [
         "Cookie dan penyimpanan browser",

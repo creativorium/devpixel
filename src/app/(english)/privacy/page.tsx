@@ -47,7 +47,7 @@ export default function Privacy() {
       <section>
         <h2>03 / Service providers and external links</h2>
         <p>
-          Vercel hosts the website, Resend delivers contact-form emails, and
+          Netlify hosts the website, Resend delivers contact-form emails, and
           Google Workspace handles our mailbox. These providers process relevant
           information to provide their services and may process it in countries
           other than your own, subject to their contractual and legal
