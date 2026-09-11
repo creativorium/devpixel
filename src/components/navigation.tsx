@@ -1,4 +1,7 @@
 "use client";
+import { useLanguage } from "./use-language";
+import { LanguageSwitcher } from "./language-switcher";
+import { originalPath } from "@/lib/i18n";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -6,7 +9,8 @@ import { PixelMark } from "./brand";
 import { ThemeToggle } from "./theme-toggle";
 import { WhatsAppButton } from "./whatsapp-button";
 export function Navigation() {
-  const pathname = usePathname();
+  const pathname = originalPath(usePathname());
+  const { t, href: localHref } = useLanguage();
   const [open, setOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -24,8 +28,8 @@ export function Navigation() {
     <header className="site-header">
       <Link
         className="brand"
-        href="/"
-        aria-label="DevnPixel home"
+        href={localHref("/")}
+        aria-label={`DevnPixel — ${t.home}`}
         onClick={() => setOpen(false)}
       >
         <PixelMark />
@@ -38,12 +42,12 @@ export function Navigation() {
         aria-controls="main-nav"
         onClick={() => setOpen(!open)}
       >
-        {open ? "Close −" : "Menu +"}
+        {open ? `${t.close} −` : `${t.menu} +`}
       </button>
       {open && (
         <button
           className="nav-backdrop"
-          aria-label="Close navigation"
+          aria-label={t.close}
           onClick={() => setOpen(false)}
           tabIndex={-1}
         />
@@ -51,28 +55,28 @@ export function Navigation() {
       <nav
         id="main-nav"
         className={open ? "nav open" : "nav"}
-        aria-label="Main navigation"
+        aria-label={t.menu}
       >
         <div className="mobile-nav-brand">
           <Link
-            href="/"
+            href={localHref("/")}
             onClick={() => setOpen(false)}
-            aria-label="DevnPixel home"
+            aria-label={`DevnPixel — ${t.home}`}
           >
             <PixelMark />
             <span>devnpixel</span>
           </Link>
         </div>
         {[
-          ["/", "Home"],
-          ["/work", "Work"],
-          ["/about", "Studio"],
-          ["/services", "Services"],
-          ["/blog", "Journal"],
+          ["/", t.home],
+          ["/work", t.work],
+          ["/about", t.studio],
+          ["/services", t.services],
+          ["/blog", t.journal],
         ].map(([href, label]) => (
           <Link
             key={href}
-            href={href}
+            href={localHref(href)}
             aria-current={
               pathname === href ||
               (href !== "/" && pathname.startsWith(`${href}/`))
@@ -87,27 +91,24 @@ export function Navigation() {
         <div className="nav-actions">
           <ThemeToggle />
           <Link
-            href="/contact"
+            href={localHref("/contact")}
             className="nav-contact"
             onClick={() => setOpen(false)}
           >
-            Let’s talk <span>↗</span>
+            {t.talk} <span>↗</span>
           </Link>
+          <LanguageSwitcher />
         </div>
         <div className="mobile-nav-extra">
-          <p className="eyebrow">INDEPENDENT MINDS.</p>
-          <p className="mobile-nav-motto">
-            Small studio.
-            <br />
-            Big possibilities.
-          </p>
+          <p className="eyebrow">{t.independent}</p>
+          <p className="mobile-nav-motto">{t.motto}</p>
           <WhatsAppButton />
           <div className="legal-links">
-            <Link href="/privacy" onClick={() => setOpen(false)}>
-              Privacy policy
+            <Link href={localHref("/privacy")} onClick={() => setOpen(false)}>
+              {t.privacy}
             </Link>
-            <Link href="/terms" onClick={() => setOpen(false)}>
-              Terms of use
+            <Link href={localHref("/terms")} onClick={() => setOpen(false)}>
+              {t.terms}
             </Link>
           </div>
         </div>

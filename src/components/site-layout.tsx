@@ -1,7 +1,10 @@
+/* eslint-disable @next/next/no-head-element -- Shared App Router root layout owns the document head. */
+import { messages } from "@/lib/translations/ui";
+import { isLocale } from "@/lib/i18n";
 import type { Metadata, Viewport } from "next";
 import { CookieConsent } from "@/components/cookie-consent";
 import localFont from "next/font/local";
-import "./globals.css";
+import "@/app/globals.css";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { site } from "@/lib/site";
@@ -42,12 +45,13 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 export const viewport: Viewport = { themeColor: "#ffffff" };
-export default function RootLayout({
+export default function SiteLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+  locale = "en",
+}: Readonly<{ children: React.ReactNode; locale?: string }>) {
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${sans.variable} ${pixel.variable}`}
       suppressHydrationWarning
     >
@@ -60,7 +64,11 @@ export default function RootLayout({
       </head>
       <body id="top">
         <a className="skip-link" href="#main">
-          Skip to content
+          {
+            messages[
+              locale === "zh-Hans" ? "zh" : isLocale(locale) ? locale : "en"
+            ].skip
+          }
         </a>
         <Navigation />
         <StructuredData
@@ -94,7 +102,7 @@ export default function RootLayout({
                 url: site.url,
                 name: site.name,
                 publisher: { "@id": `${site.url}/#organization` },
-                inLanguage: "en",
+                inLanguage: locale,
               },
             ],
           }}

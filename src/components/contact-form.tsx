@@ -1,8 +1,10 @@
 "use client";
+import { useLanguage } from "./use-language";
 import { useEffect, useRef, useState } from "react";
 import { services } from "@/lib/services";
 import { budgets } from "@/lib/contact";
 export function ContactForm({ enabled = false }: { enabled?: boolean }) {
+  const { t, locale, href } = useLanguage();
   const [status, setStatus] = useState("");
   const [sending, setSending] = useState(false);
   const serviceSelect = useRef<HTMLSelectElement>(null);
@@ -21,7 +23,7 @@ export function ContactForm({ enabled = false }: { enabled?: boolean }) {
         const form = e.currentTarget;
         const data = Object.fromEntries(new FormData(form));
         setSending(true);
-        setStatus("Sending your enquiry…");
+        setStatus(t.sending);
         try {
           const response = await fetch("/api/contact", {
             method: "POST",
@@ -31,15 +33,17 @@ export function ContactForm({ enabled = false }: { enabled?: boolean }) {
           });
           const result = await response.json();
           setStatus(
-            typeof result.message === "string"
-              ? result.message
-              : "Something went wrong. Please email code@devnpixel.com.",
+            locale !== "en"
+              ? response.ok
+                ? t.sent
+                : t.failed
+              : typeof result.message === "string"
+                ? result.message
+                : "Something went wrong. Please email code@devnpixel.com.",
           );
           if (response.ok) form.reset();
         } catch {
-          setStatus(
-            "We could not confirm submission. Please email code@devnpixel.com directly.",
-          );
+          setStatus(t.failed);
         } finally {
           setSending(false);
         }
@@ -47,17 +51,17 @@ export function ContactForm({ enabled = false }: { enabled?: boolean }) {
     >
       <div className="field-row">
         <label>
-          Your name
+          {t.name}
           <input
             name="name"
             autoComplete="name"
-            placeholder="Alex, for example"
+            placeholder={t.name}
             required
             maxLength={100}
           />
         </label>
         <label>
-          Email address
+          {t.email}
           <input
             name="email"
             type="email"
@@ -70,29 +74,37 @@ export function ContactForm({ enabled = false }: { enabled?: boolean }) {
       </div>
       <div className="field-row">
         <label>
-          What do you need?
+          {t.need}
           <select name="service" ref={serviceSelect}>
-            <option>Web design & development</option>
-            {services.map((s) => (
-              <option key={s.slug}>{s.name}</option>
+            <option value="Web design & development">{t.combined}</option>
+            {services.map((s, i) => (
+              <option key={s.slug} value={s.name}>
+                {t.serviceNames[i]}
+              </option>
             ))}
-            <option>Something else</option>
+            <option value="Something else">{t.other}</option>
           </select>
         </label>
         <label>
-          Budget range
+          {t.budget}
           <select name="budget">
             {budgets.map((budget) => (
-              <option key={budget}>{budget}</option>
+              <option key={budget} value={budget}>
+                {budget.includes("discuss")
+                  ? t.discuss
+                  : locale !== "en" && budget.startsWith("Under")
+                    ? "< $2,000"
+                    : budget}
+              </option>
             ))}
           </select>
         </label>
       </div>
       <label>
-        A little about your idea
+        {t.message}
         <textarea
           name="message"
-          placeholder="The big idea, the small details, and everything in between."
+          placeholder={t.message}
           required
           minLength={10}
           maxLength={5000}
@@ -113,17 +125,13 @@ export function ContactForm({ enabled = false }: { enabled?: boolean }) {
         type="submit"
         disabled={!enabled || sending}
       >
-        {sending ? "Sending…" : "Send enquiry"} <span>↗</span>
+        {sending ? t.sending : t.send} <span>↗</span>
       </button>
       <p className="form-status" role="status">
-        {status ||
-          (enabled
-            ? "We’ll use your details to respond to your enquiry."
-            : "The form is being connected. Please email code@devnpixel.com directly for now.")}
+        {status || (enabled ? t.formNote : t.formOffline)}
       </p>
       <p className="form-privacy">
-        Read our <a href="/privacy">privacy policy</a> for how we handle your
-        details.
+        <a href={href("/privacy")}>{t.privacy}</a>
       </p>
     </form>
   );

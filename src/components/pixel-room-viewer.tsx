@@ -1,4 +1,6 @@
 "use client";
+import { useLanguage } from "./use-language";
+import { visualCopy } from "@/lib/translations/visuals";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -20,6 +22,8 @@ export default function PixelRoomViewer({ hero = false }: { hero?: boolean }) {
   const [night, setNight] = useState(false);
   const [pixels, setPixels] = useState(2);
   const darkTheme = useDarkTheme();
+  const { locale } = useLanguage();
+  const copy = visualCopy[locale];
   const effectiveNight = hero ? darkTheme : night;
   useEffect(() => {
     const host = mount.current;
@@ -238,7 +242,7 @@ export default function PixelRoomViewer({ hero = false }: { hero?: boolean }) {
               ? "DESK_001 / A PLACE TO CREATE"
               : "ROOM_001 / THE QUIET STUDIO"}
           </span>
-          <span>{effectiveNight ? "AFTER HOURS" : "A LITTLE DAYLIGHT"}</span>
+          <span>{effectiveNight ? copy.night : copy.day}</span>
         </div>
         <div
           className="room-canvas"
@@ -258,10 +262,8 @@ export default function PixelRoomViewer({ hero = false }: { hero?: boolean }) {
           </div>
         )}
         <div className="room-stage-bottom">
-          <span>
-            {hero ? "A LITTLE SPACE FOR BIG IDEAS" : "DRAG TO LOOK AROUND"}
-          </span>
-          <span>DESIGNED ONE BLOCK AT A TIME.</span>
+          <span>{hero ? copy.desk : "DRAG TO LOOK AROUND"}</span>
+          <span>{copy.blocks}</span>
         </div>
       </div>
       {!hero && (

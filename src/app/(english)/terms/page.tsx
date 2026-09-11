@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 export const metadata: Metadata = {
   title: "Terms of use",
   description:
     "Terms for using the DevnPixel website and enquiring about our creative services.",
-  alternates: { canonical: "/terms" },
+  alternates: pageMetadata("", "", "/terms").alternates,
 };
 export default function Terms() {
   return (

@@ -1,4 +1,6 @@
 "use client";
+import { useLanguage } from "./use-language";
+
 import { useEffect, useState, useSyncExternalStore } from "react";
 import Script from "next/script";
 import Link from "next/link";
@@ -51,6 +53,7 @@ function subscribe(callback: () => void) {
   };
 }
 export function CookieConsent() {
+  const { t, href } = useLanguage();
   const choice = useSyncExternalStore(subscribe, readChoice, () => null);
   const [editing, setEditing] = useState(false);
   useEffect(() => {
@@ -92,29 +95,27 @@ gtag('config', 'G-RELL4WL624', {allow_google_signals:false, allow_ad_personaliza
         {choice === null || editing ? (
           <section className="cookie-panel" aria-labelledby="cookie-title">
             <div className="cookie-heading">
-              <h2 id="cookie-title">A little privacy.</h2>
+              <h2 id="cookie-title">{t.cookieTitle}</h2>
               {choice && (
-                <button
-                  aria-label="Close cookie settings"
-                  onClick={() => setEditing(false)}
-                >
+                <button aria-label={t.close} onClick={() => setEditing(false)}>
                   ×
                 </button>
               )}
             </div>
             <p>
-              Allow Google Analytics cookies to help us understand visits? Your
-              choice won’t affect the website.{" "}
-              <Link href="/privacy#cookies">Cookie details</Link>
+              {t.cookieText}{" "}
+              <Link href={href("/privacy") + "#cookies"}>
+                {t.cookieDetails}
+              </Link>
             </p>
             <div className="cookie-actions">
-              <button onClick={() => save("essential")}>Essential only</button>
-              <button onClick={() => save("accepted")}>Accept analytics</button>
+              <button onClick={() => save("essential")}>{t.essential}</button>
+              <button onClick={() => save("accepted")}>{t.accept}</button>
             </div>
           </section>
         ) : (
           <button className="cookie-settings" onClick={() => setEditing(true)}>
-            Cookie settings
+            {t.cookieSettings}
           </button>
         )}
       </div>

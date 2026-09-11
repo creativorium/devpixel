@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "./use-language";
 import { useEffect, useSyncExternalStore } from "react";
 
 function subscribe(callback: () => void) {
@@ -18,6 +19,7 @@ export function useDarkTheme() {
 }
 export function ThemeToggle() {
   const dark = useDarkTheme();
+  const { t } = useLanguage();
   useEffect(() => {
     const sync = () => {
       let saved: string | null = null;
@@ -40,9 +42,9 @@ export function ThemeToggle() {
     <button
       className="theme-toggle"
       role="switch"
-      aria-label="Dark mode"
+      aria-label={t.darkMode}
       aria-checked={dark}
-      title={dark ? "Switch to light mode" : "Switch to dark mode"}
+      title={t.darkMode}
       onClick={() => {
         const theme = dark ? "light" : "dark";
         document.documentElement.dataset.theme = theme;

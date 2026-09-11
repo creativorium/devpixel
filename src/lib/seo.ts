@@ -1,3 +1,4 @@
+import { locales, localizedPath, originalPath } from "./i18n";
 import type { Metadata } from "next";
 import { site } from "./site";
 export function pageMetadata(
@@ -8,7 +9,16 @@ export function pageMetadata(
   return {
     title,
     description,
-    alternates: { canonical: path },
+    alternates: {
+      canonical: path,
+      languages: Object.fromEntries([
+        ...locales.map((l) => [
+          l === "zh" ? "zh-Hans" : l,
+          localizedPath(path, l),
+        ]),
+        ["x-default", originalPath(path)],
+      ]),
+    },
     openGraph: {
       title,
       description,

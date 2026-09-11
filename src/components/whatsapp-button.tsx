@@ -1,5 +1,8 @@
+"use client";
+import { useLanguage } from "./use-language";
 import { site } from "@/lib/site";
 export function WhatsAppButton() {
+  const { t } = useLanguage();
   const valid = /^[1-9]\d{7,14}$/.test(site.whatsappNumber);
   const icon = (
     <svg
@@ -24,7 +27,7 @@ export function WhatsAppButton() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {icon} Chat on WhatsApp ↗
+          {icon} {t.whatsapp} ↗
         </a>
       ) : (
         <>

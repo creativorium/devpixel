@@ -1,4 +1,6 @@
 "use client";
+import { visualCopy } from "@/lib/translations/visuals";
+import { useLanguage } from "./use-language";
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 const lattice = Array.from({ length: 5 }, (_, x) =>
@@ -44,14 +46,7 @@ const shapes = {
     ({ x, y, z }) => Math.abs(x - 2) + Math.abs(y - 2) + Math.abs(z - 2) === 3,
   ),
 };
-const labels = {
-  dna: "THE CREATIVE DNA",
-  core: "THE BUILDING BLOCK",
-  frame: "THE OPEN FRAME",
-  steps: "THE NEXT STEP",
-  cross: "THE CONNECTION",
-  diamond: "THE PIXEL PRISM",
-};
+
 export function Sculpture({
   variant = "core",
   interactive = false,
@@ -65,6 +60,8 @@ export function Sculpture({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
+  const { t, locale } = useLanguage();
+  const labels = visualCopy[locale].shapes;
   const [paused, setPaused] = useState(false);
   const [expanded, setExpanded] = useState(false);
   useEffect(() => {
@@ -218,11 +215,11 @@ export function Sculpture({
       {interactive && (
         <button
           className="assemble-toggle"
-          aria-label={`${expanded ? "Assemble" : "Explode"} ${labels[variant].toLowerCase()}`}
+          aria-label={`${expanded ? t.assemble : t.explode} ${labels[variant].toLowerCase()}`}
           aria-pressed={expanded}
           onClick={() => setExpanded(!expanded)}
         >
-          {expanded ? "Assemble −" : "Explode +"}
+          {expanded ? `${t.assemble} −` : `${t.explode} +`}
         </button>
       )}
       <button
@@ -230,7 +227,7 @@ export function Sculpture({
         onClick={() => setPaused(!paused)}
         aria-pressed={paused}
       >
-        {paused ? "▶ Rotate" : "Ⅱ Pause"}
+        {paused ? `▶ ${t.rotate}` : `Ⅱ ${t.pause}`}
       </button>
     </div>
   );

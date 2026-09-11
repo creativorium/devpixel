@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 export const metadata: Metadata = {
   title: "Privacy policy",
   description:
     "How DevnPixel handles enquiries, website data, and your privacy choices.",
-  alternates: { canonical: "/privacy" },
+  alternates: pageMetadata("", "", "/privacy").alternates,
 };
 export default function Privacy() {
   return (
