@@ -1,3 +1,4 @@
+import { TranslatedHeading } from "@/components/translated-heading";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { isLocale, localizedPath } from "@/lib/i18n";
@@ -176,7 +177,7 @@ export default async function NativePage({
               <h1>
                 {c.homeTitle[0]}
                 <br />
-                {c.homeTitle[1]}
+                <TranslatedHeading text={c.homeTitle[1]} locale={locale} />
                 <span className="headline-square" />
               </h1>
               <p>{c.homeIntro}</p>
@@ -248,7 +249,9 @@ export default async function NativePage({
     return (
       <main id="main" className="section inner-page">
         <p className="eyebrow">{t.contact}</p>
-        <h1>{c.contactTitle}</h1>
+        <h1>
+          <TranslatedHeading text={c.contactTitle} locale={locale} />
+        </h1>
         <div className="contact-grid">
           <div>
             <h2>{t.talk}</h2>
@@ -271,7 +274,9 @@ export default async function NativePage({
     return (
       <main id="main" className="section inner-page legal-page">
         <p className="eyebrow">2026-09-11</p>
-        <h1>{t[key]}</h1>
+        <h1>
+          <TranslatedHeading text={t[key]} locale={locale} />
+        </h1>
         {legal[locale][key].map(([title, text], i) => (
           <section
             key={title}
@@ -371,7 +376,9 @@ export default async function NativePage({
     return (
       <main id="main" className="section inner-page">
         <p className="eyebrow">{t.journal}</p>
-        <h1>{c.blogTitle}</h1>
+        <h1>
+          <TranslatedHeading text={c.blogTitle} locale={locale} />
+        </h1>
         <p className="page-intro">{c.blogIntro}</p>
         {journal}
       </main>
@@ -399,7 +406,9 @@ export default async function NativePage({
         <div className="native-banner">
           <div>
             <p className="eyebrow">{t.work}</p>
-            <h1>{c.workTitle}</h1>
+            <h1>
+              <TranslatedHeading text={c.workTitle} locale={locale} />
+            </h1>
             <p>{c.conceptNote}</p>
           </div>
           <Sculpture variant="dna" interactive />
@@ -467,7 +476,9 @@ export default async function NativePage({
       <div className="native-banner">
         <div>
           <p className="eyebrow">{t.studio}</p>
-          <h1>{c.studioTitle}</h1>
+          <h1>
+            <TranslatedHeading text={c.studioTitle} locale={locale} />
+          </h1>
           <p>{c.studioIntro}</p>
         </div>
         <PixelRoomLoader hero />
