@@ -58,18 +58,18 @@ export default function Home() {
       <section className="section" id="selected">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">01 / SELECTED EXPLORATIONS</p>
+            <p className="eyebrow">01 / SELECTED WORK</p>
             <h2>
               A few things
               <br />
-              we’ve <span className="serif">imagined.</span>
+              we’ve <span className="serif">created.</span>
             </h2>
           </div>
           <div>
             <p className="section-note">
-              A glimpse of what’s possible.
+              Client work and studio explorations.
               <br />
-              Concepts today. Your project next.
+              Built, supported, and imagined.
             </p>
             <Link href="/work" className="text-link">
               View all work <span>↗</span>

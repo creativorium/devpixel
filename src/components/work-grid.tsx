@@ -7,7 +7,7 @@ export function WorkGrid({ projects }: { projects: typeof allProjects }) {
   return (
     <>
       <div className="filters" aria-label="Filter projects">
-        {["All work", ...projects.map((p) => p.category)].map((f) => (
+        {["All work", ...new Set(projects.map((p) => p.category))].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -15,7 +15,12 @@ export function WorkGrid({ projects }: { projects: typeof allProjects }) {
             className={filter === f ? "active" : ""}
           >
             {f}
-            <span>{f === "All work" ? "03" : "01"}</span>
+            <span>
+              {String(
+                projects.filter((p) => f === "All work" || p.category === f)
+                  .length,
+              ).padStart(2, "0")}
+            </span>
           </button>
         ))}
       </div>

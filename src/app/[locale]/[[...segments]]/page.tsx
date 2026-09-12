@@ -1,3 +1,5 @@
+import { JWCaseStudy } from "@/components/jw-case-study";
+import { jwCopy, conceptIndex } from "@/lib/project-copy";
 import { TranslatedHeading } from "@/components/translated-heading";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -57,7 +59,10 @@ export async function generateMetadata({
     const i = projects.findIndex((p) => p.slug === slug);
     if (i >= 0) {
       title = projects[i].name;
-      description = c.projectDescriptions[i];
+      description =
+        projects[i].kind === "jw"
+          ? jwCopy[locale].intro
+          : c.projectDescriptions[conceptIndex(projects[i].kind)];
     }
   }
   if (root === "services") {
@@ -116,7 +121,7 @@ export default async function NativePage({
   );
   const projectGrid = (
     <div className="project-grid">
-      {projects.slice(0, path === "/" ? 2 : projects.length).map((p, i) => (
+      {projects.slice(0, path === "/" ? 2 : projects.length).map((p) => (
         <Link
           className="project-card"
           href={href("/work/" + p.slug)}
@@ -127,7 +132,10 @@ export default async function NativePage({
             <div>
               <h3>{p.name}</h3>
               <p>
-                {t.categories[i]} / {t.concept} {i + 1}
+                {p.kind === "jw"
+                  ? jwCopy[locale].category
+                  : t.categories[conceptIndex(p.kind)]}{" "}
+                / {p.kind === "jw" ? jwCopy[locale].label : t.concept}
               </p>
             </div>
             <span>↗</span>
@@ -386,14 +394,17 @@ export default async function NativePage({
   if (path.startsWith("/work/")) {
     const i = projects.findIndex((p) => path === "/work/" + p.slug),
       p = projects[i];
+    if (p.kind === "jw") return <JWCaseStudy locale={locale} />;
     return (
       <main id="main" className="section inner-page">
         <p className="eyebrow">{c.conceptNote}</p>
         <h1>{p.name}</h1>
-        <p className="page-intro">{c.projectDescriptions[i]}</p>
+        <p className="page-intro">
+          {c.projectDescriptions[conceptIndex(p.kind)]}
+        </p>
         <ProjectArt kind={p.kind} />
         <section className="section">
-          <h2>{t.categories[i]}</h2>
+          <h2>{t.categories[conceptIndex(p.kind)]}</h2>
           <p>{c.scope}</p>
           {cta}
         </section>

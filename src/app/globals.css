@@ -1155,12 +1155,12 @@ textarea {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 10px;
+  font-size: 12px;
 }
 .invoice-table th {
   text-align: right;
   font-weight: 400;
-  font: 8px monospace;
+  font: 10px monospace;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-top: 1px solid #222;
@@ -1185,8 +1185,8 @@ textarea {
 }
 .invoice-table small {
   display: block;
-  font-size: 8px;
-  color: #777;
+  font-size: 10px;
+  color: #444;
   margin-top: 4px;
 }
 .paper-totals {
@@ -1667,7 +1667,7 @@ textarea {
     font-size: 17px;
   }
   .invoice-table {
-    font-size: 9px;
+    font-size: 11px;
   }
   .paper-totals .grand-total {
     font-size: 12px;
@@ -1765,7 +1765,7 @@ textarea {
     break-inside: avoid;
   }
   .invoice-table {
-    font-size: 11px;
+    font-size: 13px;
   }
   .invoice-table thead {
     display: table-header-group;
@@ -2669,7 +2669,7 @@ html[data-theme="dark"] .room-loading {
 }
 .invoice-table .item-subdescription {
   white-space: pre-wrap;
-  font-size: 9px;
+  font-size: 11px;
   line-height: 1.6;
   margin-top: 6px;
 }
@@ -2817,7 +2817,7 @@ input:disabled {
     --line: #d8d8d1;
   }
   .invoice-table .item-subdescription {
-    font-size: 10px;
+    font-size: 12px;
   }
 }
 
@@ -3684,5 +3684,59 @@ html:not([lang="en"]) h2 {
   }
   html:not([lang="en"]) .hero-actions {
     flex-wrap: wrap;
+  }
+}
+
+.art-jw {
+  background: #0d0b15;
+  overflow: hidden;
+}
+.art-jw img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+.project-detail .art-jw {
+  height: auto;
+  aspect-ratio: 1440 / 1000;
+}
+.invoice-item input,
+.invoice-item textarea {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.invoice-share-info {
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 16px 0 24px;
+  max-width: 850px;
+}
+.invoice-share-info textarea {
+  width: 100%;
+  font: 12px var(--sans);
+  overflow-wrap: anywhere;
+}
+.shared-invoice {
+  max-width: 1000px;
+  margin: auto;
+}
+.shared-invoice .invoice-paper {
+  margin: auto;
+  max-width: 800px;
+}
+.project-story section {
+  margin-bottom: 30px;
+}
+@media print {
+  .invoice-share-info {
+    display: none !important;
+  }
+  .shared-invoice {
+    max-width: none;
+  }
+  .shared-invoice .invoice-paper {
+    max-width: none;
   }
 }

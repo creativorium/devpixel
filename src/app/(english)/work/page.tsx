@@ -3,8 +3,8 @@ import { projects } from "@/lib/site";
 import { WorkGrid } from "@/components/work-grid";
 import { Sculpture } from "@/components/sculpture";
 export const metadata = pageMetadata(
-  "Web Design & Branding Portfolio Concepts",
-  "Explore DevnPixel web design, brand identity and digital product concepts. An independent studio focused on thoughtful design and purposeful development.",
+  "Web Development Projects & Design Portfolio",
+  "Explore DevnPixel client work and design concepts, including website development, payment integration and applications for JW Trading Academy.",
   "/work",
 );
 export default function Work() {
@@ -12,7 +12,7 @@ export default function Work() {
     <main id="main" className="section inner-page">
       <div className="work-hero">
         <div>
-          <p className="eyebrow">THE EXPLORATION INDEX / 01—03</p>
+          <p className="eyebrow">THE WORK INDEX / 01—04</p>
           <h1>
             Ideas made
             <br />
@@ -24,11 +24,10 @@ export default function Work() {
       <div className="intro-row">
         <p>
           Thoughtful design. Purposeful development.
-          <br />A collection of possibilities, down to the pixel.
+          <br />
+          Client projects and studio explorations, down to the pixel.
         </p>
-        <span className="tiny-label">
-          CONCEPT SHOWCASE — CLIENT WORK COMING SOON
-        </span>
+        <span className="tiny-label">CLIENT WORK & STUDIO CONCEPTS</span>
       </div>
       <WorkGrid projects={projects} />
     </main>

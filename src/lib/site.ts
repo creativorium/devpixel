@@ -9,6 +9,17 @@ export const site = {
 };
 export const projects = [
   {
+    slug: "jw-trading-academy",
+    name: "JW Trading Academy",
+    category: "Web development",
+    year: "Client project",
+    kind: "jw",
+    description:
+      "Website development, payment integration, a class application and trading journal app for JW Trading Academy, with ongoing monthly website maintenance.",
+    services:
+      "Development / Payment integration / Class app / Journal app / Monthly maintenance",
+  },
+  {
     slug: "form-and-field",
     name: "Form & Field",
     category: "Brand identity",

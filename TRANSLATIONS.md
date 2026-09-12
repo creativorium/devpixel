@@ -19,7 +19,7 @@ Use the globe selector immediately right of the contact button. It preserves the
 
 The first-pass translations are editable TypeScript strings. Save as UTF-8. Journal articles and legal notices use condensed native editions; they are not certified or word-for-word translations. Review their wording alongside the English originals before making legal or service commitments. Brand names, source titles, URLs, and text embedded in concept artwork stay in their original language.
 
-Arrays follow the existing English order: services are brand strategy, web design, development, advertising; projects and articles follow `site.ts` and `posts.ts`. Keep the number and order aligned when adding entries. New routes also belong in `src/lib/language-routes.ts`. Translate new content into all four dictionaries before publishing it.
+Service arrays follow the English order: brand strategy, web design, development, advertising. Article arrays follow `posts.ts`. Concept-project descriptions follow Form & Field, OFFGRID, Mono System, with their positions resolved by `conceptIndex` in `src/lib/project-copy.ts`. JW Trading Academy's five-language case-study copy also lives in that file. New project routes are derived from `site.ts` by `src/lib/language-routes.ts`. Translate new content before publishing it.
 
 The hidden invoice and 3D playground remain English at `/invoice` and `/threedanimation`. They stay out of navigation and the sitemap. Their language selector leads to the chosen public homepage. Form option values remain stable English identifiers for the server validator; only visitor-facing labels are translated. Submitted messages are sent as entered, without translation.
 

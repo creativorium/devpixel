@@ -2,19 +2,20 @@
 import { useEffect, useRef, useState } from "react";
 import {
   invoiceSchema,
-  money,
   newInvoice,
-  totals,
   type Invoice,
   type Item,
 } from "@/lib/invoice";
-import { PixelMark } from "./brand";
+import { InvoicePaper } from "./invoice-paper";
+import { createInvoiceSnapshot } from "@/lib/invoice-share";
 const storageKey = "devnpixel.invoice.v1";
 export function InvoiceEditor() {
   const [data, setData] = useState<Invoice | null>(null);
   const [status, setStatus] = useState(
     "Drafts stay in this browser. Export a backup to keep a copy.",
   );
+  const [shareUrl, setShareUrl] = useState("");
+  const [sharing, setSharing] = useState(false);
   const [reset, setReset] = useState(false);
   const file = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -57,7 +58,6 @@ export function InvoiceEditor() {
       "items",
       data.items.map((i) => (i.id === id ? { ...i, ...patch } : i)),
     );
-  const sum = totals(data);
   const valid =
     invoiceSchema.safeParse(data).success &&
     !!data.client.trim() &&
@@ -115,6 +115,39 @@ export function InvoiceEditor() {
             Export JSON ↓
           </button>
           <button
+            className="button small"
+            disabled={sharing || !valid}
+            onClick={async () => {
+              setSharing(true);
+              try {
+                const fragment = await createInvoiceSnapshot(data);
+                const url = new URL("/invoice/view", window.location.origin);
+                url.hash = fragment;
+                setShareUrl(url.href);
+                try {
+                  await navigator.clipboard.writeText(url.href);
+                  setStatus(
+                    "Snapshot link copied. It stays unchanged when you edit this draft.",
+                  );
+                } catch {
+                  setStatus(
+                    "Snapshot link created. Copy it from the field below.",
+                  );
+                }
+              } catch (error) {
+                setStatus(
+                  error instanceof Error
+                    ? error.message
+                    : "Could not create the snapshot link.",
+                );
+              } finally {
+                setSharing(false);
+              }
+            }}
+          >
+            {sharing ? "Creating link..." : "Create snapshot link"}
+          </button>
+          <button
             className="button small dark"
             onClick={() => {
               if (!valid) {
@@ -164,6 +197,24 @@ export function InvoiceEditor() {
       <p className="invoice-status" role="status">
         {status}
       </p>
+      <div className="invoice-share-info">
+        <p>
+          Snapshot links contain a fixed copy of the invoice. Anyone with the
+          link can view it; links cannot be revoked or updated. Keep each link
+          or export a backup.
+        </p>
+        {shareUrl && (
+          <label>
+            Last generated snapshot link (not updated by later edits)
+            <textarea
+              readOnly
+              value={shareUrl}
+              rows={3}
+              onFocus={(e) => e.currentTarget.select()}
+            />
+          </label>
+        )}
+      </div>
       {reset && (
         <div className="reset-prompt" role="alert">
           Replace the current draft? Export a backup first if you want to keep
@@ -425,118 +476,7 @@ export function InvoiceEditor() {
             <span className="eyebrow">LIVE PREVIEW</span>
             <span>A4 / PORTRAIT</span>
           </div>
-          <article className="invoice-paper">
-            <div className="paper-head">
-              <div className="paper-brand">
-                <PixelMark />
-                <strong>{data.company || "Your company"}</strong>
-              </div>
-              <span className="eyebrow">INVOICE</span>
-            </div>
-            <div className="paper-title">
-              <h2>{data.number || "DNP-001"}</h2>
-              <p>{data.project || "Your next great project"}</p>
-            </div>
-            <div className="paper-parties">
-              <div>
-                <span className="eyebrow">BILLED TO</span>
-                <strong>{data.client || "Client name"}</strong>
-                <p>
-                  {data.clientEmail}
-                  <br />
-                  {data.clientAddress}
-                </p>
-              </div>
-              <div>
-                <span className="eyebrow">FROM</span>
-                <strong>{data.sender || data.company}</strong>
-                <p>
-                  {data.email}
-                  <br />
-                  {data.address}
-                </p>
-              </div>
-              <div>
-                <span className="eyebrow">ISSUED</span>
-                <p>{data.issued}</p>
-                <span className="eyebrow">DUE DATE</span>
-                <p>{data.due}</p>
-              </div>
-            </div>
-            <table className="invoice-table">
-              <thead>
-                <tr>
-                  <th>Description</th>
-                  <th>Qty</th>
-                  <th>Rate</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.items.map((i, n) => (
-                  <tr key={i.id}>
-                    <td>
-                      {i.description || "Item description"}
-                      {i.subDescription && (
-                        <small className="item-subdescription">
-                          {i.subDescription}
-                        </small>
-                      )}
-                      {i.discount > 0 && (
-                        <small>{i.discount}% item discount</small>
-                      )}
-                    </td>
-                    <td>
-                      {i.unit === "fixed" ? 1 : i.quantity}
-                      <small>{i.unit}</small>
-                    </td>
-                    <td>{money(i.rate, data.currency)}</td>
-                    <td>{money(sum.lines[n], data.currency)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="paper-totals">
-              <div>
-                <span>Subtotal</span>
-                <span>{money(sum.subtotal, data.currency)}</span>
-              </div>
-              {data.discount > 0 && (
-                <div>
-                  <span>Discount ({data.discount}%)</span>
-                  <span>−{money(sum.discount, data.currency)}</span>
-                </div>
-              )}
-              {data.taxEnabled && (
-                <div>
-                  <span>Tax ({data.tax}%)</span>
-                  <span>{money(sum.tax, data.currency)}</span>
-                </div>
-              )}
-              <div className="grand-total">
-                <span>Total due</span>
-                <strong>{money(sum.total, data.currency)}</strong>
-              </div>
-            </div>
-            <div className="paper-notes">
-              {data.payment && (
-                <div>
-                  <span className="eyebrow">PAYMENT DETAILS</span>
-                  <p>{data.payment}</p>
-                </div>
-              )}
-              {data.notes && (
-                <div>
-                  <span className="eyebrow">A LITTLE NOTE</span>
-                  <p>{data.notes}</p>
-                </div>
-              )}
-            </div>
-            <div className="paper-footer">
-              <span>MADE WITH PURPOSE. DOWN TO THE PIXEL.</span>
-              <PixelMark />
-            </div>
-          </article>
+          <InvoicePaper data={data} />
           <p className="preview-hint">
             Choose “Save as PDF” in your print dialog. Disable browser headers
             and footers for a clean export.

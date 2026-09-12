@@ -40,7 +40,7 @@ export const pageCopy: Record<Exclude<Locale, "en">, LocalPageCopy> = {
     marketIntro:
       "Wir gestalten Websites und Marken für kleine Unternehmen mit Zielgruppen in Bali, Australien, den USA und Singapur. Die Zusammenarbeit erfolgt direkt und remote. Ein klarer Umfang, nützliche Inhalte und zuverlässige Kontaktwege bilden die Grundlage für ein bezahlbares Projekt.",
     workTitle: "Ideen werden sichtbar.",
-    conceptNote: "KONZEPTSTUDIEN — KUNDENPROJEKTE FOLGEN",
+    conceptNote: "KUNDENPROJEKTE & STUDIOKONZEPTE",
     servicesTitle: "Vom ersten Gedanken bis zum letzten Pixel.",
     servicesIntro:
       "Eine klare Identität. Eine durchdachte Website. Ein Erlebnis, das in Erinnerung bleibt. Wir unterstützen einen Teil Ihres Projekts oder verbinden das gesamte Bild.",
@@ -108,7 +108,7 @@ export const pageCopy: Record<Exclude<Locale, "en">, LocalPageCopy> = {
     marketIntro:
       "我们为面向巴厘岛、澳大利亚、美国和新加坡市场的小型企业提供网站设计、开发与品牌服务。通过清晰的远程协作流程直接沟通，以合理范围、有用内容和可靠联系渠道控制项目成本。",
     workTitle: "让想法看得见。",
-    conceptNote: "概念展示 — 客户案例将陆续发布",
+    conceptNote: "客户项目与工作室概念作品",
     servicesTitle: "从最初的想法，到最后一个像素。",
     servicesIntro:
       "清晰的品牌、周到的网站、值得探索的体验。我们可以参与其中一个环节，也可以协助连接整个项目。",
@@ -176,7 +176,7 @@ export const pageCopy: Record<Exclude<Locale, "en">, LocalPageCopy> = {
     marketIntro:
       "バリ、オーストラリア、米国、シンガポールの市場を目指す小規模事業者に、ウェブデザイン・開発・ブランディングを提供します。直接やり取りできるリモート制作で、必要な範囲と役立つ情報、確かな問い合わせ導線を整えます。",
     workTitle: "アイデアを、見える形に。",
-    conceptNote: "コンセプト制作例 — クライアント事例は今後公開",
+    conceptNote: "クライアント案件とコンセプト制作",
     servicesTitle: "最初の発想から、最後のピクセルまで。",
     servicesIntro:
       "明確なブランド、考え抜かれたウェブサイト、心に残る体験。必要な一部分から、全体をつなぐ制作までご相談ください。",
@@ -245,7 +245,7 @@ export const pageCopy: Record<Exclude<Locale, "en">, LocalPageCopy> = {
     marketIntro:
       "Kami menyediakan desain web, pengembangan, dan branding bagi usaha kecil yang menyasar Bali, Australia, Amerika Serikat, dan Singapura. Bekerja langsung dengan studio independen melalui proses jarak jauh yang jelas. Lingkup terarah, konten berguna, dan jalur kontak yang andal membantu menjaga anggaran tetap realistis.",
     workTitle: "Ide yang menjadi nyata.",
-    conceptNote: "PAMERAN KONSEP — PROYEK KLIEN AKAN MENYUSUL",
+    conceptNote: "PROYEK KLIEN & KONSEP STUDIO",
     servicesTitle: "Dari gagasan pertama hingga piksel terakhir.",
     servicesIntro:
       "Identitas yang jelas. Situs yang dipikirkan matang. Pengalaman yang layak dijelajahi. Libatkan kami untuk satu bagian atau untuk menyatukan keseluruhan proyek.",

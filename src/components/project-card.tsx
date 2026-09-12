@@ -1,6 +1,19 @@
 import Link from "next/link";
+import Image from "next/image";
 import { projects } from "@/lib/site";
 export function ProjectArt({ kind }: { kind: string }) {
+  if (kind === "jw")
+    return (
+      <div className="project-art art-jw">
+        <Image
+          src="/work/jw-trading-academy.jpg"
+          alt="JW Trading Academy website homepage"
+          width={1440}
+          height={1000}
+          sizes="(max-width: 760px) 100vw, 50vw"
+        />
+      </div>
+    );
   return (
     <div className={`project-art art-${kind}`} aria-hidden="true">
       {kind === "form" ? (
