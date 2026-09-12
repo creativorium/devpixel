@@ -1,5 +1,9 @@
-import { JWCaseStudy } from "@/components/jw-case-study";
-import { jwCopy, conceptIndex } from "@/lib/project-copy";
+import { ClientCaseStudy } from "@/components/client-case-study";
+import {
+  clientCopyFor,
+  isClientProject,
+  conceptIndex,
+} from "@/lib/project-copy";
 import { TranslatedHeading } from "@/components/translated-heading";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -59,10 +63,9 @@ export async function generateMetadata({
     const i = projects.findIndex((p) => p.slug === slug);
     if (i >= 0) {
       title = projects[i].name;
-      description =
-        projects[i].kind === "jw"
-          ? jwCopy[locale].intro
-          : c.projectDescriptions[conceptIndex(projects[i].kind)];
+      description = isClientProject(projects[i].kind)
+        ? clientCopyFor(projects[i].kind as "jw" | "wonderland", locale).intro
+        : c.projectDescriptions[conceptIndex(projects[i].kind)];
     }
   }
   if (root === "services") {
@@ -132,10 +135,13 @@ export default async function NativePage({
             <div>
               <h3>{p.name}</h3>
               <p>
-                {p.kind === "jw"
-                  ? jwCopy[locale].category
+                {isClientProject(p.kind)
+                  ? clientCopyFor(p.kind, locale).category
                   : t.categories[conceptIndex(p.kind)]}{" "}
-                / {p.kind === "jw" ? jwCopy[locale].label : t.concept}
+                /{" "}
+                {isClientProject(p.kind)
+                  ? clientCopyFor(p.kind, locale).label
+                  : t.concept}
               </p>
             </div>
             <span>↗</span>
@@ -394,7 +400,8 @@ export default async function NativePage({
   if (path.startsWith("/work/")) {
     const i = projects.findIndex((p) => path === "/work/" + p.slug),
       p = projects[i];
-    if (p.kind === "jw") return <JWCaseStudy locale={locale} />;
+    if (isClientProject(p.kind))
+      return <ClientCaseStudy kind={p.kind} locale={locale} />;
     return (
       <main id="main" className="section inner-page">
         <p className="eyebrow">{c.conceptNote}</p>

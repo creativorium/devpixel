@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "@/app/globals.css";
+import { site } from "@/lib/site";
 const sans = localFont({
-  src: "../../../../../node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2",
+  src: "../../../node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2",
   variable: "--font-sans",
   display: "swap",
 });
 export const metadata: Metadata = {
+  metadataBase: new URL(site.url),
   title: "Shared invoice",
   robots: { index: false, follow: false, nocache: true },
   referrer: "no-referrer",

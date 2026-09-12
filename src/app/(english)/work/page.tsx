@@ -12,7 +12,7 @@ export default function Work() {
     <main id="main" className="section inner-page">
       <div className="work-hero">
         <div>
-          <p className="eyebrow">THE WORK INDEX / 01—04</p>
+          <p className="eyebrow">THE WORK INDEX / 01—05</p>
           <h1>
             Ideas made
             <br />

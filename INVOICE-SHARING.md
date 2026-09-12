@@ -1,5 +1,7 @@
 # Sharing invoices
 
+For short links backed by your private Google Sheet, see [Google Sheets setup](GOOGLE-SHEETS-INVOICES.md). The no-database option below remains available and existing links are unchanged.
+
 Open `/invoice`, fill in the client, invoice number, company, dates and line items, then select **Create snapshot link**. The button copies the URL when clipboard permission is available; the generated URL also appears in a selectable field.
 
 Create invoice A and keep its link, then create invoice B and keep that link. Each URL contains an independent fixed snapshot. Changing or replacing the local draft does not change earlier links. Recipients use `/invoice/view#v1.…` to read and print the invoice without an editor or login. Save each link or export a JSON backup: the editor keeps only the current draft and there is no server-side history.

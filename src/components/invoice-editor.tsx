@@ -16,6 +16,7 @@ export function InvoiceEditor() {
   );
   const [shareUrl, setShareUrl] = useState("");
   const [sharing, setSharing] = useState(false);
+  const [ownerPassword, setOwnerPassword] = useState("");
   const [reset, setReset] = useState(false);
   const file = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -205,7 +206,7 @@ export function InvoiceEditor() {
         </p>
         {shareUrl && (
           <label>
-            Last generated snapshot link (not updated by later edits)
+            Last generated invoice link (not updated by later edits)
             <textarea
               readOnly
               value={shareUrl}
@@ -215,6 +216,62 @@ export function InvoiceEditor() {
           </label>
         )}
       </div>
+      <details className="invoice-short-link">
+        <summary>Create a short link</summary>
+        <p>
+          Save a fixed copy to your private invoice register. Anyone with the
+          link can view this invoice.
+        </p>
+        <label>
+          Owner password
+          <input
+            type="password"
+            autoComplete="off"
+            maxLength={256}
+            value={ownerPassword}
+            onChange={(e) => setOwnerPassword(e.target.value)}
+          />
+        </label>
+        <button
+          className="button small"
+          disabled={sharing || !valid || ownerPassword.length < 32}
+          onClick={async () => {
+            setSharing(true);
+            try {
+              const response = await fetch("/api/invoices", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "Bearer " + ownerPassword,
+                },
+                body: JSON.stringify(data),
+              });
+              const result = await response.json();
+              if (!response.ok)
+                throw new Error(result.message || "Could not save invoice.");
+              setShareUrl(result.url);
+              try {
+                await navigator.clipboard.writeText(result.url);
+                setStatus(
+                  "Short link copied. A fixed copy is saved in your invoice register.",
+                );
+              } catch {
+                setStatus("Short link saved. Copy it from the field above.");
+              }
+            } catch (error) {
+              setStatus(
+                error instanceof Error
+                  ? error.message
+                  : "Could not save invoice.",
+              );
+            } finally {
+              setSharing(false);
+            }
+          }}
+        >
+          {sharing ? "Saving..." : "Save & copy short link"}
+        </button>
+      </details>
       {reset && (
         <div className="reset-prompt" role="alert">
           Replace the current draft? Export a backup first if you want to keep

@@ -3687,17 +3687,17 @@ html:not([lang="en"]) h2 {
   }
 }
 
-.art-jw {
+.art-client {
   background: #0d0b15;
   overflow: hidden;
 }
-.art-jw img {
+.art-client img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: top;
 }
-.project-detail .art-jw {
+.project-detail .art-client {
   height: auto;
   aspect-ratio: 1440 / 1000;
 }
@@ -3738,5 +3738,36 @@ html:not([lang="en"]) h2 {
   }
   .shared-invoice .invoice-paper {
     max-width: none;
+  }
+}
+
+.shared-invoice .invoice-paper {
+  border: 1px solid #c9c9c9;
+  box-shadow: 0 6px 28px #0000000d;
+}
+.invoice-short-link {
+  margin-block: 20px;
+}
+.invoice-short-link label {
+  display: grid;
+  gap: 8px;
+  max-width: 360px;
+  margin-block: 12px;
+}
+.invoice-short-link input {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+}
+@media print {
+  .shared-invoice .invoice-paper {
+    border: 0;
+    box-shadow: none;
+  }
+  .invoice-short-link {
+    display: none;
   }
 }

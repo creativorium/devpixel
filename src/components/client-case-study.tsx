@@ -1,10 +1,16 @@
 import Link from "next/link";
 import { ProjectArt } from "./project-card";
-import { jwCopy } from "@/lib/project-copy";
+import { clientCopyFor, type ClientKind } from "@/lib/project-copy";
 import { localizedPath, type Locale } from "@/lib/i18n";
 import { messages } from "@/lib/translations/ui";
-export function JWCaseStudy({ locale = "en" }: { locale?: Locale }) {
-  const c = jwCopy[locale],
+export function ClientCaseStudy({
+  kind,
+  locale = "en",
+}: {
+  kind: ClientKind;
+  locale?: Locale;
+}) {
+  const c = clientCopyFor(kind, locale),
     t = messages[locale];
   return (
     <main id="main" className="section inner-page project-detail">
@@ -12,19 +18,23 @@ export function JWCaseStudy({ locale = "en" }: { locale?: Locale }) {
         ← {t.allWork}
       </Link>
       <p className="eyebrow">{c.label}</p>
-      <h1>JW Trading Academy</h1>
+      <h1>{kind === "jw" ? "JW Trading Academy" : "Wonderland Bali"}</h1>
       <div className="intro-row">
         <p>{c.intro}</p>
         <a
           className="text-link"
-          href="https://jwtradingacademy.com/"
+          href={
+            kind === "jw"
+              ? "https://jwtradingacademy.com/"
+              : "https://wonderlandbali.com/"
+          }
           target="_blank"
           rel="noopener noreferrer"
         >
           {c.visit} ↗
         </a>
       </div>
-      <ProjectArt kind="jw" />
+      <ProjectArt kind={kind} />
       <div className="project-story">
         <h2>{c.scope}</h2>
         <div>

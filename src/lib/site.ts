@@ -15,9 +15,20 @@ export const projects = [
     year: "Client project",
     kind: "jw",
     description:
-      "Website development, payment integration, a class application and trading journal app for JW Trading Academy, with ongoing monthly website maintenance.",
+      "Website development with Vite, integration of existing class and journal apps with payments, and monthly maintenance for JW Trading Academy.",
     services:
-      "Development / Payment integration / Class app / Journal app / Monthly maintenance",
+      "Vite development / Payment integration / Existing class & journal app integration / Monthly maintenance",
+  },
+  {
+    slug: "wonderland-bali",
+    name: "Wonderland Bali",
+    category: "Web development",
+    year: "Client project",
+    kind: "wonderland",
+    description:
+      "Complete website development with Vite for Wonderland Bali, with GA4 and Google Search Console integration and ongoing monthly maintenance.",
+    services:
+      "Vite development / GA4 / Google Search Console / Monthly maintenance",
   },
   {
     slug: "form-and-field",

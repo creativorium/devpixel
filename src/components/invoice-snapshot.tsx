@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import { InvoicePaper } from "./invoice-paper";
 import { readInvoiceSnapshot } from "@/lib/invoice-share";
-import type { Invoice } from "@/lib/invoice";
-export function InvoiceSnapshot() {
+import { invoiceSchema, type Invoice } from "@/lib/invoice";
+export function InvoiceSnapshot({ id }: { id?: string }) {
   const [data, setData] = useState<Invoice | null>(null),
     [error, setError] = useState("");
   useEffect(() => {
@@ -13,7 +13,18 @@ export function InvoiceSnapshot() {
       const current = ++generation;
       setData(null);
       setError("");
-      readInvoiceSnapshot(window.location.hash)
+      (id
+        ? fetch(`/api/invoices/${encodeURIComponent(id)}`, {
+            cache: "no-store",
+            referrerPolicy: "no-referrer",
+          }).then(async (response) => {
+            const body = await response.json();
+            if (!response.ok)
+              throw new Error(body.message || "Invoice unavailable.");
+            return invoiceSchema.parse(body.invoice);
+          })
+        : readInvoiceSnapshot(window.location.hash)
+      )
         .then((invoice) => {
           if (active && current === generation) setData(invoice);
         })
@@ -27,7 +38,7 @@ export function InvoiceSnapshot() {
       active = false;
       window.removeEventListener("hashchange", load);
     };
-  }, []);
+  }, [id]);
   return (
     <main id="main" className="invoice-page shared-invoice">
       <div className="invoice-heading">

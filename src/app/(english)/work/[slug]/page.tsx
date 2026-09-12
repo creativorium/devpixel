@@ -1,4 +1,5 @@
-import { JWCaseStudy } from "@/components/jw-case-study";
+import { ClientCaseStudy } from "@/components/client-case-study";
+import { isClientProject } from "@/lib/project-copy";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { projects } from "@/lib/site";
@@ -17,7 +18,7 @@ export async function generateMetadata({
   const p = projects.find((p) => p.slug === slug);
   if (!p) notFound();
   return pageMetadata(
-    `${p.name} — ${p.category}${p.kind === "jw" ? "" : " Concept"}`,
+    `${p.name} — ${p.category}${isClientProject(p.kind) ? "" : " Concept"}`,
     p.description,
     `/work/${slug}`,
   );
@@ -30,7 +31,7 @@ export default async function Project({
   const { slug } = await params;
   const p = projects.find((p) => p.slug === slug);
   if (!p) notFound();
-  if (p.kind === "jw") return <JWCaseStudy />;
+  if (isClientProject(p.kind)) return <ClientCaseStudy kind={p.kind} />;
   return (
     <main id="main" className="section inner-page project-detail">
       <Link className="text-link" href="/work">
