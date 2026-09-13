@@ -1,3 +1,4 @@
+import { agencyArticles } from "./agency-articles";
 import type { Locale } from "../i18n";
 // The article order matches src/lib/posts.ts. Edit titles and section text here.
 export type ArticleTranslation = {
@@ -6,6 +7,7 @@ export type ArticleTranslation = {
 };
 export const articles: Record<Exclude<Locale, "en">, ArticleTranslation[]> = {
   de: [
+    ...agencyArticles.de,
     {
       title:
         "Webentwicklung in Bali: ein praktischer Leitfaden für kleine Unternehmen",
@@ -117,6 +119,7 @@ export const articles: Record<Exclude<Locale, "en">, ArticleTranslation[]> = {
     },
   ],
   zh: [
+    ...agencyArticles.zh,
     {
       title: "巴厘岛网站开发：小型企业实用指南",
       sections: [
@@ -224,6 +227,7 @@ export const articles: Record<Exclude<Locale, "en">, ArticleTranslation[]> = {
     },
   ],
   ja: [
+    ...agencyArticles.ja,
     {
       title: "バリのウェブ開発：小規模事業者のための実践ガイド",
       sections: [
@@ -332,6 +336,7 @@ export const articles: Record<Exclude<Locale, "en">, ArticleTranslation[]> = {
     },
   ],
   id: [
+    ...agencyArticles.id,
     {
       title: "Pengembangan web di Bali: panduan praktis untuk usaha kecil",
       sections: [

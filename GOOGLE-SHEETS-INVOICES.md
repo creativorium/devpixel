@@ -2,6 +2,12 @@
 
 Short invoice links use `/i/<random-code>`. Your private Sheet stores one fixed copy per link. The original `/invoice/view#...` snapshot links still work without Google Sheets.
 
+## Which email and what does it cost?
+
+Use the **service account email**, usually `name@project-id.iam.gserviceaccount.com`, from Google Cloud Console → IAM & Admin → Service Accounts. It is also the `client_email` in the key JSON. This is different from the Google login you use to open the console. Share the invoice Sheet with this service account as Editor.
+
+As checked on 13 September 2026, standard Sheets API use has no additional charge. Google says above-quota charging is planned later in 2026; consult its [current usage and pricing limits](https://developers.google.com/workspace/sheets/api/limits). Netlify hosting/function usage and any existing Workspace subscription are separate.
+
 ## Set up once
 
 1. In [Google Cloud Console](https://console.cloud.google.com/), create/select a project and enable **Google Sheets API**.

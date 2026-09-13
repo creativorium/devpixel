@@ -3771,3 +3771,15 @@ html:not([lang="en"]) h2 {
     display: none;
   }
 }
+
+/* Keep client website screenshots intact instead of cropping their sides on phones. */
+@media (max-width: 760px) {
+  .project-card .art-client {
+    height: auto;
+    aspect-ratio: 1440 / 1000;
+  }
+  .project-card .art-client img {
+    display: block;
+    object-fit: contain;
+  }
+}

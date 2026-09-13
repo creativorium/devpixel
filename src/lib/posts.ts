@@ -1,3 +1,4 @@
+import { agencyPosts } from "./agency-posts";
 export type Post = {
   slug: string;
   title: string;
@@ -9,6 +10,7 @@ export type Post = {
   sources?: { title: string; url: string }[];
 };
 export const posts: Post[] = [
+  ...agencyPosts,
   {
     slug: "web-development-bali-small-business-guide",
     title: "Web development in Bali: a practical guide for small businesses",

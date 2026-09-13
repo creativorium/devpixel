@@ -326,7 +326,7 @@ export default async function NativePage({
               headline: a.title,
               description: a.sections[0][1],
               datePublished: post.date,
-              dateModified: "2026-09-11",
+              dateModified: post.date > "2026-09-11" ? post.date : "2026-09-11",
               inLanguage: locale === "zh" ? "zh-Hans" : locale,
               mainEntityOfPage: site.url + href(path),
               author: {

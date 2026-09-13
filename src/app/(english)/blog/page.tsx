@@ -28,7 +28,17 @@ export default function Blog() {
             </div>
             <p className="eyebrow">
               {post.category} /{" "}
-              <time dateTime={post.date}>10 September 2026</time>
+              <time dateTime={post.date}>
+                {new Date(`${post.date}T12:00:00Z`).toLocaleDateString(
+                  "en-GB",
+                  {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                    timeZone: "UTC",
+                  },
+                )}
+              </time>
             </p>
             <h2>
               <Link href={`/blog/${post.slug}`}>{post.title}</Link>

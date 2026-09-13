@@ -97,7 +97,14 @@ export default async function Article({
       <h1>{post.title}</h1>
       <p className="article-byline">
         By <Link href="/about">DevnPixel Studio</Link> ·{" "}
-        <time dateTime={post.date}>10 September 2026</time>
+        <time dateTime={post.date}>
+          {new Date(`${post.date}T12:00:00Z`).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            timeZone: "UTC",
+          })}
+        </time>
       </p>
       <p className="article-summary">{post.description}</p>
       <nav className="article-contents" aria-label="Article contents">

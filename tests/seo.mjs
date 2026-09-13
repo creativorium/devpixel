@@ -13,7 +13,7 @@ try {
   const links = await page
     .locator(".journal-card h2 a")
     .evaluateAll((es) => es.map((e) => e.getAttribute("href")));
-  assert.equal(links.length, 5);
+  assert.equal(links.length, 7);
   const titles = new Set();
   for (const path of [
     "/",
@@ -74,7 +74,7 @@ try {
   }
   for (const width of [320, 390, 800, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const path of ["/", "/blog", links[0]]) {
+    for (const path of ["/", "/work", "/blog", links[0]]) {
       await page.goto(base + path);
       await page.evaluate(() => document.fonts.ready);
       assert.ok(
@@ -83,6 +83,24 @@ try {
         ),
         `${width}px overflow on ${path}`,
       );
+      if (width < 760 && (path === "/" || path === "/work")) {
+        const frames = await page
+          .locator(".project-card .art-client")
+          .evaluateAll((elements) =>
+            elements.map((el) => {
+              const rect = el.getBoundingClientRect();
+              return {
+                ratio: rect.width / rect.height,
+                fit: getComputedStyle(el.querySelector("img")).objectFit,
+              };
+            }),
+          );
+        assert.equal(frames.length, 2);
+        for (const frame of frames) {
+          assert.ok(Math.abs(frame.ratio - 1.44) < 0.02);
+          assert.equal(frame.fit, "contain");
+        }
+      }
     }
   }
   await page.setViewportSize({ width: 1440, height: 1000 });
@@ -92,6 +110,21 @@ try {
     fullPage: true,
   });
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(base + "/work");
+  await page
+    .locator(".project-grid")
+    .screenshot({ path: "test-results/portfolio-mobile.png" });
+  for (const prefix of ["/de", "/id", "/ja", "/zh"]) {
+    for (const path of links.slice(0, 2)) {
+      assert.equal((await page.goto(base + prefix + path)).status(), 200);
+      await expect(page.locator("h1")).toHaveCount(1);
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+        "href",
+        canonical + prefix + path,
+      );
+      assert.ok((await page.locator("main").innerText()).length > 300);
+    }
+  }
   await page.goto(base + links[0]);
   await page.screenshot({ path: "test-results/article-mobile.png" });
   assert.equal(
@@ -99,7 +132,7 @@ try {
     404,
   );
   console.log(
-    "SEO checks passed: unique metadata, canonical host, 5 static articles, structured data, sitemap, icons, responsive layouts, and 404.",
+    "SEO checks passed: unique metadata, canonical host, 7 static articles, structured data, sitemap, icons, responsive layouts, and 404.",
   );
 } finally {
   await browser.close();

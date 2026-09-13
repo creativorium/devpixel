@@ -26,3 +26,5 @@ The hidden invoice and 3D playground remain English at `/invoice` and `/threedan
 No Vercel environment-variable changes are required. The existing Resend configuration remains in use. After editing, run `npm run build`, `npm run lint`, and `npm test`. With a production server running, set `TEST_BASE_URL` and run `node tests/languages.mjs` for route, SEO, responsive-menu, query-preservation, and consent checks.
 
 Routing follows the [Next.js internationalization guidance](https://nextjs.org/docs/app/guides/internationalization).
+
+The two Bali agency articles are in `src/lib/agency-posts.ts`, with condensed native editions in `src/lib/translations/agency-articles.ts`. Both are prepended to their respective arrays so translated content stays aligned.
