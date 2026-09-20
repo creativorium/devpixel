@@ -121,7 +121,15 @@ export async function saveInvoice(
 ) {
   const data = validateStoredInvoice(value);
   const headers = (await request("Invoices!A1:I1")).values?.[0];
-  if (!headers || invoiceHeaders.some((h, i) => headers[i] !== h))
+  if (
+    !headers ||
+    invoiceHeaders.some(
+      (h, i) =>
+        String(headers[i] ?? "")
+          .trim()
+          .toLowerCase() !== h.toLowerCase(),
+    )
+  )
     throw new Error("Invoice sheet headers missing");
   const id = randomBytes(18).toString("base64url");
   const url = `${site.url}/i/${id}`;

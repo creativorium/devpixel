@@ -43,11 +43,14 @@ export async function POST(request: Request) {
   }
   try {
     return Response.json(await saveInvoice(data), { status: 201, headers });
-  } catch {
+  } catch (error) {
     return Response.json(
       {
         message:
-          "Could not save the invoice. Check the Google Sheets setup. If a request timed out, check the sheet before retrying.",
+          error instanceof Error &&
+          error.message === "Invoice sheet headers missing"
+            ? "Check columns A–I in the Invoices tab: ID, Created UTC, Invoice number, Client, Currency, Total, View link, Snapshot JSON, Status."
+            : "Could not save the invoice. Check the Sheets API is enabled, the worksheet tab is named Invoices, the service account has Editor access, and the Netlify variables are correct. If a request timed out, check the sheet before retrying.",
       },
       { status: 503, headers },
     );

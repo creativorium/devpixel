@@ -17,6 +17,7 @@ export function InvoiceEditor() {
   const [shareUrl, setShareUrl] = useState("");
   const [sharing, setSharing] = useState(false);
   const [ownerPassword, setOwnerPassword] = useState("");
+  const [shortStatus, setShortStatus] = useState("");
   const [reset, setReset] = useState(false);
   const file = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -236,32 +237,42 @@ export function InvoiceEditor() {
           className="button small"
           disabled={sharing || !valid || ownerPassword.length < 32}
           onClick={async () => {
+            setShortStatus("Saving invoice to Google Sheets...");
             setSharing(true);
             try {
               const response = await fetch("/api/invoices", {
                 method: "POST",
+                signal: AbortSignal.timeout(35_000),
                 headers: {
                   "Content-Type": "application/json",
                   Authorization: "Bearer " + ownerPassword,
                 },
                 body: JSON.stringify(data),
               });
-              const result = await response.json();
+              const result = await response.json().catch(() => {
+                throw new Error(
+                  "The server did not return an invoice response. Check the Netlify function logs and your Sheet before retrying.",
+                );
+              });
               if (!response.ok)
                 throw new Error(result.message || "Could not save invoice.");
               setShareUrl(result.url);
               try {
                 await navigator.clipboard.writeText(result.url);
-                setStatus(
+                setShortStatus(
                   "Short link copied. A fixed copy is saved in your invoice register.",
                 );
               } catch {
-                setStatus("Short link saved. Copy it from the field above.");
+                setShortStatus(
+                  "Short link saved. Copy it from the field below.",
+                );
               }
             } catch (error) {
-              setStatus(
+              setShortStatus(
                 error instanceof Error
-                  ? error.message
+                  ? error.name === "TimeoutError"
+                    ? "Saving timed out. Check your Sheet before retrying; the invoice may already have been saved."
+                    : error.message
                   : "Could not save invoice.",
               );
             } finally {
@@ -271,6 +282,32 @@ export function InvoiceEditor() {
         >
           {sharing ? "Saving..." : "Save & copy short link"}
         </button>
+        {!valid && (
+          <p>
+            Complete the client, company, invoice number and item titles. Check
+            that the due date is on or after the issue date and numeric values
+            are valid.
+          </p>
+        )}
+        {ownerPassword.length < 32 && (
+          <p>
+            Enter your complete owner password (at least 32 characters) to
+            enable saving.
+          </p>
+        )}
+        <p role="status" aria-live="polite">
+          {shortStatus}
+        </p>
+        {shareUrl && (
+          <label>
+            Invoice link to copy
+            <input
+              readOnly
+              value={shareUrl}
+              onFocus={(e) => e.currentTarget.select()}
+            />
+          </label>
+        )}
       </details>
       {reset && (
         <div className="reset-prompt" role="alert">

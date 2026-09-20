@@ -107,6 +107,17 @@ try {
     page.getByRole("button", { name: "Save & copy short link" }),
   ).toBeDisabled();
   await page.getByLabel("Owner password", { exact: true }).fill(password);
+  const failSave = async (route) =>
+    route.fulfill({
+      status: 503,
+      json: { message: "Check the Google Sheets setup." },
+    });
+  await page.route("**/api/invoices", failSave);
+  await page.getByRole("button", { name: "Save & copy short link" }).click();
+  await expect(page.locator('.invoice-short-link [role="status"]')).toHaveText(
+    "Check the Google Sheets setup.",
+  );
+  await page.unroute("**/api/invoices", failSave);
   await page.getByRole("button", { name: "Save & copy short link" }).click();
   await expect(field).toHaveValue(base + "/i/" + shortId);
   assert.ok(
@@ -145,11 +156,13 @@ try {
     await expect(
       page.locator('a[href="https://jwtradingacademy.com/"]'),
     ).toBeVisible();
-    assert.ok(
-      await page
-        .locator(".art-client img")
-        .evaluate((img) => img.complete && img.naturalWidth > 0),
-    );
+    await expect
+      .poll(() =>
+        page
+          .locator(".art-client img")
+          .evaluate((img) => img.complete && img.naturalWidth > 0),
+      )
+      .toBe(true);
     await expect(page.locator("main")).toContainText("Vite");
     await page.goto(base + prefix + "/work/wonderland-bali");
     await expect(page.locator("h1")).toHaveText("Wonderland Bali");
