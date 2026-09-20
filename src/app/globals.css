@@ -3701,6 +3701,9 @@ html:not([lang="en"]) h2 {
   height: auto;
   aspect-ratio: 1440 / 1000;
 }
+.project-detail .art-fzfilmco {
+  aspect-ratio: 1664 / 1024;
+}
 .invoice-item input,
 .invoice-item textarea {
   font-size: 14px;
@@ -3777,6 +3780,9 @@ html:not([lang="en"]) h2 {
   .project-card .art-client {
     height: auto;
     aspect-ratio: 1440 / 1000;
+  }
+  .project-card .art-fzfilmco {
+    aspect-ratio: 1664 / 1024;
   }
   .project-card .art-client img {
     display: block;

@@ -4,18 +4,20 @@ import { projects } from "@/lib/site";
 export function ProjectArt({ kind }: { kind: string }) {
   if (kind === "jw" || kind === "wonderland" || kind === "fzfilmco")
     return (
-      <div className="project-art art-client">
+      <div
+        className={`project-art art-client${kind === "fzfilmco" ? " art-fzfilmco" : ""}`}
+      >
         <Image
           src={
             kind === "jw"
               ? "/work/jw-trading-academy.jpg"
               : kind === "wonderland"
                 ? "/work/wonderland-bali.jpg"
-                : "/work/fz-film-co.jpg"
+                : "/work/fz-film-co-wedding.jpg"
           }
           alt={`${kind === "jw" ? "JW Trading Academy" : kind === "wonderland" ? "Wonderland Bali" : "FZ Film Co"} website homepage`}
-          width={1440}
-          height={1000}
+          width={kind === "fzfilmco" ? 1664 : 1440}
+          height={kind === "fzfilmco" ? 1024 : 1000}
           sizes="(max-width: 760px) 100vw, 50vw"
         />
       </div>

@@ -183,6 +183,9 @@ try {
   await expect(page.locator(".project-card").first()).toContainText(
     "JW Trading Academy",
   );
+  await expect(
+    page.locator('.project-card[href="/work/fz-film-co"] img'),
+  ).toHaveAttribute("src", /fz-film-co-wedding/);
   for (const prefix of ["", "/de", "/id", "/ja", "/zh"]) {
     await page.goto(base + prefix + "/");
     const featured = await page
