@@ -71,3 +71,10 @@ export const projects = [
     services: "Product strategy / UI/UX design / Design system",
   },
 ];
+
+const homeProjectSlugs = ["fz-film-co", "jw-trading-academy"];
+export const homeProjects = homeProjectSlugs.map((slug) => {
+  const project = projects.find((item) => item.slug === slug);
+  if (!project) throw new Error(`Missing homepage project: ${slug}`);
+  return project;
+});

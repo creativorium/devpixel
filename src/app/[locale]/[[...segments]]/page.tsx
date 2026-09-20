@@ -14,7 +14,7 @@ import { messages } from "@/lib/translations/ui";
 import { articles } from "@/lib/translations/articles";
 import { legal } from "@/lib/translations/legal";
 import { services } from "@/lib/services";
-import { projects, site } from "@/lib/site";
+import { homeProjects, projects, site } from "@/lib/site";
 import { posts } from "@/lib/posts";
 import { pageMetadata } from "@/lib/seo";
 import { Sculpture } from "@/components/sculpture";
@@ -124,7 +124,7 @@ export default async function NativePage({
   );
   const projectGrid = (
     <div className="project-grid">
-      {projects.slice(0, path === "/" ? 2 : projects.length).map((p) => (
+      {(path === "/" ? homeProjects : projects).map((p) => (
         <Link
           className="project-card"
           href={href("/work/" + p.slug)}

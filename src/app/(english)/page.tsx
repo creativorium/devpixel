@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Sculpture } from "@/components/sculpture";
 import { ProjectCard } from "@/components/project-card";
 import { PixelMark } from "@/components/brand";
-import { projects } from "@/lib/site";
+import { homeProjects } from "@/lib/site";
 import { services } from "@/lib/services";
 import { ServiceTicker } from "@/components/service-ticker";
 import { posts } from "@/lib/posts";
@@ -77,7 +77,7 @@ export default function Home() {
           </div>
         </div>
         <div className="project-grid">
-          {projects.slice(0, 2).map((p) => (
+          {homeProjects.map((p) => (
             <ProjectCard key={p.slug} project={p} />
           ))}
         </div>

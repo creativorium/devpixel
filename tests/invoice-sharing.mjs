@@ -183,6 +183,13 @@ try {
   await expect(page.locator(".project-card").first()).toContainText(
     "JW Trading Academy",
   );
+  for (const prefix of ["", "/de", "/id", "/ja", "/zh"]) {
+    await page.goto(base + prefix + "/");
+    const featured = await page
+      .locator(".project-grid .project-card h3")
+      .allTextContents();
+    assert.deepEqual(featured, ["FZ Film Co", "JW Trading Academy"]);
+  }
   console.log(
     "Sharing and portfolio checks passed: independent snapshots, short-link creation/view/revocation with mocked storage, no persisted password, isolated viewers, paper border/print/mobile, invalid links, and all three client case studies in five languages.",
   );
