@@ -31,6 +31,16 @@ export const projects = [
       "Vite development / GA4 / Google Search Console / Monthly maintenance",
   },
   {
+    slug: "fz-film-co",
+    name: "FZ Film Co",
+    category: "Web development",
+    year: "Client project",
+    kind: "fzfilmco",
+    description:
+      "Vue website development for FZ Film Co, a film production company in Singapore.",
+    services: "Vue development / Responsive website / Project showcase",
+  },
+  {
     slug: "form-and-field",
     name: "Form & Field",
     category: "Brand identity",

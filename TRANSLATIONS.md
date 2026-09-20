@@ -27,4 +27,4 @@ No Vercel environment-variable changes are required. The existing Resend configu
 
 Routing follows the [Next.js internationalization guidance](https://nextjs.org/docs/app/guides/internationalization).
 
-The two Bali agency articles are in `src/lib/agency-posts.ts`, with condensed native editions in `src/lib/translations/agency-articles.ts`. Both are prepended to their respective arrays so translated content stays aligned.
+The two Bali agency articles are in `src/lib/agency-posts.ts`, with condensed native editions in `src/lib/translations/agency-articles.ts`. Both are prepended to their respective arrays so translated content stays aligned. Client case-study copy for JW Trading Academy, Wonderland Bali, and FZ Film Co lives in `src/lib/project-copy.ts`.

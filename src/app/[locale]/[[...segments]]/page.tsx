@@ -64,7 +64,7 @@ export async function generateMetadata({
     if (i >= 0) {
       title = projects[i].name;
       description = isClientProject(projects[i].kind)
-        ? clientCopyFor(projects[i].kind as "jw" | "wonderland", locale).intro
+        ? clientCopyFor(projects[i].kind, locale).intro
         : c.projectDescriptions[conceptIndex(projects[i].kind)];
     }
   }

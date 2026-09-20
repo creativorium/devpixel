@@ -262,10 +262,127 @@ export const wonderlandCopy: Record<Locale, ClientCopy> = {
     ],
   },
 };
-export type ClientKind = "jw" | "wonderland";
+export const fzFilmCoCopy: Record<Locale, ClientCopy> = {
+  en: {
+    label: "CLIENT PROJECT / SINGAPORE",
+    category: "Web development",
+    intro:
+      "Vue website development for FZ Film Co, a film production company based in Singapore.",
+    visit: "Visit the website",
+    scope: "A focused portfolio website for film and production work.",
+    sections: [
+      [
+        "Vue development",
+        "We developed the website with Vue, creating a responsive foundation for presenting the company and its work.",
+      ],
+      [
+        "Project showcase",
+        "The website gives FZ Film Co a visual space to present film, commercial, and social media production work.",
+      ],
+      [
+        "Responsive experience",
+        "Layouts and interactions adapt across desktop and mobile so the portfolio remains clear and accessible on different screens.",
+      ],
+    ],
+  },
+  de: {
+    label: "KUNDENPROJEKT / SINGAPUR",
+    category: "Webentwicklung",
+    intro:
+      "Entwicklung einer Vue-Website für FZ Film Co, eine Filmproduktionsfirma aus Singapur.",
+    visit: "Website besuchen",
+    scope:
+      "Eine fokussierte Portfolio-Website für Film- und Produktionsarbeiten.",
+    sections: [
+      [
+        "Vue-Entwicklung",
+        "Wir entwickelten die responsive Website mit Vue als Grundlage für die Präsentation des Unternehmens und seiner Arbeiten.",
+      ],
+      [
+        "Projektpräsentation",
+        "Die Website bietet FZ Film Co einen visuellen Raum für Film-, Werbe- und Social-Media-Produktionen.",
+      ],
+      [
+        "Responsive Nutzung",
+        "Layouts und Interaktionen passen sich Desktop und Mobilgeräten an, damit das Portfolio auf verschiedenen Bildschirmen klar zugänglich bleibt.",
+      ],
+    ],
+  },
+  zh: {
+    label: "客户项目 / 新加坡",
+    category: "网站开发",
+    intro: "为新加坡电影制作公司 FZ Film Co 开发 Vue 网站。",
+    visit: "访问网站",
+    scope: "用于展示影视制作作品的专注型作品集网站。",
+    sections: [
+      [
+        "Vue 开发",
+        "我们使用 Vue 开发响应式网站，为公司及其作品展示建立稳定基础。",
+      ],
+      [
+        "项目展示",
+        "网站为 FZ Film Co 提供视觉空间，展示电影、商业广告和社交媒体制作项目。",
+      ],
+      [
+        "响应式体验",
+        "页面布局和交互适配桌面与移动设备，让作品集在不同屏幕上保持清晰易用。",
+      ],
+    ],
+  },
+  ja: {
+    label: "クライアント案件 / シンガポール",
+    category: "ウェブ開発",
+    intro:
+      "シンガポールの映像制作会社 FZ Film Co のウェブサイトを Vue で開発しました。",
+    visit: "サイトを見る",
+    scope: "映像・制作実績を伝えるためのポートフォリオサイト。",
+    sections: [
+      [
+        "Vue 開発",
+        "Vue を使ってレスポンシブなウェブサイトを開発し、会社と制作実績を紹介する基盤を整えました。",
+      ],
+      [
+        "プロジェクト紹介",
+        "映画、広告、ソーシャルメディアの制作実績を視覚的に紹介できる場を構築しました。",
+      ],
+      [
+        "レスポンシブ対応",
+        "デスクトップとモバイルの両方でポートフォリオが見やすくなるよう、レイアウトと操作を最適化しました。",
+      ],
+    ],
+  },
+  id: {
+    label: "PROYEK KLIEN / SINGAPURA",
+    category: "Pengembangan web",
+    intro:
+      "Pengembangan website Vue untuk FZ Film Co, perusahaan produksi film yang berbasis di Singapura.",
+    visit: "Kunjungi website",
+    scope: "Website portofolio terarah untuk karya film dan produksi.",
+    sections: [
+      [
+        "Pengembangan Vue",
+        "Kami mengembangkan website responsif dengan Vue sebagai fondasi untuk memperkenalkan perusahaan dan karya-karyanya.",
+      ],
+      [
+        "Pameran proyek",
+        "Website ini memberi FZ Film Co ruang visual untuk menampilkan karya film, iklan komersial, dan produksi media sosial.",
+      ],
+      [
+        "Pengalaman responsif",
+        "Tata letak dan interaksi menyesuaikan desktop dan perangkat seluler agar portofolio tetap jelas di berbagai ukuran layar.",
+      ],
+    ],
+  },
+};
+
+export type ClientKind = "jw" | "wonderland" | "fzfilmco";
 export function isClientProject(kind: string): kind is ClientKind {
-  return kind === "jw" || kind === "wonderland";
+  return kind === "jw" || kind === "wonderland" || kind === "fzfilmco";
 }
 export function clientCopyFor(kind: ClientKind, locale: Locale) {
-  return kind === "jw" ? jwCopy[locale] : wonderlandCopy[locale];
+  return kind === "jw"
+    ? jwCopy[locale]
+    : kind === "wonderland"
+      ? wonderlandCopy[locale]
+      : fzFilmCoCopy[locale];
 }

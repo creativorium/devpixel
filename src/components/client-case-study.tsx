@@ -18,7 +18,13 @@ export function ClientCaseStudy({
         ← {t.allWork}
       </Link>
       <p className="eyebrow">{c.label}</p>
-      <h1>{kind === "jw" ? "JW Trading Academy" : "Wonderland Bali"}</h1>
+      <h1>
+        {kind === "jw"
+          ? "JW Trading Academy"
+          : kind === "wonderland"
+            ? "Wonderland Bali"
+            : "FZ Film Co"}
+      </h1>
       <div className="intro-row">
         <p>{c.intro}</p>
         <a
@@ -26,7 +32,9 @@ export function ClientCaseStudy({
           href={
             kind === "jw"
               ? "https://jwtradingacademy.com/"
-              : "https://wonderlandbali.com/"
+              : kind === "wonderland"
+                ? "https://wonderlandbali.com/"
+                : "https://fzfilmco.com/"
           }
           target="_blank"
           rel="noopener noreferrer"

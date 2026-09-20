@@ -172,14 +172,19 @@ try {
     await expect(page.locator("main")).toContainText("Vite");
     await expect(page.locator("main")).toContainText("Search Console");
     await expect(page.locator(".art-client img")).toBeVisible();
+    await page.goto(base + prefix + "/work/fz-film-co");
+    await expect(page.locator("h1")).toHaveText("FZ Film Co");
+    await expect(page.locator('a[href="https://fzfilmco.com/"]')).toBeVisible();
+    await expect(page.locator("main")).toContainText("Vue");
+    await expect(page.locator(".art-client img")).toBeVisible();
   }
   await page.goto(base + "/work");
-  await expect(page.locator(".project-card")).toHaveCount(5);
+  await expect(page.locator(".project-card")).toHaveCount(6);
   await expect(page.locator(".project-card").first()).toContainText(
     "JW Trading Academy",
   );
   console.log(
-    "Sharing and portfolio checks passed: independent snapshots, short-link creation/view/revocation with mocked storage, no persisted password, isolated viewers, paper border/print/mobile, invalid links, and both client case studies in all five languages.",
+    "Sharing and portfolio checks passed: independent snapshots, short-link creation/view/revocation with mocked storage, no persisted password, isolated viewers, paper border/print/mobile, invalid links, and all three client case studies in five languages.",
   );
   await recipient.close();
   await context.close();

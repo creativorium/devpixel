@@ -2,16 +2,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { projects } from "@/lib/site";
 export function ProjectArt({ kind }: { kind: string }) {
-  if (kind === "jw" || kind === "wonderland")
+  if (kind === "jw" || kind === "wonderland" || kind === "fzfilmco")
     return (
       <div className="project-art art-client">
         <Image
           src={
             kind === "jw"
               ? "/work/jw-trading-academy.jpg"
-              : "/work/wonderland-bali.jpg"
+              : kind === "wonderland"
+                ? "/work/wonderland-bali.jpg"
+                : "/work/fz-film-co.jpg"
           }
-          alt={`${kind === "jw" ? "JW Trading Academy" : "Wonderland Bali"} website homepage`}
+          alt={`${kind === "jw" ? "JW Trading Academy" : kind === "wonderland" ? "Wonderland Bali" : "FZ Film Co"} website homepage`}
           width={1440}
           height={1000}
           sizes="(max-width: 760px) 100vw, 50vw"
