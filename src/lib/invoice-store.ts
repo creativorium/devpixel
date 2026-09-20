@@ -62,12 +62,15 @@ export type SheetRequest = (
   values?: (string | number)[][],
 ) => Promise<SheetValues>;
 let auth: GoogleAuth | undefined;
+export class InvoiceSetupError extends Error {}
 const sheetRequest: SheetRequest = async (range, values) => {
   const id = process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
   const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   const key = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY;
   if (!id || !/^[\w-]+$/.test(id) || !email || !key)
-    throw new Error("Sheets configuration missing");
+    throw new InvoiceSetupError(
+      "Netlify is missing a Google Sheets variable, or the spreadsheet ID is invalid. Use only the ID between /d/ and /edit, not the whole URL. Check Functions scope and redeploy.",
+    );
   auth ??= new GoogleAuth({
     credentials: {
       client_email: email,
@@ -75,8 +78,18 @@ const sheetRequest: SheetRequest = async (range, values) => {
     },
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
-  const token = await auth.getAccessToken();
-  if (!token) throw new Error("Sheets authentication unavailable");
+  let token;
+  try {
+    token = await auth.getAccessToken();
+  } catch {
+    throw new InvoiceSetupError(
+      "Google authentication failed. Check that the service-account email and private key come from the same JSON file. Paste only the private_key value, including BEGIN/END PRIVATE KEY, without surrounding quotes. Confirm the key is still active, then redeploy.",
+    );
+  }
+  if (!token)
+    throw new InvoiceSetupError(
+      "Google authentication did not return an access token. Check the service-account credentials and try again.",
+    );
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(range)}${values ? ":append?valueInputOption=RAW&insertDataOption=INSERT_ROWS" : ""}`;
   const response = await fetch(url, {
     method: values ? "POST" : "GET",
@@ -92,6 +105,26 @@ const sheetRequest: SheetRequest = async (range, values) => {
   });
   if (!response.ok) {
     await response.body?.cancel();
+    if (response.status === 400)
+      throw new InvoiceSetupError(
+        "Google rejected the Sheet range or data. Check that the worksheet tab at the bottom is named exactly Invoices. The document title is separate. Also check for merged cells in columns A–I.",
+      );
+    if (response.status === 403)
+      throw new InvoiceSetupError(
+        "Google denied access. Enable Google Sheets API in the service account's project and share this spreadsheet with the service-account email as Editor. Check any protected ranges if saving is blocked.",
+      );
+    if (response.status === 404)
+      throw new InvoiceSetupError(
+        "Google could not find an accessible spreadsheet. Check GOOGLE_SHEETS_SPREADSHEET_ID and share that exact Sheet with your service-account email.",
+      );
+    if (response.status === 401)
+      throw new InvoiceSetupError(
+        "Google rejected the credentials. Confirm the service account and its key are active, update Netlify if needed, and redeploy.",
+      );
+    if (response.status === 429)
+      throw new InvoiceSetupError(
+        "Google Sheets request quota was reached. Wait a minute before retrying.",
+      );
     throw new Error("Sheets request failed");
   }
   return (await boundedJson(response, 1_000_000)) as SheetValues;
