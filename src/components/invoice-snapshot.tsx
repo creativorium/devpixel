@@ -43,8 +43,7 @@ export function InvoiceSnapshot({ id }: { id?: string }) {
     <main id="main" className="invoice-page shared-invoice">
       <div className="invoice-heading">
         <div>
-          <p className="eyebrow">SHARED INVOICE</p>
-          <h1>Invoice snapshot.</h1>
+          <h1>Invoice</h1>
         </div>
         {data && (
           <button className="button dark" onClick={() => window.print()}>
@@ -52,11 +51,6 @@ export function InvoiceSnapshot({ id }: { id?: string }) {
           </button>
         )}
       </div>
-      <p className="invoice-share-info">
-        A fixed copy supplied by the sender. This link does not verify the
-        sender’s identity or payment status. Confirm payment details directly
-        with the sender.
-      </p>
       {error ? (
         <p role="alert">{error}</p>
       ) : data ? (
