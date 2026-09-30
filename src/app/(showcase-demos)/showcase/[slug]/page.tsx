@@ -17,7 +17,7 @@ export async function generateMetadata({
     s = showcases.find((s) => s.slug === slug);
   if (!s) notFound();
   const title = `${s.name} — ${s.seo} | DevnPixel Showcase`,
-    description = `${s.style}. Explore this fictional ${s.category.toLowerCase()} website concept for ${s.location}, with interactive previews. Custom website design by DevnPixel.`,
+    description = `${s.seo}. Explore the ${s.name} concept by DevnPixel, creating websites for local and expat-owned businesses in Bali.`,
     url = `${site.url}/showcase/${slug}`;
   return {
     title,

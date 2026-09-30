@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { ShowcaseLocalContext } from "./showcase-local-context";
 import Image from "next/image";
 import Link from "next/link";
 import { showcases, showcaseCategories } from "@/lib/showcase";
@@ -86,7 +85,6 @@ export function ShowcaseIndex({ locale = "en" }: { locale?: Locale }) {
             </article>
           ))}
       </div>
-      <ShowcaseLocalContext locale={locale} />
       <div className="showcase-bottom">
         <p className="eyebrow">FROM A DIRECTION TO YOUR BRAND</p>
         <h2>{t.contact}</h2>
