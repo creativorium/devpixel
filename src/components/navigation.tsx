@@ -2,6 +2,7 @@
 import { useLanguage } from "./use-language";
 import { LanguageSwitcher } from "./language-switcher";
 import { originalPath } from "@/lib/i18n";
+import { showcaseCopy } from "@/lib/showcase-copy";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -10,7 +11,7 @@ import { ThemeToggle } from "./theme-toggle";
 import { WhatsAppButton } from "./whatsapp-button";
 export function Navigation() {
   const pathname = originalPath(usePathname());
-  const { t, href: localHref } = useLanguage();
+  const { t, locale, href: localHref } = useLanguage();
   const [open, setOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -70,6 +71,7 @@ export function Navigation() {
         {[
           ["/", t.home],
           ["/work", t.work],
+          ["/showcase", showcaseCopy[locale].nav],
           ["/about", t.studio],
           ["/services", t.services],
           ["/blog", t.journal],

@@ -1,0 +1,2097 @@
+.experience-site {
+  overflow: clip;
+}
+.experience-site h1 {
+  max-width: none;
+}
+.experience-site button {
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.2s;
+}
+.experience-site label {
+  display: grid;
+  gap: 9px;
+  font-size: 12px;
+}
+.experience-site input:not([type="checkbox"]),
+.experience-site select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  background: transparent;
+  color: inherit;
+  padding: 13px 12px;
+  border-radius: 0;
+  min-height: 47px;
+}
+.experience-site option {
+  color: #242c25;
+  background: #fff;
+}
+.experience-site form {
+  display: grid;
+  gap: 20px;
+}
+.experience-site [role="status"]:empty {
+  display: none;
+}
+.experience-site [role="status"] {
+  font-size: 13px;
+  line-height: 1.65;
+  margin: 0;
+}
+.experience-site fieldset {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+.experience-site legend {
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+.experience-site dialog {
+  color: var(--ink);
+  background: var(--paper);
+  border: 0;
+  padding: 32px;
+  max-height: 90svh;
+}
+.experience-site dialog::backdrop {
+  background: #15201999;
+  backdrop-filter: blur(4px);
+}
+.exp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 28px 5%;
+}
+.exp-header nav {
+  display: flex;
+  gap: 28px;
+  font-size: 12px;
+}
+.exp-brand {
+  font-size: 30px;
+  letter-spacing: -0.06em;
+  white-space: nowrap;
+}
+.demo-serif .exp-brand {
+  font-family: Georgia, serif;
+}
+.exp-photo {
+  position: relative;
+  overflow: hidden;
+  min-height: 150px;
+}
+.exp-photo img {
+  object-fit: cover;
+}
+.exp-dates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-width: 0;
+}
+.exp-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.exp-tabs button {
+  background: transparent;
+  color: inherit;
+  border: 1px solid color-mix(in srgb, currentColor 24%, transparent);
+  padding: 11px 17px;
+  font-size: 12px;
+}
+.exp-tabs button[aria-pressed="true"] {
+  color: var(--paper);
+  background: var(--ink);
+}
+.exp-close {
+  display: block;
+  margin: 0 0 20px auto;
+  background: transparent;
+  border: 0;
+  padding: 10px;
+}
+.exp-text-button {
+  border: 0;
+  background: transparent;
+  text-decoration: underline;
+  padding: 10px;
+}
+.experience-design {
+  padding: 90px 6%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10%;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+}
+.experience-design h2 {
+  font-size: clamp(28px, 3vw, 46px);
+}
+.experience-next {
+  padding: 0 6% 65px;
+}
+.experience-next > div {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.experience-next a {
+  border-top: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+  padding-top: 18px;
+  display: grid;
+  gap: 10px;
+}
+.experience-next a span {
+  font-size: 11px;
+}
+.experience-next a strong {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* NATIV: a storefront, product grid and shopping drawer. */
+.store-announcement {
+  padding: 10px;
+  background: #3a342e;
+  color: #fff;
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+}
+.demo-nativ-bali-objects .exp-header {
+  padding: 24px 5%;
+  border-bottom: 1px solid #3a342e24;
+}
+.store-bag-button {
+  border: 0;
+  background: transparent;
+  font-size: 13px;
+}
+.store-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  min-height: 540px;
+  background: #e6ddd1;
+}
+.store-hero > div:first-child {
+  padding: 75px 12%;
+  align-self: center;
+}
+.store-hero h1 {
+  font-size: clamp(65px, 7.5vw, 120px);
+  line-height: 0.92;
+  letter-spacing: -0.07em;
+}
+.store-hero h1 em {
+  font-family: Georgia, serif;
+  font-weight: 400;
+}
+.store-hero p:not(.demo-kicker) {
+  max-width: 350px;
+  font-size: 14px;
+}
+.store-season {
+  position: absolute;
+  bottom: 22px;
+  right: 30px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: white;
+  text-shadow: 0 1px 4px black;
+}
+.store-cta {
+  display: inline-flex;
+  justify-content: center;
+  gap: 30px;
+  align-items: center;
+  padding: 18px 26px;
+  background: #3a342e;
+  color: #fff;
+  border: 0;
+  font-size: 12px;
+  min-height: 50px;
+}
+.store-catalog {
+  padding: 80px 5% 65px;
+}
+.store-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 35px;
+}
+.store-heading h2 {
+  font-size: 40px;
+  margin: 0;
+}
+.store-heading > span {
+  font-size: 12px;
+}
+.store-tools {
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  align-items: end;
+  border-block: 1px solid #3a342e22;
+  padding: 20px 0;
+  margin-bottom: 35px;
+}
+.store-tools > .exp-tabs {
+  margin-right: auto;
+  align-self: center;
+}
+.store-tools label {
+  max-width: 210px;
+}
+.store-tools input,
+.store-tools select {
+  font-size: 12px;
+}
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 26px;
+}
+.store-quick-view {
+  position: relative;
+  padding: 0;
+  width: 100%;
+  border: 0;
+  background: transparent;
+}
+.store-object {
+  height: 340px;
+  background: #e6ded3;
+}
+.store-quick-view > span {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  padding: 13px;
+  background: #fff9;
+  font-size: 12px;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: 0.2s;
+}
+.store-quick-view:hover > span,
+.store-quick-view:focus-visible > span {
+  opacity: 1;
+  transform: none;
+}
+.store-product:nth-child(2) .store-object {
+  background: #e6e7e1;
+}
+.store-product:nth-child(3) .store-object {
+  background: #e8ddd5;
+}
+.store-product-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 22px 0 8px;
+}
+.store-product-title h3 {
+  font-size: 19px;
+  margin: 0;
+}
+.store-product-title > span {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.store-product > p {
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+.store-product-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.store-add {
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  padding: 8px 0;
+  background: transparent;
+  font-size: 12px;
+}
+.store-swatches {
+  display: flex;
+  gap: 9px;
+}
+.swatch {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 3px solid var(--paper);
+  border-radius: 50%;
+  outline: 1px solid transparent;
+}
+.swatch[aria-pressed="true"] {
+  outline-color: var(--ink);
+}
+.swatch-sand {
+  background: #c5af97;
+}
+.swatch-charcoal {
+  background: #464845;
+}
+.object-dark .demo-object i:first-child {
+  background: linear-gradient(100deg, #292d2b, #777b73 48%, #30342f);
+}
+.object-dark .demo-object i:first-child:before {
+  background: #252925;
+  border-color: #676c64;
+}
+.store-status {
+  padding-top: 22px;
+  min-height: 25px;
+}
+.store-story {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #e4e5dc;
+}
+.store-story .exp-photo {
+  min-height: 500px;
+}
+.store-story > div:last-child {
+  align-self: center;
+  padding: 70px 12%;
+}
+.store-story h2 {
+  font-size: clamp(35px, 4vw, 58px);
+}
+.store-detail {
+  width: min(900px, 94vw);
+}
+.store-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 35px;
+  align-items: center;
+}
+.store-detail-grid h2 {
+  font-size: 38px;
+}
+.store-detail-grid > div:last-child {
+  padding-right: 20px;
+}
+.store-detail-grid .store-object {
+  height: 400px;
+}
+.experience-site .store-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  height: 100svh;
+  max-height: 100svh;
+  width: min(470px, 100vw);
+  margin: 0;
+  padding: 32px;
+}
+.store-drawer-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 28px;
+  border-bottom: 1px solid #3a342e33;
+}
+.store-drawer-head h2 {
+  font-size: 30px;
+  margin: 0;
+}
+.store-drawer-head button {
+  border: 0;
+  background: transparent;
+  font-size: 28px;
+}
+.store-cart-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 24px 0;
+  border-bottom: 1px solid #3a342e22;
+}
+.store-cart-line strong {
+  font-size: 15px;
+}
+.store-cart-line p {
+  font-size: 11px;
+  margin: 8px 0 0;
+}
+.store-cart-line .demo-quantity {
+  gap: 10px;
+}
+.store-cart-line .demo-quantity button {
+  width: 28px;
+  height: 28px;
+}
+.store-subtotal {
+  display: flex;
+  justify-content: space-between;
+  margin: 32px 0 14px;
+}
+.store-drawer > .store-cta {
+  width: 100%;
+}
+.store-drawer [role="status"] {
+  padding-top: 16px;
+}
+
+/* COAST: fleet selection beside a persistent booking summary. */
+.demo-coast-canggu-rental {
+  --paper: #f3f5ef !important;
+  --ink: #19392b !important;
+}
+.demo-coast-canggu-rental .exp-header {
+  background: #e5fa83;
+  border-bottom: 1px solid #19392b30;
+}
+.demo-coast-canggu-rental .exp-brand {
+  font-weight: 700;
+}
+.rental-nav-cta,
+.rental-submit {
+  background: #19392b;
+  color: #e5fa83;
+  border: 0;
+  padding: 16px 22px;
+  font-size: 12px;
+}
+.rental-intro {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 60px 5%;
+  background: #e5fa83;
+}
+.rental-intro h1 {
+  font-size: clamp(58px, 6vw, 92px);
+  line-height: 1;
+  font-weight: 700;
+  max-width: 900px;
+}
+.rental-intro p:not(.demo-kicker) {
+  max-width: 480px;
+  font-size: 14px;
+  margin-bottom: 0;
+}
+.rental-stamp {
+  flex: 0 0 185px;
+  width: 185px;
+  height: 185px;
+  border: 2px solid #19392b;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  transform: rotate(12deg);
+}
+.rental-stamp span {
+  font-size: 9px;
+  letter-spacing: 0.13em;
+}
+.rental-stamp strong {
+  font-size: 56px;
+}
+.rental-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  gap: 40px;
+  padding: 60px 5% 80px;
+  align-items: start;
+}
+.rental-section-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+.rental-section-label h2 {
+  font-size: 23px;
+  margin: 0;
+  letter-spacing: -0.035em;
+}
+.rental-section-label > span {
+  font-size: 11px;
+}
+.rental-fleet > .exp-tabs {
+  margin-bottom: 25px;
+}
+.rental-bike-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.rental-bike-card {
+  text-align: left;
+  color: #19392b;
+  border: 1px solid #cdd5c9;
+  background: #fff;
+  padding: 20px;
+}
+.rental-bike-card.selected {
+  border: 2px solid #19392b;
+  padding: 19px;
+  background: #f4fadf;
+}
+.rental-card-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  gap: 10px;
+  letter-spacing: 0.03em;
+}
+.bike-illustration {
+  width: 100%;
+  height: auto;
+  display: block;
+  color: #b8c6b4;
+}
+.bike-1 {
+  color: #d4b295;
+}
+.bike-2 {
+  color: #72968e;
+}
+.rental-bike-card .bike-illustration {
+  margin: 22px 0;
+}
+.rental-bike-card h3 {
+  font-size: 22px;
+  margin-bottom: 13px;
+}
+.rental-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+.rental-specs span {
+  background: #19392b09;
+  padding: 5px 8px;
+  font-size: 9px;
+}
+.rental-bike-card > strong {
+  font-size: 19px;
+}
+.rental-bike-card small {
+  font-size: 10px;
+  font-weight: 400;
+}
+.rental-fleet > .demo-small {
+  margin-top: 25px;
+  max-width: 580px;
+}
+.rental-booking {
+  position: sticky;
+  top: 80px;
+  background: white;
+  border: 1px solid #ccd4c8;
+  box-shadow: 0 10px 30px #19392b09;
+  padding: 28px;
+}
+.rental-booking h2 {
+  font-size: 33px;
+  margin-bottom: 0;
+}
+.rental-booking .demo-kicker {
+  margin: 0;
+}
+.rental-selection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-block: 1px solid #19392b20;
+}
+.rental-selection svg {
+  width: 110px;
+  flex-shrink: 0;
+}
+.rental-selection strong {
+  font-size: 13px;
+}
+.experience-site .exp-check {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+}
+.exp-check input {
+  accent-color: #19392b;
+}
+.rental-totals {
+  margin: 0;
+  font-size: 12px;
+}
+.rental-totals > div {
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 0;
+}
+.rental-totals dd {
+  margin: 0;
+}
+.rental-totals > div:last-child {
+  border-top: 1px solid #19392b33;
+  font-size: 16px;
+  padding-top: 17px;
+  margin-top: 6px;
+}
+.rental-booking [role="status"] {
+  background: #eff5e4;
+  padding: 12px;
+}
+.rental-booking .demo-small {
+  margin: 0;
+  font-size: 10px;
+}
+.rental-how {
+  display: grid;
+  grid-template-columns: 1.2fr repeat(3, 1fr);
+  gap: 35px;
+  padding: 65px 5%;
+  background: #dbe6d3;
+}
+.rental-how h2 {
+  font-size: 42px;
+}
+.rental-how article > span {
+  font-size: 12px;
+  display: block;
+  margin-bottom: 30px;
+}
+.rental-how h3 {
+  font-size: 20px;
+}
+.rental-how p {
+  font-size: 13px;
+}
+
+/* EMBER: an oversized editorial opening and readable restaurant menu. */
+.restaurant-reserve {
+  display: inline-flex;
+  background: transparent;
+  border: 1px solid #f8ead477;
+  padding: 15px 22px;
+  color: inherit;
+  font-size: 12px;
+}
+.restaurant-title {
+  padding: 55px 5% 45px;
+  text-align: center;
+}
+.restaurant-title h1 {
+  font-size: clamp(66px, 8vw, 125px);
+  line-height: 0.95;
+  margin-bottom: 0;
+}
+.restaurant-title h1 em {
+  color: #dda571;
+}
+.restaurant-hero > .exp-photo {
+  height: 450px;
+  margin: 0 5%;
+}
+.restaurant-hero-bottom {
+  display: grid;
+  grid-template-columns: 1.1fr 0.6fr 1fr;
+  gap: 40px;
+  align-items: center;
+  padding: 30px 5% 60px;
+}
+.restaurant-hero-bottom p {
+  max-width: 380px;
+  font-size: 13px;
+  margin: 0;
+}
+.restaurant-hero-bottom > a {
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 8px;
+  font-size: 12px;
+}
+.restaurant-hero-bottom > span {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  line-height: 1.9;
+  text-align: right;
+}
+.restaurant-menu {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 10%;
+  padding: 90px 8%;
+  border-top: 1px solid #f8ead433;
+}
+.restaurant-menu-heading {
+  align-self: center;
+}
+.restaurant-menu-heading h2 {
+  font-size: clamp(48px, 5vw, 80px);
+}
+.restaurant-menu-heading > .exp-tabs {
+  margin: 32px 0;
+}
+.restaurant-menu-heading > .demo-small {
+  max-width: 320px;
+  font-size: 11px;
+}
+.restaurant-menu-paper {
+  background: #f5e8d5;
+  color: #393127;
+  padding: 45px;
+  outline: 1px solid #847562;
+  outline-offset: -12px;
+}
+.restaurant-menu-date {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-align: center;
+  margin-bottom: 32px;
+}
+.restaurant-menu-paper article {
+  display: flex;
+  justify-content: space-between;
+  gap: 22px;
+  border-bottom: 1px solid #39312730;
+  padding: 25px 0;
+}
+.restaurant-menu-paper h3 {
+  font-family: Georgia, serif;
+  font-size: 26px;
+}
+.restaurant-menu-paper article p {
+  font-size: 12px;
+  margin-bottom: 0;
+}
+.restaurant-menu-paper article strong {
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 400;
+  padding-top: 6px;
+}
+.restaurant-menu-signature {
+  text-align: center;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 28px;
+  padding-top: 35px;
+}
+.restaurant-vibe {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8%;
+  padding: 40px 8% 90px;
+  align-items: center;
+}
+.restaurant-vibe .exp-photo {
+  height: 500px;
+  border-radius: 50% 50% 0 0;
+}
+.restaurant-vibe h2 {
+  font-size: clamp(42px, 4vw, 65px);
+}
+.restaurant-vibe p:not(.demo-kicker) {
+  font-size: 14px;
+  max-width: 420px;
+}
+.restaurant-vibe .restaurant-reserve {
+  margin-top: 15px;
+}
+.restaurant-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12%;
+  background: #253328;
+  padding: 85px 8%;
+}
+.restaurant-table h2 {
+  font-size: 55px;
+}
+.restaurant-table > div > p:not(.demo-kicker) {
+  max-width: 350px;
+  font-size: 13px;
+}
+.restaurant-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+.restaurant-table form {
+  align-self: center;
+}
+.restaurant-table .restaurant-reserve {
+  justify-content: center;
+  background: #f8ead4;
+  color: #253328;
+}
+
+/* SELA: arched imagery and treatment-to-appointment selection. */
+.demo-sela-ubud-spa .exp-header {
+  border-bottom: 1px solid #4b493a20;
+}
+.spa-link {
+  font-size: 12px;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 7px;
+}
+.spa-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7%;
+  padding: 55px 9% 90px;
+  position: relative;
+  align-items: center;
+}
+.spa-hero-copy h1 {
+  font-size: clamp(62px, 7vw, 105px);
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+}
+.spa-hero-copy h1 em {
+  color: #8b785c;
+}
+.spa-hero-copy > p:not(.demo-kicker) {
+  max-width: 300px;
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+.spa-hero > .exp-photo {
+  height: 580px;
+  border-radius: 48% 48% 3px 3px;
+}
+.spa-side-note {
+  position: absolute;
+  left: 2%;
+  top: 180px;
+  writing-mode: vertical-rl;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+}
+.spa-circle {
+  position: absolute;
+  bottom: 50px;
+  left: 49%;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  background: #ded2bf;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  line-height: 1.7;
+  transform: rotate(-14deg);
+  border: 1px solid #4b493a44;
+}
+.spa-philosophy {
+  display: grid;
+  grid-template-columns: 0.3fr 1.5fr 1fr;
+  gap: 45px;
+  padding: 55px 9% 75px;
+  align-items: center;
+  border-bottom: 1px solid #4b493a25;
+}
+.spa-philosophy > span {
+  font-size: 58px;
+  color: #8b785c;
+}
+.spa-philosophy > p {
+  font-family: Georgia, serif;
+  font-size: 33px;
+  line-height: 1.3;
+  margin: 0;
+}
+.spa-philosophy > div {
+  font-size: 13px;
+  line-height: 1.9;
+}
+.spa-treatment-layout {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 10%;
+  padding: 90px 9%;
+  align-items: start;
+}
+.spa-treatments h2 {
+  font-size: clamp(45px, 5vw, 70px);
+  margin-bottom: 45px;
+}
+.spa-treatment {
+  display: flex;
+  align-items: start;
+  gap: 20px;
+  width: 100%;
+  padding: 28px 0;
+  text-align: left;
+  border: 0;
+  border-top: 1px solid #4b493a40;
+  background: transparent;
+}
+.spa-treatment.selected {
+  background: #4b493a08;
+  padding-inline: 16px;
+}
+.spa-treatment-number {
+  font-size: 10px;
+  padding-top: 7px;
+}
+.spa-treatment > span:nth-child(2) {
+  flex: 1;
+}
+.spa-treatment strong {
+  display: block;
+  font-family: Georgia, serif;
+  font-size: 27px;
+  font-weight: 400;
+  margin-bottom: 12px;
+}
+.spa-treatment small {
+  display: block;
+  font-size: 12px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+.spa-treatment em {
+  font-size: 10px;
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+.spa-treatment > span:last-child {
+  font-size: 21px;
+}
+.spa-appointment {
+  padding: 40px;
+  background: #e1d7c7;
+  border-radius: 140px 140px 0 0;
+  padding-top: 70px;
+  position: sticky;
+  top: 80px;
+}
+.spa-appointment > .demo-kicker,
+.spa-appointment > h2 {
+  text-align: center;
+}
+.spa-appointment > h2 {
+  font-size: 42px;
+}
+.spa-selected {
+  text-align: center;
+  border-block: 1px solid #4b493a30;
+  padding: 17px 0;
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: 22px;
+}
+.spa-times {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.spa-times button {
+  background: transparent;
+  border: 1px solid #4b493a40;
+  padding: 12px 8px;
+  font-size: 11px;
+}
+.spa-times button[aria-pressed="true"] {
+  background: #4b493a;
+  color: #eee7dc;
+}
+.spa-price {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+  border-top: 1px solid #4b493a30;
+  padding-top: 20px;
+}
+.spa-submit {
+  background: #4b493a;
+  color: #fff;
+  border: 0;
+  padding: 17px;
+  font-size: 12px;
+}
+.spa-appointment .demo-small {
+  margin: 0;
+  font-size: 10px;
+}
+.spa-closing {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  background: #dce0d4;
+}
+.spa-closing > .exp-photo {
+  height: 400px;
+}
+.spa-closing > div:last-child {
+  padding: 55px 15%;
+}
+.spa-closing h2 {
+  font-size: 54px;
+}
+.spa-closing p:not(.demo-kicker) {
+  font-size: 13px;
+}
+
+/* RIMBA: hospitality booking bar and spacious room comparisons. */
+.hotel-reserve {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 16px 23px;
+  color: #f3f0e7;
+  background: #243b2e;
+  border: 0;
+  font-size: 12px;
+}
+.hotel-hero {
+  position: relative;
+  color: white;
+  min-height: 620px;
+  display: flex;
+  align-items: center;
+  padding: 90px 8%;
+}
+.hotel-hero > .exp-photo {
+  position: absolute;
+  inset: 0;
+}
+.hotel-hero > .exp-photo:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #10251aba, #10251a22);
+}
+.hotel-hero > div:nth-child(2) {
+  position: relative;
+  z-index: 1;
+}
+.hotel-hero h1 {
+  font-size: clamp(70px, 7vw, 115px);
+  line-height: 0.95;
+}
+.hotel-hero p:not(.demo-kicker) {
+  max-width: 350px;
+  font-size: 14px;
+}
+.hotel-coordinate {
+  position: absolute;
+  right: 35px;
+  bottom: 30px;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+}
+.experience-site .hotel-booking-bar {
+  position: relative;
+  margin: -28px 5% 0;
+  background: #e7e9db;
+  padding: 30px;
+  grid-template-columns: 2fr 1fr 0.7fr auto;
+  gap: 20px;
+  align-items: end;
+  box-shadow: 0 10px 30px #243b2e0c;
+}
+.hotel-booking-bar .exp-dates {
+  gap: 18px;
+}
+.hotel-booking-bar > [role="status"] {
+  grid-column: 1/-1;
+}
+.hotel-welcome {
+  text-align: center;
+  padding: 100px 8% 80px;
+}
+.hotel-welcome h2 {
+  font-size: clamp(44px, 5vw, 72px);
+}
+.hotel-welcome > p:last-child {
+  max-width: 580px;
+  margin: 30px auto 0;
+  font-size: 14px;
+  line-height: 1.9;
+}
+.hotel-rooms {
+  padding: 0 8% 85px;
+}
+.hotel-section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 35px;
+  align-items: end;
+  margin-bottom: 40px;
+}
+.hotel-section-heading h2 {
+  font-size: 48px;
+  margin: 0;
+}
+.hotel-section-heading p {
+  font-size: 13px;
+  margin: 0;
+}
+.hotel-room {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  margin-bottom: 32px;
+  background: #e9e8df;
+}
+.hotel-room:nth-child(odd) {
+  grid-template-columns: 1fr 1.2fr;
+}
+.hotel-room:nth-child(odd) > .exp-photo {
+  order: 2;
+}
+.hotel-room > .exp-photo {
+  min-height: 360px;
+}
+.hotel-room > div:last-child {
+  padding: 45px;
+  align-self: center;
+}
+.hotel-room h3 {
+  font:
+    40px Georgia,
+    serif;
+  margin-bottom: 18px;
+}
+.hotel-room p,
+.hotel-room ul {
+  font-size: 13px;
+  line-height: 1.8;
+}
+.hotel-room ul {
+  padding-left: 18px;
+  margin: 22px 0;
+}
+.hotel-room-price {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+  border-top: 1px solid #243b2e25;
+  padding-top: 22px;
+  align-items: center;
+  font-size: 11px;
+}
+.hotel-room-price button {
+  border: 0;
+  background: transparent;
+  border-bottom: 1px solid currentColor;
+  padding: 5px 0;
+  font-size: 12px;
+}
+
+/* SORA: one property, a photo mosaic, floor plans and stay calculator. */
+.villa-enquire {
+  display: inline-flex;
+  justify-content: center;
+  border: 0;
+  color: #f7f3e8;
+  background: #263f50;
+  padding: 16px 22px;
+  font-size: 12px;
+}
+.villa-heading {
+  padding: 45px 5% 35px;
+}
+.villa-heading h1 {
+  font-size: clamp(58px, 6.5vw, 100px);
+  margin-bottom: 30px;
+}
+.villa-heading > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 25px;
+  font-size: 12px;
+}
+.villa-gallery {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 14px;
+  margin: 0 5%;
+  height: 510px;
+}
+.villa-gallery button {
+  padding: 0;
+  border: 0;
+  position: relative;
+  overflow: hidden;
+  background: #dce3e4;
+}
+.villa-gallery > .exp-photo,
+.villa-gallery button .exp-photo {
+  height: 100%;
+}
+.villa-gallery > div {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+  min-height: 0;
+}
+.villa-gallery > button > span {
+  position: absolute;
+  left: 25px;
+  bottom: 25px;
+  padding: 14px 22px;
+  background: #fff;
+  font-size: 12px;
+}
+.villa-gallery button img {
+  transition: transform 0.6s;
+}
+.villa-gallery button:hover img {
+  transform: scale(1.03);
+}
+.villa-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  gap: 8%;
+  padding: 65px 5% 80px;
+  align-items: start;
+}
+.villa-house h2 {
+  font-size: clamp(42px, 4.5vw, 64px);
+}
+.villa-house > p:not(.demo-kicker) {
+  max-width: 610px;
+  font-size: 14px;
+}
+.villa-amenities {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 35px 0 50px;
+  border-block: 1px solid #263f5025;
+  padding: 30px 0;
+  gap: 25px;
+}
+.villa-amenities > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+}
+.villa-amenities span {
+  font-size: 24px;
+}
+.villa-house > h3 {
+  font:
+    28px Georgia,
+    serif;
+  margin-bottom: 25px;
+}
+.villa-plan {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 30px;
+  margin: 30px 0 50px;
+  align-items: center;
+}
+.villa-plan h3 {
+  font:
+    26px Georgia,
+    serif;
+}
+.villa-plan p {
+  font-size: 12px;
+}
+.villa-floorplan {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border: 4px solid #758591;
+  background: #ebece4;
+  padding: 8px;
+  gap: 6px;
+  min-height: 250px;
+}
+.villa-floorplan > span {
+  display: grid;
+  place-content: center;
+  font-size: 9px;
+  text-align: center;
+  border: 1px solid #7d8b9455;
+  padding: 17px 8px;
+}
+.villa-floorplan .plan-living,
+.villa-floorplan .plan-pool {
+  grid-column: 1/-1;
+}
+.villa-floorplan .plan-pool {
+  background: #c4d5de;
+}
+.villa-details > h3 {
+  font:
+    28px Georgia,
+    serif;
+}
+.villa-details details {
+  border-top: 1px solid #263f5040;
+  padding: 22px 0;
+}
+.villa-details summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.villa-details details p {
+  font-size: 12px;
+  margin: 18px 0 0;
+  line-height: 1.8;
+}
+.villa-stay {
+  position: sticky;
+  top: 80px;
+  padding: 32px;
+  background: #fffdf8;
+  border: 1px solid #263f5030;
+  box-shadow: 0 8px 30px #263f5009;
+}
+.villa-stay h2 {
+  font-size: 44px;
+}
+.villa-stay > p:not(.demo-kicker) {
+  font-size: 12px;
+  margin-bottom: 25px;
+}
+.villa-stay > p > strong {
+  font-size: 20px;
+}
+.villa-estimate {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  border-top: 1px solid #263f5030;
+  padding-top: 20px;
+  font-size: 12px;
+}
+.villa-stay .demo-small {
+  font-size: 10px;
+  margin: 0;
+}
+.villa-stay [role="status"] {
+  background: #e7eef0;
+  padding: 12px;
+}
+.villa-lightbox {
+  width: min(1100px, 94vw);
+}
+.villa-lightbox > .exp-photo {
+  height: 65svh;
+}
+.villa-lightbox > div:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 20px;
+  font-size: 12px;
+}
+.villa-lightbox > div:last-child button {
+  background: transparent;
+  border: 1px solid currentColor;
+  padding: 10px;
+}
+
+@media (max-width: 1100px) {
+  .rental-workspace,
+  .villa-content {
+    grid-template-columns: minmax(0, 1fr) 310px;
+    gap: 25px;
+  }
+  .rental-bike-grid {
+    grid-template-columns: 1fr;
+  }
+  .rental-bike-card .bike-illustration {
+    max-height: 160px;
+    margin: 12px 0;
+  }
+  .rental-booking,
+  .villa-stay {
+    padding: 23px;
+  }
+  .rental-how {
+    grid-template-columns: 1fr 1fr;
+  }
+  .store-tools {
+    flex-wrap: wrap;
+  }
+  .store-tools > .exp-tabs {
+    width: 100%;
+  }
+  .store-tools label {
+    flex: 1;
+    max-width: none;
+  }
+  .store-object {
+    height: 270px;
+  }
+  .store-product-title {
+    display: block;
+  }
+  .store-product-title h3 {
+    margin-bottom: 9px;
+  }
+  .spa-treatment-layout {
+    gap: 5%;
+    padding-inline: 6%;
+  }
+  .spa-appointment {
+    padding-inline: 25px;
+  }
+  .spa-hero > .exp-photo {
+    height: 500px;
+  }
+  .spa-philosophy {
+    grid-template-columns: 0.2fr 1fr;
+  }
+  .spa-philosophy > div {
+    grid-column: 2;
+  }
+  .restaurant-menu {
+    gap: 6%;
+    padding-inline: 5%;
+  }
+  .restaurant-menu-paper {
+    padding: 35px;
+  }
+  .experience-site .hotel-booking-bar {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+  .hotel-booking-bar > .hotel-reserve {
+    grid-column: 1/-1;
+  }
+  .hotel-room > div:last-child {
+    padding: 30px;
+  }
+  .hotel-room-price {
+    display: block;
+  }
+  .hotel-room-price button {
+    display: block;
+    margin-top: 15px;
+  }
+  .villa-plan {
+    grid-template-columns: 1fr;
+  }
+  .villa-amenities {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 700px) {
+  .exp-header {
+    flex-wrap: wrap;
+    gap: 22px 15px;
+    padding: 22px 5%;
+  }
+  .exp-brand {
+    font-size: 26px;
+    flex: 1;
+  }
+  .exp-header nav {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    gap: 35px;
+    border-top: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+    padding-top: 18px;
+    font-size: 11px;
+  }
+  .exp-header > a:last-child:not(.exp-brand),
+  .store-bag-button {
+    font-size: 10px;
+    padding: 12px 14px;
+  }
+  .exp-photo {
+    min-height: 120px;
+  }
+  .experience-design {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 60px 6%;
+  }
+  .experience-next > div {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .experience-next a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+  }
+  .experience-next a strong {
+    font-size: 15px;
+  }
+  .experience-next {
+    padding-bottom: 40px;
+  }
+  .exp-dates {
+    gap: 10px;
+  }
+  .experience-site input:not([type="checkbox"]),
+  .experience-site select {
+    font-size: 13px;
+    padding: 12px 8px;
+  }
+  .experience-site .demo-toolbar {
+    position: sticky;
+  }
+  .store-hero {
+    grid-template-columns: 1fr;
+  }
+  .store-hero > div:first-child {
+    padding: 40px 7%;
+  }
+  .store-hero h1 {
+    font-size: 80px;
+  }
+  .store-hero > .exp-photo {
+    height: 330px;
+  }
+  .store-season {
+    font-size: 8px;
+    bottom: 15px;
+    right: 18px;
+  }
+  .store-catalog {
+    padding: 50px 5%;
+  }
+  .store-heading h2 {
+    font-size: 30px;
+  }
+  .store-tools {
+    gap: 16px;
+  }
+  .store-tools > .exp-tabs {
+    gap: 5px;
+  }
+  .store-tools > .exp-tabs button {
+    font-size: 10px;
+    padding: 10px 12px;
+  }
+  .store-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px 15px;
+  }
+  .store-object {
+    height: 220px;
+  }
+  .store-object .demo-object {
+    transform: scale(0.75);
+  }
+  .store-quick-view > span {
+    opacity: 1;
+    transform: none;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    padding: 8px;
+    font-size: 10px;
+  }
+  .store-product-title h3 {
+    font-size: 17px;
+  }
+  .store-product-title > span {
+    font-size: 11px;
+  }
+  .store-product-bottom {
+    align-items: start;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .store-product > p {
+    font-size: 10px;
+  }
+  .store-story {
+    grid-template-columns: 1fr;
+  }
+  .store-story .exp-photo {
+    min-height: 320px;
+  }
+  .store-story > div:last-child {
+    padding: 45px 7%;
+  }
+  .store-detail-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .store-detail-grid .store-object {
+    height: 250px;
+  }
+  .store-detail-grid > div:last-child {
+    padding: 0;
+  }
+  .experience-site .store-detail {
+    padding: 20px;
+  }
+  .store-detail h2 {
+    font-size: 30px;
+  }
+  .experience-site .store-drawer {
+    padding: 25px;
+  }
+  .rental-intro {
+    padding: 35px 6% 45px;
+  }
+  .rental-intro h1 {
+    font-size: clamp(46px, 12vw, 72px);
+  }
+  .rental-stamp {
+    display: none;
+  }
+  .rental-workspace {
+    grid-template-columns: 1fr;
+    padding: 35px 5% 55px;
+    gap: 35px;
+  }
+  .rental-section-label h2 {
+    font-size: 20px;
+  }
+  .rental-section-label > span {
+    font-size: 9px;
+  }
+  .rental-bike-grid {
+    grid-template-columns: 1fr;
+  }
+  .rental-bike-card .bike-illustration {
+    max-height: 190px;
+  }
+  .rental-booking {
+    position: static;
+    padding: 28px;
+  }
+  .rental-how {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 45px 6%;
+  }
+  .rental-how h2 {
+    font-size: 42px;
+  }
+  .rental-how article {
+    border-top: 1px solid #19392b30;
+    padding-top: 20px;
+    display: grid;
+    grid-template-columns: 35px 1fr;
+    gap: 10px;
+  }
+  .rental-how article > span {
+    grid-row: 1/3;
+    margin: 0;
+  }
+  .rental-how h3 {
+    margin: 0;
+  }
+  .rental-how p {
+    grid-column: 2;
+  }
+  .restaurant-title {
+    padding: 35px 5%;
+  }
+  .restaurant-title h1 {
+    font-size: clamp(52px, 12vw, 80px);
+  }
+  .restaurant-title .demo-kicker {
+    font-size: 8px;
+  }
+  .restaurant-hero > .exp-photo {
+    height: 300px;
+  }
+  .restaurant-hero-bottom {
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    padding: 25px 6% 45px;
+  }
+  .restaurant-hero-bottom p {
+    grid-column: 1/-1;
+  }
+  .restaurant-hero-bottom > a {
+    text-align: left;
+  }
+  .restaurant-hero-bottom > span {
+    font-size: 8px;
+  }
+  .restaurant-menu {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 50px 6%;
+  }
+  .restaurant-menu-heading h2 {
+    font-size: 56px;
+  }
+  .restaurant-menu-heading > .demo-small {
+    max-width: none;
+  }
+  .restaurant-menu-paper {
+    padding: 30px 24px;
+  }
+  .restaurant-menu-paper article {
+    gap: 15px;
+  }
+  .restaurant-menu-paper h3 {
+    font-size: 23px;
+  }
+  .restaurant-menu-paper article strong {
+    font-size: 10px;
+  }
+  .restaurant-vibe {
+    grid-template-columns: 1fr;
+    gap: 35px;
+    padding: 20px 6% 55px;
+  }
+  .restaurant-vibe .exp-photo {
+    height: 330px;
+  }
+  .restaurant-vibe h2 {
+    font-size: 48px;
+  }
+  .restaurant-table {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 50px 6%;
+  }
+  .restaurant-table h2 {
+    font-size: 48px;
+  }
+  .spa-hero {
+    grid-template-columns: 1fr;
+    gap: 35px;
+    padding: 35px 8% 60px;
+  }
+  .spa-hero-copy h1 {
+    font-size: clamp(62px, 15vw, 84px);
+  }
+  .spa-side-note {
+    display: none;
+  }
+  .spa-hero > .exp-photo {
+    height: 390px;
+    margin: 0 4%;
+  }
+  .spa-circle {
+    width: 100px;
+    height: 100px;
+    left: auto;
+    right: 4%;
+    bottom: 25px;
+    font-size: 8px;
+  }
+  .spa-philosophy {
+    grid-template-columns: 30px 1fr;
+    gap: 20px;
+    padding: 30px 7% 50px;
+  }
+  .spa-philosophy > span {
+    font-size: 35px;
+  }
+  .spa-philosophy > p {
+    font-size: 28px;
+  }
+  .spa-treatment-layout {
+    grid-template-columns: 1fr;
+    gap: 35px;
+    padding: 50px 6%;
+  }
+  .spa-treatments h2 {
+    font-size: 52px;
+    margin-bottom: 35px;
+  }
+  .spa-treatment {
+    gap: 14px;
+  }
+  .spa-treatment strong {
+    font-size: 24px;
+  }
+  .spa-appointment {
+    position: static;
+    padding: 65px 28px 30px;
+    border-radius: 130px 130px 0 0;
+  }
+  .spa-closing {
+    grid-template-columns: 1fr;
+  }
+  .spa-closing > .exp-photo {
+    height: 300px;
+  }
+  .spa-closing > div:last-child {
+    padding: 45px 8%;
+  }
+  .spa-closing h2 {
+    font-size: 48px;
+  }
+  .hotel-hero {
+    min-height: 530px;
+    padding: 65px 7%;
+  }
+  .hotel-hero h1 {
+    font-size: clamp(60px, 14vw, 86px);
+  }
+  .hotel-coordinate {
+    right: 22px;
+    font-size: 8px;
+  }
+  .experience-site .hotel-booking-bar {
+    margin: -15px 5% 0;
+    padding: 24px;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 12px;
+  }
+  .hotel-booking-bar > .exp-dates {
+    grid-column: 1/-1;
+  }
+  .hotel-welcome {
+    padding: 65px 7%;
+  }
+  .hotel-welcome h2 {
+    font-size: 42px;
+  }
+  .hotel-rooms {
+    padding: 0 5% 50px;
+  }
+  .hotel-section-heading {
+    display: block;
+    margin-bottom: 30px;
+  }
+  .hotel-section-heading h2 {
+    font-size: 42px;
+    margin-bottom: 20px;
+  }
+  .hotel-room,
+  .hotel-room:nth-child(odd) {
+    grid-template-columns: 1fr;
+  }
+  .hotel-room:nth-child(odd) > .exp-photo {
+    order: 0;
+  }
+  .hotel-room > .exp-photo {
+    min-height: 260px;
+  }
+  .hotel-room > div:last-child {
+    padding: 28px;
+  }
+  .hotel-room h3 {
+    font-size: 34px;
+  }
+  .villa-heading {
+    padding: 35px 6% 25px;
+  }
+  .villa-heading h1 {
+    font-size: clamp(49px, 12vw, 72px);
+  }
+  .villa-heading > div {
+    flex-direction: column;
+    gap: 8px;
+    font-size: 10px;
+  }
+  .villa-gallery {
+    display: block;
+    height: auto;
+    margin: 0 5%;
+  }
+  .villa-gallery > button {
+    width: 100%;
+    height: 310px;
+  }
+  .villa-gallery > div {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 130px;
+    margin-top: 10px;
+    gap: 10px;
+  }
+  .villa-gallery > button > span {
+    left: 16px;
+    bottom: 16px;
+    padding: 12px 15px;
+    font-size: 10px;
+  }
+  .villa-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 45px 6%;
+  }
+  .villa-house h2 {
+    font-size: 42px;
+  }
+  .villa-amenities {
+    gap: 20px;
+  }
+  .villa-plan-tabs button {
+    padding: 10px;
+    font-size: 10px;
+  }
+  .villa-plan {
+    gap: 22px;
+  }
+  .villa-stay {
+    position: static;
+    padding: 28px;
+  }
+  .experience-site .villa-lightbox {
+    padding: 15px;
+  }
+  .villa-lightbox > .exp-photo {
+    height: 55svh;
+  }
+  .villa-lightbox > div:last-child {
+    flex-wrap: wrap;
+    font-size: 10px;
+  }
+  .villa-lightbox > div:last-child > span {
+    order: 3;
+    width: 100%;
+    text-align: center;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .experience-site * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
+.rental-home-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+  background: #e5fa83;
+  min-height: 610px;
+}
+.rental-home-hero > div:first-child {
+  padding: 80px 10%;
+  align-self: center;
+}
+.rental-home-hero h1 {
+  font-size: clamp(64px, 6.5vw, 100px);
+  font-weight: 700;
+  line-height: 0.97;
+}
+.rental-home-hero p:not(.demo-kicker) {
+  max-width: 360px;
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+.rental-home-note {
+  display: block;
+  font-size: 10px;
+  margin-top: 25px;
+}
+.rental-home-badge {
+  position: absolute;
+  bottom: 35px;
+  left: calc(50% - 65px);
+  background: #19392b;
+  color: #e5fa83;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.7;
+  transform: rotate(-12deg);
+}
+.rental-home-fleet {
+  padding: 80px 5%;
+  display: grid;
+  grid-template-columns: 0.8fr 1.8fr;
+  gap: 7%;
+  align-items: center;
+}
+.rental-home-fleet h2 {
+  font-size: 48px;
+}
+.rental-home-fleet > div > p:not(.demo-kicker) {
+  font-size: 13px;
+}
+.rental-home-models {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.rental-home-models > a {
+  background: white;
+  border: 1px solid #19392b30;
+  padding: 20px;
+  transition: transform 0.2s;
+}
+.rental-home-models > a:hover {
+  transform: translateY(-5px);
+}
+.rental-home-models h3 {
+  font-size: 19px;
+  margin: 20px 0 10px;
+}
+.rental-home-models p {
+  font-size: 10px;
+}
+.rental-home-models p span {
+  display: block;
+  margin-top: 15px;
+}
+@media (max-width: 1000px) {
+  .rental-home-fleet {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .rental-home-hero h1 {
+    font-size: 64px;
+  }
+}
+@media (max-width: 700px) {
+  .rental-home-hero {
+    grid-template-columns: 1fr;
+  }
+  .rental-home-hero > div:first-child {
+    padding: 45px 7%;
+  }
+  .rental-home-hero h1 {
+    font-size: clamp(56px, 14vw, 72px);
+  }
+  .rental-home-hero > .exp-photo {
+    height: 330px;
+  }
+  .rental-home-badge {
+    left: auto;
+    right: 20px;
+    bottom: 20px;
+    width: 100px;
+    height: 100px;
+    font-size: 10px;
+  }
+  .rental-home-fleet {
+    padding: 50px 6%;
+  }
+  .rental-home-models {
+    grid-template-columns: 1fr;
+  }
+  .rental-home-models .bike-illustration {
+    max-height: 180px;
+  }
+  .rental-home-models p span {
+    display: inline;
+    margin-left: 20px;
+  }
+}

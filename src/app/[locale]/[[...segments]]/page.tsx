@@ -1,4 +1,6 @@
 import { ClientCaseStudy } from "@/components/client-case-study";
+import { ShowcaseIndex } from "@/components/showcase-index";
+import { showcaseCopy } from "@/lib/showcase-copy";
 import {
   clientCopyFor,
   isClientProject,
@@ -53,6 +55,10 @@ export async function generateMetadata({
     description = c.homeIntro;
   const root = path.split("/")[1];
   const slug = path.split("/")[2];
+  if (root === "showcase") {
+    title = showcaseCopy[locale].title;
+    description = showcaseCopy[locale].intro;
+  }
   if (root === "about") {
     title = t.studio;
     description = c.studioIntro;
@@ -175,6 +181,7 @@ export default async function NativePage({
       {t.contact} ↗
     </Link>
   );
+  if (path === "/showcase") return <ShowcaseIndex locale={locale} />;
   if (path === "/")
     return (
       <main id="main">

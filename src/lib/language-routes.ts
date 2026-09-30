@@ -5,6 +5,7 @@ export const publicPaths = [
   "/",
   "/about",
   "/work",
+  "/showcase",
   "/services",
   "/contact",
   "/blog",

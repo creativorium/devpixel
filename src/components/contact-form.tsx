@@ -3,14 +3,22 @@ import { useLanguage } from "./use-language";
 import { useEffect, useRef, useState } from "react";
 import { services } from "@/lib/services";
 import { budgets } from "@/lib/contact";
+import { showcases } from "@/lib/showcase";
 export function ContactForm({ enabled = false }: { enabled?: boolean }) {
   const { t, locale, href } = useLanguage();
   const [status, setStatus] = useState("");
   const [sending, setSending] = useState(false);
   const serviceSelect = useRef<HTMLSelectElement>(null);
+  const messageInput = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
     const slug = new URLSearchParams(window.location.search).get("service");
     const service = services.find((s) => s.slug === slug);
+    const concept = showcases.find(
+      (s) =>
+        s.slug === new URLSearchParams(window.location.search).get("showcase"),
+    );
+    if (concept && messageInput.current && !messageInput.current.value)
+      messageInput.current.value = `I'm interested in a website like the ${concept.name} showcase (${concept.category}). My project: `;
     if (service && serviceSelect.current)
       serviceSelect.current.value = service.name;
   }, []);
@@ -103,6 +111,7 @@ export function ContactForm({ enabled = false }: { enabled?: boolean }) {
       <label>
         {t.message}
         <textarea
+          ref={messageInput}
           name="message"
           placeholder={t.message}
           required

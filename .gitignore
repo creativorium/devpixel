@@ -8,3 +8,5 @@ test-results/
 playwright-report/
 .vercel/
 *.log
+output/playwright/
+.playwright-cli/
