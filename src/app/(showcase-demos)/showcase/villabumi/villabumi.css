@@ -1,0 +1,1365 @@
+.bumi-site {
+  --bumi-paper: #f5f2ec;
+  --bumi-ink: #332f28;
+  --bumi-muted: #716d63;
+  --bumi-clay: #a45f45;
+  --bumi-line: #dfdbd2;
+  background: var(--bumi-paper);
+  color: var(--bumi-ink);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+.bumi-site * {
+  box-sizing: border-box;
+  min-width: 0;
+}
+.bumi-site h1,
+.bumi-site h2,
+.bumi-site h3,
+.bumi-site p {
+  margin: 0;
+}
+.bumi-site h1,
+.bumi-site h2,
+.bumi-site h3 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+}
+.bumi-site h2 {
+  font-size: clamp(30px, 3.2vw, 48px);
+  line-height: 1.16;
+}
+.bumi-site h1 em,
+.bumi-site h2 em {
+  font-weight: 400;
+}
+.bumi-site p {
+  line-height: 1.8;
+}
+.bumi-site a {
+  text-decoration: none;
+  color: inherit;
+}
+.bumi-site button,
+.bumi-site input,
+.bumi-site textarea {
+  font: inherit;
+  color: inherit;
+}
+.bumi-site button {
+  cursor: pointer;
+}
+.bumi-site :focus-visible {
+  outline: 2px solid var(--bumi-clay);
+  outline-offset: 5px;
+}
+.bumi-site section[id] {
+  scroll-margin-top: 110px;
+}
+.bumi-site .bumi-eyebrow {
+  font:
+    10px/1.6 Arial,
+    Helvetica,
+    sans-serif;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--bumi-clay);
+}
+.bumi-site .bumi-fine {
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--bumi-muted);
+}
+.bumi-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.bumi-skip {
+  position: fixed;
+  left: 12px;
+  top: -100px;
+  padding: 14px;
+  background: var(--bumi-paper);
+  z-index: 120;
+}
+.bumi-skip:focus {
+  top: 8px;
+}
+.bumi-preview-bar {
+  height: 34px;
+  padding: 0 4.5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #e8e4dc;
+  font-size: 10px;
+  letter-spacing: 0.025em;
+}
+.bumi-preview-bar > span {
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  color: var(--bumi-muted);
+}
+.bumi-preview-bar a {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.bumi-preview-bar svg {
+  width: 12px;
+  height: 12px;
+}
+.bumi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 28px;
+  padding: 24px 4.5%;
+  border-bottom: 1px solid var(--bumi-line);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: color-mix(in srgb, var(--bumi-paper) 96%, transparent);
+  backdrop-filter: blur(12px);
+}
+.bumi-wordmark {
+  font-family: Georgia, serif;
+  font-size: 21px;
+  letter-spacing: 0.19em;
+  white-space: nowrap;
+}
+.bumi-wordmark span {
+  display: block;
+  font:
+    7px/1.6 Arial,
+    sans-serif;
+  letter-spacing: 0.24em;
+  margin-top: 6px;
+}
+.bumi-desktop-nav {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+.bumi-desktop-nav a {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  position: relative;
+  padding: 10px 0;
+}
+.bumi-desktop-nav a:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: 2px;
+  height: 1px;
+  background: var(--bumi-clay);
+  transition: right 0.25s;
+}
+.bumi-desktop-nav a:hover:after {
+  right: 0;
+}
+.bumi-header-actions {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+.bumi-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  background: var(--bumi-ink);
+  color: var(--bumi-paper) !important;
+  border: 1px solid var(--bumi-ink);
+  padding: 17px 24px;
+  min-height: 49px;
+  font-size: 11px;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  transition: background 0.2s;
+}
+.bumi-button:hover {
+  background: #51473b;
+}
+.bumi-button-clay {
+  background: var(--bumi-clay);
+  border-color: var(--bumi-clay);
+  padding: 12px 21px;
+  min-height: 41px;
+}
+.bumi-button-clay:hover {
+  background: #854a35;
+}
+.bumi-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 17px;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: transparent;
+  padding: 7px 0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.bumi-menu-toggle {
+  display: none;
+}
+.bumi-mobile-nav {
+  display: none;
+}
+.bumi-hero {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  min-height: min(680px, calc(100svh - 100px));
+  border-bottom: 1px solid var(--bumi-line);
+}
+.bumi-hero-copy {
+  padding: 100px 8.2% 35px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+.bumi-hero h1 {
+  font-size: clamp(43px, 4.8vw, 76px);
+  line-height: 1.1;
+  margin: 25px 0 27px;
+  max-width: 700px;
+}
+.bumi-hero .bumi-lead {
+  max-width: 360px;
+  font-size: 15px;
+  color: var(--bumi-muted);
+}
+.bumi-hero-links {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  margin-top: 34px;
+}
+.bumi-hero-foot {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  border-top: 1px solid var(--bumi-line);
+  margin-top: 74px;
+  padding-top: 24px;
+  width: 100%;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bumi-muted);
+}
+.bumi-hero-foot > a {
+  margin-left: auto;
+  font-size: 23px;
+  line-height: 1;
+}
+.bumi-hero-image {
+  position: relative;
+  display: block;
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #d6d4c7;
+  text-align: left;
+}
+.bumi-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.bumi-hero-image > .bumi-photo {
+  position: absolute;
+  inset: 0;
+  object-position: 57% center;
+  transition: transform 1.5s ease;
+}
+.bumi-hero-image:hover > .bumi-photo {
+  transform: scale(1.035);
+}
+.bumi-image-tag {
+  position: absolute;
+  bottom: 25px;
+  left: 25px;
+  right: 25px;
+  color: white;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-shadow: 0 1px 8px #000;
+}
+.bumi-image-tag > span {
+  font-size: 22px;
+}
+.bumi-hero-image:after {
+  content: "";
+  position: absolute;
+  inset: 70% 0 0;
+  background: linear-gradient(transparent, #0004);
+  pointer-events: none;
+}
+.bumi-image-tag {
+  z-index: 1;
+}
+.bumi-about {
+  display: grid;
+  grid-template-columns: 45% 55%;
+  border-bottom: 1px solid var(--bumi-line);
+}
+.bumi-about-photo {
+  position: relative;
+  min-height: 530px;
+  overflow: hidden;
+}
+.bumi-about-photo > .bumi-photo {
+  position: absolute;
+  inset: 0;
+}
+.bumi-photo-caption {
+  position: absolute;
+  bottom: 24px;
+  left: 28px;
+  color: white;
+  letter-spacing: 0.17em;
+  font-size: 8px;
+  text-shadow: 0 2px 4px #000;
+}
+.bumi-about-copy {
+  padding: 80px 11%;
+  align-self: center;
+}
+.bumi-rule {
+  display: block;
+  width: 35px;
+  height: 1px;
+  background: var(--bumi-clay);
+  margin-bottom: 25px;
+}
+.bumi-about-copy h2 {
+  margin: 14px 0 25px;
+}
+.bumi-about-copy > p:not(.bumi-eyebrow) {
+  font-size: 14px;
+  color: var(--bumi-muted);
+  margin-bottom: 18px;
+}
+.bumi-about-copy .bumi-text-link {
+  margin-top: 10px;
+}
+.bumi-section {
+  padding: 90px max(4.5%, calc((100% - 1240px) / 2));
+  border-bottom: 1px solid var(--bumi-line);
+}
+.bumi-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 42px;
+}
+.bumi-section-heading h2 {
+  margin-top: 14px;
+}
+.bumi-section-heading > p {
+  font-size: 12px;
+  color: var(--bumi-muted);
+}
+.bumi-gallery-grid {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  grid-template-rows: 260px 260px;
+  gap: 18px;
+}
+.bumi-gallery-photo {
+  position: relative;
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #d6d4c7;
+  text-align: left;
+}
+.bumi-gallery-photo-0 {
+  grid-row: 1/3;
+}
+.bumi-gallery-photo .bumi-photo {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.6s;
+}
+.bumi-gallery-photo:hover .bumi-photo {
+  transform: scale(1.025);
+}
+.bumi-gallery-photo > span {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 38px 23px 20px;
+  background: linear-gradient(transparent, #0007);
+  color: white;
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.bumi-gallery-photo > span > span {
+  font-size: 22px;
+}
+.bumi-gallery-photo-0 .bumi-photo {
+  object-position: 50% center;
+}
+.bumi-rooms {
+  padding-bottom: 55px;
+}
+.bumi-room {
+  display: grid;
+  grid-template-columns: 43% 1fr;
+  gap: 8%;
+  align-items: center;
+  padding: 35px 0;
+  border-bottom: 1px solid var(--bumi-line);
+}
+.bumi-room:last-child {
+  border: 0;
+}
+.bumi-room:nth-of-type(even) {
+  grid-template-columns: 1fr 43%;
+}
+.bumi-room:nth-of-type(even) .bumi-room-photo {
+  order: 2;
+}
+.bumi-room-photo {
+  height: 350px;
+  position: relative;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: #d6d4c7;
+}
+.bumi-room-photo .bumi-photo {
+  transition: transform 0.6s;
+}
+.bumi-room-photo:hover .bumi-photo {
+  transform: scale(1.035);
+}
+.bumi-room-plus {
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+  border: 1px solid #fff8;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  color: white;
+  background: #0002;
+}
+.bumi-room-copy {
+  max-width: 490px;
+}
+.bumi-room-number {
+  display: block;
+  font:
+    italic 37px/1 Georgia,
+    serif;
+  color: #b3a28e;
+  margin-bottom: 22px;
+}
+.bumi-room h3 {
+  font-size: 12px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--bumi-clay);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.bumi-room-copy > p {
+  font-size: 14px;
+  color: var(--bumi-muted);
+}
+.bumi-room-copy .bumi-room-detail {
+  font-size: 10px;
+  margin-top: 25px;
+  padding-top: 18px;
+  border-top: 1px solid var(--bumi-line);
+  letter-spacing: 0.02em;
+}
+.bumi-facilities {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 10%;
+  align-items: center;
+}
+.bumi-facilities h2 {
+  margin: 16px 0;
+}
+.bumi-facilities p:not(.bumi-eyebrow) {
+  font-size: 13px;
+  color: var(--bumi-muted);
+}
+.bumi-facilities ul {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px 35px;
+  padding: 0;
+  margin: 0;
+}
+.bumi-facilities li {
+  display: flex;
+  gap: 15px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.bumi-facilities li > span {
+  color: var(--bumi-clay);
+}
+.bumi-rates > .bumi-section-heading {
+  margin-bottom: 22px;
+}
+.bumi-rate-badge {
+  font-size: 8px;
+  letter-spacing: 0.13em;
+  padding: 12px 0;
+  color: var(--bumi-muted);
+}
+.bumi-rates > p {
+  font-size: 14px;
+  color: var(--bumi-muted);
+}
+.bumi-rates table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 36px;
+  text-align: left;
+}
+.bumi-rates th,
+.bumi-rates td {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--bumi-line);
+  font-weight: 400;
+  font-size: 14px;
+}
+.bumi-rates thead th {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--bumi-muted);
+  padding: 14px 0;
+}
+.bumi-rates td,
+.bumi-rates th:last-child {
+  text-align: right;
+}
+.bumi-rates td {
+  font-family: Georgia, serif;
+  font-size: 27px;
+  font-variant-numeric: tabular-nums;
+}
+.bumi-rates tbody th > span {
+  display: block;
+  color: var(--bumi-muted);
+  font-size: 11px;
+  margin-top: 7px;
+}
+.bumi-rates-bottom {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 70px;
+  padding-top: 30px;
+}
+.bumi-rates-bottom > div {
+  max-width: 780px;
+  font-size: 12px;
+  color: var(--bumi-muted);
+}
+.bumi-rates-bottom .bumi-fine {
+  margin-top: 14px;
+}
+.bumi-rates-bottom > .bumi-button {
+  flex-shrink: 0;
+}
+.bumi-location {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9%;
+  align-items: center;
+}
+.bumi-location h2 {
+  margin: 17px 0 25px;
+  font-size: clamp(30px, 3vw, 44px);
+}
+.bumi-location > div > p:not(.bumi-eyebrow) {
+  color: var(--bumi-muted);
+  font-size: 13px;
+}
+.bumi-location ul {
+  list-style: none;
+  padding: 0;
+  margin: 25px 0;
+  display: grid;
+  gap: 14px;
+  font-size: 12px;
+}
+.bumi-location li {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.bumi-location li span {
+  color: var(--bumi-clay);
+  min-width: 68px;
+  font-size: 11px;
+}
+.bumi-location > div > .bumi-fine {
+  font-size: 10px;
+}
+.bumi-map {
+  display: block;
+  background: #d9e0d7;
+  overflow: hidden;
+}
+.bumi-map > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.bumi-map-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 17px;
+  background: #e9e9df;
+  font-size: 9px;
+}
+.bumi-map-caption > span:last-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bumi-map-caption svg {
+  width: 13px;
+}
+.bumi-contact {
+  text-align: center;
+  padding-top: 90px;
+  padding-bottom: 80px;
+}
+.bumi-contact h2 {
+  margin: 17px 0 20px;
+  font-size: 48px;
+}
+.bumi-contact > p:not(.bumi-eyebrow) {
+  color: var(--bumi-muted);
+  font-size: 14px;
+}
+.bumi-contact form {
+  max-width: 650px;
+  margin: 38px auto 45px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 27px;
+}
+.bumi-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+.bumi-site label {
+  display: block;
+  font-size: 10px;
+  color: var(--bumi-muted);
+  line-height: 1.7;
+}
+.bumi-site input,
+.bumi-site textarea {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid #c6c0b4;
+  border-radius: 0;
+  background: transparent;
+  padding: 12px 0;
+  font-size: 14px;
+  color: var(--bumi-ink);
+  outline-offset: 4px;
+  min-height: 45px;
+  color-scheme: light;
+}
+.bumi-site input::placeholder,
+.bumi-site textarea::placeholder {
+  color: #8d877d;
+}
+.bumi-site textarea {
+  resize: vertical;
+  min-height: 95px;
+}
+.bumi-optional {
+  font-size: 9px;
+  opacity: 0.75;
+}
+.bumi-form-submit {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+}
+.bumi-form-status {
+  font-size: 12px;
+  background: #e8e9df;
+  padding: 16px;
+  border-left: 2px solid #64765d;
+}
+.bumi-form-status:empty {
+  display: none;
+}
+.bumi-contact-links {
+  display: flex;
+  justify-content: center;
+  gap: 35px;
+  font-size: 11px;
+  flex-wrap: wrap;
+}
+.bumi-contact-links a {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.bumi-contact-links svg {
+  width: 12px;
+}
+.bumi-footer {
+  padding: 32px 4.5% 85px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.bumi-footer .bumi-wordmark {
+  font-size: 15px;
+}
+.bumi-footer p {
+  font-size: 9px;
+  color: var(--bumi-muted);
+}
+.bumi-footer > a:last-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 10px;
+}
+.bumi-footer > a:last-child svg {
+  width: 13px;
+}
+.bumi-whatsapp {
+  position: fixed;
+  right: 25px;
+  bottom: 23px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 30px;
+  background: #33493e;
+  color: white !important;
+  font-size: 10px;
+  padding: 14px 20px;
+  box-shadow: 0 3px 15px #263c3125;
+  border: 1px solid #ffffff30;
+}
+.bumi-whatsapp > svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+}
+.bumi-lightbox {
+  width: min(1150px, 94vw);
+  max-width: 94vw;
+  max-height: 94dvh;
+  background: var(--bumi-paper);
+  color: var(--bumi-ink);
+  border: 0;
+  padding: 20px 25px;
+  margin: auto;
+  overflow: auto;
+}
+.bumi-lightbox::backdrop {
+  background: #181f19d9;
+  backdrop-filter: blur(6px);
+}
+.bumi-lightbox-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  padding-bottom: 17px;
+}
+.bumi-lightbox-top button {
+  background: none;
+  border: 0;
+  padding: 10px;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+.bumi-lightbox-image {
+  height: min(65vh, 680px);
+  background: #e7e3db;
+}
+.bumi-lightbox-image .bumi-photo {
+  object-fit: contain;
+}
+.bumi-lightbox-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 0 0;
+  text-align: center;
+}
+.bumi-lightbox-bottom > button {
+  border: 1px solid var(--bumi-line);
+  background: none;
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+}
+.bumi-lightbox-bottom p {
+  font-family: Georgia, serif;
+  font-size: 20px;
+}
+.bumi-lightbox-bottom span {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--bumi-muted);
+  display: block;
+  margin-top: 5px;
+}
+@media (min-width: 1800px) {
+  .bumi-hero-copy {
+    padding-left: max(8.2%, calc((100vw - 1500px) / 2));
+  }
+  .bumi-hero {
+    min-height: 760px;
+  }
+  .bumi-about-copy {
+    padding-right: max(11%, calc((100vw - 1500px) / 2));
+  }
+}
+@media (max-width: 1000px) {
+  .bumi-desktop-nav {
+    gap: 19px;
+  }
+  .bumi-hero-copy {
+    padding-top: 65px;
+  }
+  .bumi-hero h1 {
+    font-size: 49px;
+  }
+  .bumi-hero-links {
+    gap: 18px;
+  }
+  .bumi-hero-links .bumi-button {
+    padding: 15px 18px;
+    gap: 15px;
+  }
+  .bumi-about-copy {
+    padding: 55px 9%;
+  }
+  .bumi-section {
+    padding-top: 65px;
+    padding-bottom: 65px;
+  }
+  .bumi-facilities {
+    gap: 35px;
+    grid-template-columns: 1fr 1.4fr;
+  }
+  .bumi-facilities ul {
+    gap: 20px;
+  }
+  .bumi-rates-bottom {
+    gap: 35px;
+  }
+  .bumi-room-photo {
+    height: 290px;
+  }
+  .bumi-room {
+    gap: 7%;
+  }
+  .bumi-gallery-grid {
+    grid-template-rows: 220px 220px;
+  }
+  .bumi-footer {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 760px) {
+  .bumi-preview-bar {
+    height: 31px;
+    padding: 0 5%;
+    font-size: 9px;
+  }
+  .bumi-preview-bar > span {
+    display: none;
+  }
+  .bumi-header {
+    padding: 18px 5%;
+    gap: 14px;
+  }
+  .bumi-wordmark {
+    font-size: 17px;
+    letter-spacing: 0.16em;
+  }
+  .bumi-wordmark span {
+    font-size: 6px;
+  }
+  .bumi-desktop-nav {
+    display: none;
+  }
+  .bumi-header-actions {
+    gap: 14px;
+  }
+  .bumi-header-actions .bumi-button {
+    padding: 10px 13px;
+    min-height: 38px;
+    font-size: 10px;
+    gap: 12px;
+  }
+  .bumi-header-actions .bumi-button svg {
+    width: 13px;
+  }
+  .bumi-menu-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    background: none;
+    border: 0;
+    font-size: 10px;
+  }
+  .bumi-menu-toggle > span:last-child {
+    font-size: 18px;
+  }
+  .bumi-mobile-nav:not([hidden]) {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bumi-paper);
+    border-bottom: 1px solid var(--bumi-line);
+    padding: 15px 6% 30px;
+    box-shadow: 0 20px 25px #332f2810;
+    max-height: calc(100dvh - 100px);
+    overflow: auto;
+  }
+  .bumi-mobile-nav a {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 17px 0;
+    border-bottom: 1px solid var(--bumi-line);
+    font-family: Georgia, serif;
+    font-size: 25px;
+  }
+  .bumi-mobile-nav small {
+    font:
+      9px Arial,
+      sans-serif;
+    color: var(--bumi-clay);
+  }
+  .bumi-mobile-nav svg {
+    margin-left: auto;
+  }
+  .bumi-mobile-nav p {
+    font-size: 11px;
+    color: var(--bumi-muted);
+    margin-top: 25px;
+  }
+  .bumi-hero {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .bumi-hero-copy {
+    padding: 53px 6% 30px;
+  }
+  .bumi-hero h1 {
+    font-size: clamp(41px, 8.7vw, 62px);
+    margin: 20px 0 22px;
+    line-height: 1.12;
+  }
+  .bumi-hero .bumi-lead {
+    font-size: 14px;
+    max-width: 350px;
+  }
+  .bumi-hero-links {
+    margin-top: 27px;
+    gap: 25px;
+  }
+  .bumi-hero-links .bumi-button {
+    font-size: 10px;
+    padding: 15px 17px;
+    gap: 15px;
+  }
+  .bumi-hero-foot {
+    margin-top: 36px;
+    padding-top: 20px;
+    font-size: 8px;
+    gap: 20px;
+  }
+  .bumi-hero-image {
+    height: 430px;
+  }
+  .bumi-hero-image > .bumi-photo {
+    object-position: 50% 50%;
+  }
+  .bumi-about {
+    display: flex;
+    flex-direction: column;
+  }
+  .bumi-about-copy {
+    order: -1;
+    padding: 55px 6%;
+  }
+  .bumi-about-photo {
+    min-height: 0;
+    height: 330px;
+    margin: 0 6% 50px;
+  }
+  .bumi-about-copy > p:not(.bumi-eyebrow) {
+    font-size: 14px;
+  }
+  .bumi-section {
+    padding: 55px 6%;
+  }
+  .bumi-section-heading {
+    display: block;
+    margin-bottom: 30px;
+  }
+  .bumi-section-heading .bumi-text-link {
+    margin-top: 22px;
+  }
+  .bumi-section-heading > p {
+    margin-top: 18px;
+  }
+  .bumi-site h2 {
+    font-size: 34px;
+  }
+  .bumi-gallery-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 340px 220px;
+    gap: 12px;
+  }
+  .bumi-gallery-photo-0 {
+    grid-row: auto;
+    grid-column: 1/-1;
+  }
+  .bumi-gallery-photo > span {
+    padding: 25px 12px 14px;
+    font-size: 9px;
+    line-height: 1.4;
+    gap: 10px;
+  }
+  .bumi-gallery-photo > span > span {
+    font-size: 16px;
+  }
+  .bumi-room,
+  .bumi-room:nth-of-type(even) {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding: 30px 0;
+    align-items: stretch;
+  }
+  .bumi-room:nth-of-type(even) .bumi-room-photo {
+    order: 0;
+  }
+  .bumi-room-photo {
+    height: auto;
+    aspect-ratio: 1.4;
+  }
+  .bumi-room-number {
+    font-size: 28px;
+    margin-bottom: 15px;
+  }
+  .bumi-room h3 {
+    font-size: 11px;
+    margin-bottom: 16px;
+  }
+  .bumi-room-copy .bumi-room-detail {
+    margin-top: 18px;
+    padding-top: 15px;
+    line-height: 1.7;
+  }
+  .bumi-facilities {
+    display: block;
+  }
+  .bumi-facilities ul {
+    margin-top: 30px;
+    gap: 20px 18px;
+  }
+  .bumi-facilities li {
+    font-size: 11px;
+    gap: 10px;
+  }
+  .bumi-rate-badge {
+    display: block;
+    margin-top: 20px;
+    padding: 0;
+    font-size: 8px;
+  }
+  .bumi-rates > p {
+    font-size: 13px;
+  }
+  .bumi-rates table {
+    margin-top: 25px;
+  }
+  .bumi-rates th,
+  .bumi-rates td {
+    padding: 22px 0;
+    font-size: 13px;
+  }
+  .bumi-rates tbody th {
+    padding-right: 20px;
+  }
+  .bumi-rates tbody th > span {
+    font-size: 10px;
+    line-height: 1.7;
+  }
+  .bumi-rates td {
+    font-size: 24px;
+    white-space: nowrap;
+  }
+  .bumi-rates thead th {
+    font-size: 8px;
+    letter-spacing: 0.1em;
+  }
+  .bumi-rates-bottom {
+    display: block;
+    padding-top: 25px;
+  }
+  .bumi-rates-bottom > .bumi-button {
+    margin-top: 25px;
+  }
+  .bumi-location {
+    display: block;
+  }
+  .bumi-location .bumi-map {
+    margin-top: 30px;
+  }
+  .bumi-map-caption {
+    font-size: 8px;
+    padding: 14px 10px;
+    gap: 8px;
+  }
+  .bumi-contact h2 {
+    font-size: 40px;
+  }
+  .bumi-contact form {
+    margin: 30px auto 35px;
+    gap: 25px;
+  }
+  .bumi-form-row {
+    gap: 20px;
+  }
+  .bumi-site input,
+  .bumi-site textarea {
+    font-size: 16px;
+  }
+  .bumi-form-submit {
+    display: block;
+  }
+  .bumi-form-submit > .bumi-fine {
+    display: block;
+    margin-top: 15px;
+  }
+  .bumi-contact-links {
+    gap: 17px 25px;
+    font-size: 11px;
+  }
+  .bumi-footer {
+    padding: 28px 6% 100px;
+    gap: 22px;
+  }
+  .bumi-footer p {
+    order: 3;
+    width: 100%;
+    font-size: 9px;
+  }
+  .bumi-footer .bumi-wordmark {
+    font-size: 14px;
+  }
+  .bumi-whatsapp {
+    right: 16px;
+    bottom: 16px;
+    padding: 12px 16px;
+    font-size: 9px;
+  }
+  .bumi-whatsapp svg {
+    width: 20px;
+    height: 20px;
+  }
+  .bumi-lightbox {
+    padding: 15px;
+    max-height: 92dvh;
+  }
+  .bumi-lightbox-image {
+    height: 52vh;
+  }
+  .bumi-lightbox-bottom {
+    gap: 15px;
+  }
+  .bumi-lightbox-bottom p {
+    font-size: 17px;
+  }
+  .bumi-lightbox-bottom > button {
+    flex-shrink: 0;
+  }
+  .bumi-lightbox-top {
+    font-size: 8px;
+    letter-spacing: 0.06em;
+  }
+}
+/* Motion stays local to this preview; content remains visible without JavaScript. */
+.bumi-header {
+  transition:
+    box-shadow 0.35s ease,
+    background 0.35s ease;
+}
+.bumi-header-scrolled {
+  box-shadow: 0 7px 24px #332f2809;
+}
+.bumi-button,
+.bumi-whatsapp {
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.bumi-button svg,
+.bumi-text-link svg,
+.bumi-text-link > span,
+.bumi-room-plus {
+  transition: transform 0.3s ease;
+}
+.bumi-gallery-photo .bumi-photo,
+.bumi-room-photo .bumi-photo {
+  transition: transform 0.85s cubic-bezier(0.2, 0.65, 0.3, 1);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .bumi-button:hover {
+    transform: translateY(-2px);
+  }
+  .bumi-button:hover svg,
+  .bumi-text-link:hover svg,
+  .bumi-text-link:hover > span {
+    transform: translate(3px, -1px);
+  }
+  .bumi-room-photo:hover .bumi-room-plus {
+    transform: rotate(90deg);
+  }
+  .bumi-whatsapp:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 22px #263c312b;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .bumi-hero-copy > .bumi-eyebrow {
+    animation: bumi-enter 0.8s both;
+  }
+  .bumi-hero h1 {
+    animation: bumi-enter 1s 0.08s both;
+  }
+  .bumi-hero .bumi-lead {
+    animation: bumi-enter 1s 0.18s both;
+  }
+  .bumi-hero-links {
+    animation: bumi-enter 0.9s 0.28s both;
+  }
+  .bumi-hero-foot {
+    animation: bumi-enter 0.9s 0.35s both;
+  }
+  .bumi-hero-image {
+    animation: bumi-photo-enter 1.2s both;
+  }
+  .bumi-reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 0.8s ease,
+      transform 0.8s cubic-bezier(0.2, 0.65, 0.3, 1);
+  }
+  .bumi-reveal.bumi-in-view {
+    opacity: 1;
+    transform: none;
+  }
+  .bumi-gallery-photo-1.bumi-reveal {
+    transition-delay: 0.08s;
+  }
+  .bumi-gallery-photo-2.bumi-reveal {
+    transition-delay: 0.16s;
+  }
+  .bumi-lightbox[open] {
+    animation: bumi-dialog-enter 0.25s ease both;
+  }
+}
+@keyframes bumi-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes bumi-photo-enter {
+  from {
+    opacity: 0.3;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes bumi-dialog-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media print {
+  .bumi-site .bumi-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .bumi-site * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

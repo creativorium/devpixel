@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { site } from "@/lib/site";
 import "./showcase-demo.css";
 import "./showcase-experiences.css";
+import "./showcase-variants.css";
 const sans = localFont({
   src: "../../../node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2",
   variable: "--demo-sans",

@@ -3,7 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { showcases, showcaseCategories } from "@/lib/showcase";
-import { showcaseCopy } from "@/lib/showcase-copy";
+import { showcaseCopy, showcasePlatforms } from "@/lib/showcase-copy";
 import { localizedPath, type Locale } from "@/lib/i18n";
 export function ShowcaseIndex({ locale = "en" }: { locale?: Locale }) {
   const [filter, setFilter] = useState("all");
@@ -14,6 +14,7 @@ export function ShowcaseIndex({ locale = "en" }: { locale?: Locale }) {
         <p className="eyebrow">DEVNPIXEL / DESIGN EXPLORATIONS / BALI</p>
         <h1>{t.title}</h1>
         <p>{t.intro}</p>
+        <p className="showcase-platforms">{showcasePlatforms[locale]}</p>
         <Link className="text-link" href={localizedPath("/contact", locale)}>
           {t.contact} ↗
         </Link>
@@ -31,13 +32,22 @@ export function ShowcaseIndex({ locale = "en" }: { locale?: Locale }) {
             aria-pressed={filter === category}
             onClick={() => setFilter(category)}
           >
-            {t.categories[i]} <span>01</span>
+            {t.categories[i]}{" "}
+            <span>
+              {String(
+                showcases.filter((s) => s.category === category).length,
+              ).padStart(2, "0")}
+            </span>
           </button>
         ))}
       </div>
       <p className="showcase-note">{t.note}</p>
       <p className="sr-only" role="status">
-        {filter === "all" ? showcases.length : 1} {t.concept}
+        {
+          showcases.filter((s) => filter === "all" || s.category === filter)
+            .length
+        }{" "}
+        {t.concept}
       </p>
       <div className="showcase-grid">
         {showcases

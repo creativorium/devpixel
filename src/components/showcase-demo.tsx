@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { ShowcaseVariant } from "./showcase-variants";
 import { showcases, showcaseContact, type Showcase } from "@/lib/showcase";
 import {
   ShopExperience,
@@ -53,7 +54,9 @@ export function ShowcaseDemo({
           Want a website like this? <span>Let’s talk ↗</span>
         </Link>
       </aside>
-      {s.category === "Rental" ? (
+      {s.variant ? (
+        <ShowcaseVariant s={s} browse={rentalBrowse} />
+      ) : s.category === "Rental" ? (
         <RentalExperience s={s} browse={rentalBrowse} />
       ) : (
         <Experience s={s} />
@@ -78,7 +81,7 @@ export function ShowcaseDemo({
         <p className="demo-kicker">A DIFFERENT DIRECTION</p>
         <div>
           {showcases
-            .filter((p) => p.slug !== s.slug)
+            .filter((p) => p.slug !== s.slug && p.category === s.category)
             .slice(0, 3)
             .map((p) => (
               <Link key={p.slug} href={`/showcase/${p.slug}`}>

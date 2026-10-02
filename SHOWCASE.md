@@ -1,6 +1,17 @@
 # Showcase preview
 
-The review contains **six English concept websites**, one per category, including Spa / Wellness. Expansion to five per category is left for after design review. Each category has its own layout and customer journey.
+The local review contains **30 English concept websites: five per category**, including Spa / Wellness. These changes are prepared for local review, not automatically published. Each category has layouts and interactions suited to its business.
+
+| Category          | Five directions                                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------------------------------- |
+| Hospitality       | Rimba nature retreat, Solis social hotel, Linea long-stay residence, Taman field lodge, Nocturne design hotel |
+| Cafe / Restaurant | Ember kitchen, Daybreak bakery, Meja seasonal table, Saltline seafood, Mori dining counter                    |
+| Shops / Ecommerce | Nativ ceramics, Tide surf goods, Sari fashion, Botan skincare, Ground coffee                                  |
+| Villa             | Sora coastal villa, Batu architectural house, Lumen family villa, Azul seaside villa, Arca private estate     |
+| Rental            | Coast scooters, North cars, Drift surfboards, Pedal bicycles, Frame camera equipment                          |
+| Spa / Wellness    | Sela spa, Aura day spa, Forma movement studio, Nami bath house, Terra private rituals                         |
+
+The directory mentions Shopify, WordPress, suitable CMS platforms and custom development. All current demos are custom Next.js previews, **not running Shopify or WordPress**. Real platform, payments, inventory and reservation integrations are scoped for each client project.
 
 | Category          | Concept       | URL                              |
 | ----------------- | ------------- | -------------------------------- |
@@ -18,6 +29,8 @@ Spa: `/showcase/sela-ubud-spa`. Rental home: `/showcase/coast-canggu-rental`; fl
 
 `src/components/showcase-experiences.tsx` contains the six separate experiences; `showcase-experiences.css` styles them. The shop supports search, categories, sorting, finishes, quick view and a cart drawer. Rental calculates sample totals. Spa offers treatment duration and time selection. Restaurant has menu tabs and table requests. Hotel has room comparison and a booking bar; villa has a photo mosaic, configuration diagram and stay estimate.
 
+`src/components/showcase-variants.tsx` and `showcase-variants.css` supply the 24 additional concepts. Their content lives in `src/lib/showcase-additions.ts`. The four new stores have six sample products each, product options, filtering, sorting, quick views and quantity-aware cart drawers. The four new rental home pages link to their own `/rentals` planner with a validated `item=0`, `1` or `2` query selection. All five rental concepts have both a home and planner route.
+
 The directory uses actual local browser screenshots in `public/showcase/previews/`. Regenerate these after visual changes, waiting for fonts and hero images to load.
 
 - `src/lib/showcase.ts`: the six concepts, prices, copy and SEO descriptions.
@@ -28,7 +41,7 @@ The directory uses actual local browser screenshots in `public/showcase/previews
 
 The demo forms only update local page state. They do not create bookings, send enquiries, process payments or save personal data. The DevnPixel CTA opens the existing contact form with the chosen concept prefilled. Brands, prices and offers are fictional design examples, not client work or actual inventory.
 
-Each concept has a unique title, description, canonical URL, social metadata and CreativeWork/Breadcrumb structured data. The sitemap includes the six concept routes and rental booking page; localized directory routes have hreflang alternates. Demos do not claim to be real local businesses.
+Each concept has a unique title, description, canonical URL, social metadata and CreativeWork/Breadcrumb structured data. The sitemap includes all 30 concept routes and five rental planners; localized directory routes have hreflang alternates. Demos do not claim to be real local businesses.
 
 ## Photography
 

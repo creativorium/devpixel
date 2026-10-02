@@ -5,11 +5,13 @@ import { publicPaths } from "@/lib/language-routes";
 import { locales, localizedPath } from "@/lib/i18n";
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
-    {
-      url: `${site.url}/showcase/coast-canggu-rental/rentals`,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
+    ...showcases
+      .filter((s) => s.category === "Rental")
+      .map((s) => ({
+        url: `${site.url}/showcase/${s.slug}/rentals`,
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
+      })),
     ...publicPaths.flatMap((path) =>
       locales.map((locale) => ({
         url: site.url + localizedPath(path, locale),

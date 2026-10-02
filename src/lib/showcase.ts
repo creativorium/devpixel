@@ -1,3 +1,4 @@
+import { additionalShowcases } from "./showcase-additions";
 export const showcaseCategories = [
   "Hospitality",
   "Cafe / Restaurant",
@@ -24,6 +25,11 @@ export type Showcase = {
   features: string[];
   seo: string;
   design: string;
+  variant?: 1 | 2 | 3 | 4;
+  gallery?: string[];
+  itemGroups?: string[];
+  options?: string[];
+  productKind?: "apparel" | "surf" | "beauty" | "coffee";
 };
 export const showcases: Showcase[] = [
   {
@@ -246,6 +252,8 @@ showcases.push({
   design:
     "A spa website in Ubud should help guests compare treatments, durations and prices before choosing an appointment. Sela pairs a calm editorial introduction with a treatment list and a guided appointment preview. A real business could connect therapist availability, secure deposits and consent forms, with treatment details supplied by qualified staff.",
 });
+
+showcases.push(...additionalShowcases);
 
 const moodboards: Record<ShowcaseCategory, [string, string, string]> = {
   Hospitality: ["retreat", "pool", "interior"],

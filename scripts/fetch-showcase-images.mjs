@@ -1,6 +1,16 @@
 // Illustrative Unsplash photographs, not photographs of the fictional demo brands.
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, access } from "node:fs/promises";
 const photos = {
+  surf: "photo-1502680390469-be75c86b636f",
+  car: "photo-1503376780353-7e6692767b70",
+  fashion: "photo-1445205170230-053b83016050",
+  bakery: "photo-1509440159596-0249088772ff",
+  bicycle: "photo-1485965120184-e220f721d03e",
+  camera: "photo-1516035069371-29a1b244cc32",
+  beauty: "photo-1608571423902-eed4a5ad8108",
+  wellness: "photo-1544367567-0f2fcb009e0b",
+  bath: "photo-1544161515-4ab6ce6db874",
+  "night-hotel": "photo-1566073771259-6a8506099945",
   spa: "photo-1540555700478-4be289fbecef",
   retreat: "photo-1654703943019-e519711ea124",
   pool: "photo-1571896349842-33c89424de2d",
@@ -18,6 +28,13 @@ const photos = {
 };
 await mkdir("public/showcase", { recursive: true });
 for (const [name, id] of Object.entries(photos)) {
+  if (
+    await access(`public/showcase/${name}.jpg`).then(
+      () => true,
+      () => false,
+    )
+  )
+    continue;
   const url = `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=80`;
   const response = await fetch(url, { signal: AbortSignal.timeout(25000) });
   if (
