@@ -310,7 +310,7 @@ export function VillaBumiPreview() {
           ))}
         </nav>
         <div className="bumi-header-actions">
-          <a className="bumi-button bumi-button-clay" href="#contact">
+          <a className="bumi-button bumi-button-compact" href="#contact">
             Enquire <Arrow diagonal />
           </a>
           <button
