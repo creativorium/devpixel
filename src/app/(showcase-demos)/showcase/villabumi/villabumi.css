@@ -1,7 +1,7 @@
 .bumi-site {
   --bumi-paper: #f5f2ec;
   --bumi-ink: #332f28;
-  --bumi-muted: #716d63;
+  --bumi-muted: #645f55;
   --bumi-line: #dfdbd2;
   background: var(--bumi-paper);
   color: var(--bumi-ink);
@@ -470,7 +470,7 @@
   font:
     italic 37px/1 Georgia,
     serif;
-  color: #b3a28e;
+  color: #8f7e69;
   margin-bottom: 22px;
 }
 .bumi-room h3 {
