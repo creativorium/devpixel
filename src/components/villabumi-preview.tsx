@@ -1,8 +1,37 @@
 "use client";
 /* eslint-disable @next/next/no-html-link-for-pages -- Native navigation keeps this client preview portable to its planned Vite build. */
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type FocusEvent,
+  type FormEvent,
+  type PointerEvent,
+} from "react";
 import { villaBumi as villa } from "@/lib/villabumi";
+
+/** Auto-slide timing: each slider changes every 6s with a 1.2s crossfade (see CSS). */
+const SLIDE_INTERVAL = 6000;
+const CLOCK_TICK = 1000;
+/** The next photo is only mounted (and so requested) this long before its turn. */
+const PRELOAD_LEAD = 2000;
+/** Second within each 6s cycle at which a slider changes: hero, then tiles 2s apart. */
+const SLIDE_OFFSETS = [0, 1, 3, 5];
+const sliders = [villa.heroSlides, ...villa.galleryTiles.map((t) => t.photos)];
+const photoTitle = (id: string) => villa.photos.find((p) => p.id === id)!.title;
+
+const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
+function subscribeMotion(onChange: () => void) {
+  const query = window.matchMedia(reducedMotionQuery);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+function subscribeVisibility(onChange: () => void) {
+  document.addEventListener("visibilitychange", onChange);
+  return () => document.removeEventListener("visibilitychange", onChange);
+}
 
 const navigation = [
   ["about", "About"],
@@ -56,10 +85,14 @@ function VillaPhoto({
   id,
   priority = false,
   className = "",
+  decorative = false,
+  upcoming = false,
 }: {
   id: string;
   priority?: boolean;
   className?: string;
+  decorative?: boolean;
+  upcoming?: boolean;
 }) {
   const photo = villa.photos.find((p) => p.id === id)!;
   // Native responsive images intentionally keep this React component portable to Vite.
@@ -70,13 +103,58 @@ function VillaPhoto({
       src={`/villabumi/${id}.webp`}
       srcSet={`/villabumi/${id}-720.webp 720w, /villabumi/${id}-1200.webp 1200w, /villabumi/${id}.webp 1800w`}
       sizes="(max-width: 700px) 100vw, 55vw"
-      alt={photo.alt}
+      alt={decorative ? "" : photo.alt}
+      aria-hidden={decorative || undefined}
+      data-upcoming={upcoming || undefined}
       width={1800}
       height={1200}
       loading={priority ? "eager" : "lazy"}
       fetchPriority={priority ? "high" : "auto"}
       decoding="async"
     />
+  );
+}
+
+/**
+ * Stacks a slider's photos absolutely inside its frame. Only photos already shown,
+ * plus the upcoming one shortly before its turn, are mounted, so nothing loads early.
+ */
+function Crossfade({
+  ids,
+  active,
+  seen,
+  upcoming,
+  priority = false,
+}: {
+  ids: string[];
+  active: number;
+  seen: number;
+  upcoming: number;
+  priority?: boolean;
+}) {
+  return ids.map((id, i) =>
+    i <= seen || i === upcoming ? (
+      <VillaPhoto
+        key={id}
+        id={id}
+        priority={priority && i === 0}
+        decorative={i !== active}
+        upcoming={i === upcoming}
+        className={`bumi-slide${i === active ? " bumi-slide-active" : ""}`}
+      />
+    ) : null,
+  );
+}
+
+function PauseIcon({ paused }: { paused: boolean }) {
+  return (
+    <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+      {paused ? (
+        <path d="M2 1v8l7-4Z" fill="currentColor" />
+      ) : (
+        <path d="M2 1h2v8H2zM6 1h2v8H6z" fill="currentColor" />
+      )}
+    </svg>
   );
 }
 
@@ -148,12 +226,12 @@ function AreaMap() {
             Uluwatu
           </text>
         </g>
-        <circle cx="328" cy="162" r="32" fill="#b2684c" opacity=".12" />
+        <circle cx="328" cy="162" r="32" fill="#332f28" opacity=".12" />
         <circle
           cx="328"
           cy="162"
           r="7"
-          fill="#ae644b"
+          fill="#332f28"
           stroke="#fff9f0"
           strokeWidth="3"
         />
@@ -191,6 +269,30 @@ export function VillaBumiPreview() {
   const siteRef = useRef<HTMLDivElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activePhoto, setActivePhoto] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxPaused, setLightboxPaused] = useState(false);
+  const [announcement, setAnnouncement] = useState("");
+  const [slidesPaused, setSlidesPaused] = useState(false);
+  // frames: photo shown per slider; seen: furthest photo reached (kept mounted);
+  // upcoming: next photo mounted ahead of its turn, or -1.
+  const [slides, setSlides] = useState(() => ({
+    frames: sliders.map(() => 0),
+    seen: sliders.map(() => 0),
+    upcoming: sliders.map(() => -1),
+  }));
+  // Sliders under the pointer or holding keyboard focus skip their turn.
+  const hovered = useRef(new Set<number>());
+  const focused = useRef(new Set<number>());
+  const motionAllowed = useSyncExternalStore(
+    subscribeMotion,
+    () => !window.matchMedia(reducedMotionQuery).matches,
+    () => false,
+  );
+  const pageHidden = useSyncExternalStore(
+    subscribeVisibility,
+    () => document.hidden,
+    () => false,
+  );
   const [notice, setNotice] = useState("");
   const gallery = useRef<HTMLDialogElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
@@ -244,14 +346,100 @@ export function VillaBumiPreview() {
       );
     };
   }, []);
+  const slidesRunning =
+    motionAllowed && !slidesPaused && !pageHidden && !lightboxOpen;
+  useEffect(() => {
+    if (!slidesRunning) return;
+    let beat = 0;
+    let stopped = false;
+    const cycle = SLIDE_INTERVAL / CLOCK_TICK;
+    const lead = PRELOAD_LEAD / CLOCK_TICK;
+    // Which slider changes at a given beat (-1 for none); the first change is one cycle in.
+    const due = (at: number) =>
+      at < cycle
+        ? -1
+        : SLIDE_OFFSETS.findIndex((offset) => (at - offset) % cycle === 0);
+    const clock = window.setInterval(() => {
+      beat += 1;
+      const preload = due(beat + lead);
+      if (preload >= 0)
+        setSlides((current) => ({
+          ...current,
+          upcoming: current.upcoming.map((value, i) =>
+            i === preload ? (current.frames[i] + 1) % sliders[i].length : value,
+          ),
+        }));
+      const slider = due(beat);
+      if (
+        slider < 0 ||
+        hovered.current.has(slider) ||
+        focused.current.has(slider)
+      )
+        return;
+      // Hold the current photo until the upcoming one has loaded and decoded,
+      // so the fade never reveals an empty frame. It retries on its next turn.
+      const next = siteRef.current?.querySelector<HTMLImageElement>(
+        `[data-slider="${slider}"] img[data-upcoming]`,
+      );
+      if (!next?.complete || !next.naturalWidth) return;
+      next.decode().then(
+        () => {
+          if (stopped) return;
+          setSlides(({ frames, seen, upcoming }) => {
+            const shown = (frames[slider] + 1) % sliders[slider].length;
+            return {
+              frames: frames.map((frame, i) => (i === slider ? shown : frame)),
+              seen: seen.map((value, i) =>
+                i === slider ? Math.max(value, shown) : value,
+              ),
+              upcoming: upcoming.map((value, i) => (i === slider ? -1 : value)),
+            };
+          });
+        },
+        () => {},
+      );
+    }, CLOCK_TICK);
+    return () => {
+      stopped = true;
+      window.clearInterval(clock);
+    };
+  }, [slidesRunning]);
+  const sliderOf = (event: { currentTarget: HTMLElement }) =>
+    Number(event.currentTarget.dataset.slider);
+  const holdHandlers = {
+    onPointerEnter: (event: PointerEvent<HTMLElement>) =>
+      hovered.current.add(sliderOf(event)),
+    onPointerLeave: (event: PointerEvent<HTMLElement>) =>
+      hovered.current.delete(sliderOf(event)),
+    onFocus: (event: FocusEvent<HTMLElement>) =>
+      focused.current.add(sliderOf(event)),
+    onBlur: (event: FocusEvent<HTMLElement>) =>
+      focused.current.delete(sliderOf(event)),
+  };
   const openPhoto = (id: string) => {
     setActivePhoto(villa.photos.findIndex((p) => p.id === id));
+    setAnnouncement("");
+    setLightboxOpen(true);
     gallery.current?.showModal();
   };
-  const step = (direction: number) =>
-    setActivePhoto(
-      (n) => (n + direction + villa.photos.length) % villa.photos.length,
+  const step = (direction: number) => {
+    const next =
+      (activePhoto + direction + villa.photos.length) % villa.photos.length;
+    setActivePhoto(next);
+    // Only manual changes are announced; auto-advance stays silent.
+    setAnnouncement(
+      `${villa.photos[next].title}, photograph ${next + 1} of ${villa.photos.length}`,
     );
+  };
+  useEffect(() => {
+    if (!lightboxOpen || !motionAllowed || lightboxPaused || pageHidden) return;
+    // Re-armed whenever the photo changes, so prev/next/arrow keys reset it.
+    const timer = window.setTimeout(
+      () => setActivePhoto((n) => (n + 1) % villa.photos.length),
+      SLIDE_INTERVAL,
+    );
+    return () => window.clearTimeout(timer);
+  }, [lightboxOpen, motionAllowed, lightboxPaused, pageHidden, activePhoto]);
   useEffect(() => {
     if (!menuOpen) return;
     const escape = (event: KeyboardEvent) => {
@@ -310,7 +498,7 @@ export function VillaBumiPreview() {
           ))}
         </nav>
         <div className="bumi-header-actions">
-          <a className="bumi-button bumi-button-clay" href="#contact">
+          <a className="bumi-button bumi-button-compact" href="#contact">
             Enquire <Arrow diagonal />
           </a>
           <button
@@ -362,6 +550,18 @@ export function VillaBumiPreview() {
             <div className="bumi-hero-foot">
               <span>03 bedrooms</span>
               <span>01 private escape</span>
+              {motionAllowed && (
+                <button
+                  type="button"
+                  className="bumi-slides-toggle"
+                  aria-label="Pause slides"
+                  aria-pressed={slidesPaused}
+                  onClick={() => setSlidesPaused(!slidesPaused)}
+                >
+                  <PauseIcon paused={slidesPaused} />
+                  Pause slides
+                </button>
+              )}
               <a href="#about" aria-label="Discover the villa below">
                 ↓
               </a>
@@ -369,10 +569,18 @@ export function VillaBumiPreview() {
           </div>
           <button
             className="bumi-hero-image"
-            onClick={() => openPhoto("sunset")}
-            aria-label="View Villa Bumi pool terrace photograph"
+            onClick={() => openPhoto(villa.heroSlides[slides.frames[0]])}
+            aria-label={`View ${photoTitle(villa.heroSlides[slides.frames[0]])} photograph`}
+            data-slider={0}
+            {...holdHandlers}
           >
-            <VillaPhoto id="sunset" priority />
+            <Crossfade
+              ids={villa.heroSlides}
+              active={slides.frames[0]}
+              seen={slides.seen[0]}
+              upcoming={slides.upcoming[0]}
+              priority
+            />
             <span className="bumi-image-tag">
               A slower kind of Bali <span>＋</span>
             </span>
@@ -417,24 +625,30 @@ export function VillaBumiPreview() {
             </button>
           </div>
           <div className="bumi-gallery-grid">
-            {["living", "bedroomDetail", "garden"].map((id, i) => (
-              <button
-                className={`bumi-gallery-photo bumi-gallery-photo-${i}`}
-                key={id}
-                onClick={() => openPhoto(id)}
-                aria-label={`View ${villa.photos.find((p) => p.id === id)!.title} photograph`}
-              >
-                <VillaPhoto id={id} />
-                <span>
-                  {
-                    ["Open, easy living", "Quiet corners", "Naturally at home"][
-                      i
-                    ]
-                  }
-                  <span aria-hidden="true">＋</span>
-                </span>
-              </button>
-            ))}
+            {villa.galleryTiles.map((tile, i) => {
+              const current = tile.photos[slides.frames[i + 1]];
+              return (
+                <button
+                  className={`bumi-gallery-photo bumi-gallery-photo-${i}`}
+                  key={tile.caption}
+                  onClick={() => openPhoto(current)}
+                  aria-label={`View ${photoTitle(current)} photograph`}
+                  data-slider={i + 1}
+                  {...holdHandlers}
+                >
+                  <Crossfade
+                    ids={tile.photos}
+                    active={slides.frames[i + 1]}
+                    seen={slides.seen[i + 1]}
+                    upcoming={slides.upcoming[i + 1]}
+                  />
+                  <span>
+                    {tile.caption}
+                    <span aria-hidden="true">＋</span>
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </section>
         <section
@@ -689,6 +903,7 @@ export function VillaBumiPreview() {
         ref={gallery}
         className="bumi-lightbox"
         aria-label="Villa Bumi photo gallery"
+        onClose={() => setLightboxOpen(false)}
         onClick={(e) => {
           if (e.target === e.currentTarget) gallery.current?.close();
         }}
@@ -705,12 +920,26 @@ export function VillaBumiPreview() {
       >
         <div className="bumi-lightbox-top">
           <span>VILLA BUMI / GALLERY</span>
-          <button
-            onClick={() => gallery.current?.close()}
-            aria-label="Close photo gallery"
-          >
-            Close ×
-          </button>
+          <div className="bumi-lightbox-actions">
+            {motionAllowed && (
+              <button
+                type="button"
+                className="bumi-slides-toggle"
+                aria-label="Pause slideshow"
+                aria-pressed={lightboxPaused}
+                onClick={() => setLightboxPaused(!lightboxPaused)}
+              >
+                <PauseIcon paused={lightboxPaused} />
+                Pause slideshow
+              </button>
+            )}
+            <button
+              onClick={() => gallery.current?.close()}
+              aria-label="Close photo gallery"
+            >
+              Close ×
+            </button>
+          </div>
         </div>
         <div className="bumi-lightbox-image">
           <VillaPhoto id={villa.photos[activePhoto].id} priority />
@@ -719,7 +948,7 @@ export function VillaBumiPreview() {
           <button onClick={() => step(-1)} aria-label="Previous photograph">
             ←
           </button>
-          <div aria-live="polite">
+          <div>
             <p>{villa.photos[activePhoto].title}</p>
             <span>
               {String(activePhoto + 1).padStart(2, "0")} / {villa.photos.length}
@@ -729,6 +958,9 @@ export function VillaBumiPreview() {
             →
           </button>
         </div>
+        <p className="bumi-visually-hidden" aria-live="polite">
+          {announcement}
+        </p>
       </dialog>
     </div>
   );
