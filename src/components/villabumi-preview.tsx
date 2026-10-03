@@ -148,12 +148,12 @@ function AreaMap() {
             Uluwatu
           </text>
         </g>
-        <circle cx="328" cy="162" r="32" fill="#b2684c" opacity=".12" />
+        <circle cx="328" cy="162" r="32" fill="#332f28" opacity=".12" />
         <circle
           cx="328"
           cy="162"
           r="7"
-          fill="#ae644b"
+          fill="#332f28"
           stroke="#fff9f0"
           strokeWidth="3"
         />
