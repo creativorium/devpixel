@@ -60,6 +60,14 @@ export const villaBumi = {
       alt: "The edge of Villa Bumi’s infinity pool facing the tree canopy and horizon",
     },
   ],
+  /** Hero crossfade order; the first photo is the static image without motion. */
+  heroSlides: ["sunset", "pool", "exterior", "deck"],
+  /** Gallery tiles: fixed caption, each with its own photos (none shared). */
+  galleryTiles: [
+    { caption: "Open, easy living", photos: ["living", "bedroom3"] },
+    { caption: "Quiet corners", photos: ["bedroomDetail", "bedroom2"] },
+    { caption: "Naturally at home", photos: ["garden", "bedroom1"] },
+  ],
   rooms: [
     {
       name: "Bedroom one",

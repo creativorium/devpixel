@@ -259,8 +259,31 @@
   font-size: 23px;
   line-height: 1;
 }
+.bumi-slides-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+  padding: 4px 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: none;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--bumi-ink);
+}
+.bumi-slides-toggle[aria-pressed="true"] {
+  border-bottom-color: var(--bumi-ink);
+}
+.bumi-hero-foot > .bumi-slides-toggle {
+  margin-left: auto;
+}
+.bumi-hero-foot > .bumi-slides-toggle + a {
+  margin-left: 0;
+}
 .bumi-hero-image {
   position: relative;
+  isolation: isolate;
   display: block;
   border: 0;
   padding: 0;
@@ -302,12 +325,13 @@
 .bumi-hero-image:after {
   content: "";
   position: absolute;
+  z-index: 1;
   inset: 70% 0 0;
   background: linear-gradient(transparent, #0004);
   pointer-events: none;
 }
 .bumi-image-tag {
-  z-index: 1;
+  z-index: 2;
 }
 .bumi-about {
   display: grid;
@@ -380,6 +404,7 @@
 }
 .bumi-gallery-photo {
   position: relative;
+  isolation: isolate;
   border: 0;
   padding: 0;
   overflow: hidden;
@@ -399,6 +424,7 @@
 }
 .bumi-gallery-photo > span {
   position: absolute;
+  z-index: 2;
   bottom: 0;
   left: 0;
   right: 0;
@@ -805,6 +831,11 @@
   font-size: 9px;
   letter-spacing: 0.14em;
   padding-bottom: 17px;
+}
+.bumi-lightbox-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 .bumi-lightbox-top button {
   background: none;
@@ -1256,6 +1287,35 @@
 .bumi-gallery-photo .bumi-photo,
 .bumi-room-photo .bumi-photo {
   transition: transform 0.85s cubic-bezier(0.2, 0.65, 0.3, 1);
+}
+/* Auto-slide crossfade: the incoming photo fades in on top over 1.2s, then the
+   outgoing one is hidden, so the frame never dips to its background colour. */
+.bumi-site .bumi-slide {
+  opacity: 0;
+}
+.bumi-site .bumi-slide-active {
+  opacity: 1;
+  z-index: 1;
+}
+.bumi-hero-image > .bumi-slide {
+  transition:
+    opacity 0s linear 1.2s,
+    transform 1.5s ease;
+}
+.bumi-hero-image > .bumi-slide-active {
+  transition:
+    opacity 1.2s ease,
+    transform 1.5s ease;
+}
+.bumi-gallery-photo .bumi-slide {
+  transition:
+    opacity 0s linear 1.2s,
+    transform 0.85s cubic-bezier(0.2, 0.65, 0.3, 1);
+}
+.bumi-gallery-photo .bumi-slide-active {
+  transition:
+    opacity 1.2s ease,
+    transform 0.85s cubic-bezier(0.2, 0.65, 0.3, 1);
 }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .bumi-button:hover {
