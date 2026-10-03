@@ -15,6 +15,8 @@ import { villaBumi as villa } from "@/lib/villabumi";
 /** Auto-slide timing: each slider changes every 6s with a 1.2s crossfade (see CSS). */
 const SLIDE_INTERVAL = 6000;
 const CLOCK_TICK = 1000;
+/** The next photo is only mounted (and so requested) this long before its turn. */
+const PRELOAD_LEAD = 2000;
 /** Second within each 6s cycle at which a slider changes: hero, then tiles 2s apart. */
 const SLIDE_OFFSETS = [0, 1, 3, 5];
 const sliders = [villa.heroSlides, ...villa.galleryTiles.map((t) => t.photos)];
@@ -84,11 +86,13 @@ function VillaPhoto({
   priority = false,
   className = "",
   decorative = false,
+  upcoming = false,
 }: {
   id: string;
   priority?: boolean;
   className?: string;
   decorative?: boolean;
+  upcoming?: boolean;
 }) {
   const photo = villa.photos.find((p) => p.id === id)!;
   // Native responsive images intentionally keep this React component portable to Vite.
@@ -101,6 +105,7 @@ function VillaPhoto({
       sizes="(max-width: 700px) 100vw, 55vw"
       alt={decorative ? "" : photo.alt}
       aria-hidden={decorative || undefined}
+      data-upcoming={upcoming || undefined}
       width={1800}
       height={1200}
       loading={priority ? "eager" : "lazy"}
@@ -112,28 +117,29 @@ function VillaPhoto({
 
 /**
  * Stacks a slider's photos absolutely inside its frame. Only photos already shown,
- * plus the next one while motion is allowed, are mounted, so nothing loads early.
+ * plus the upcoming one shortly before its turn, are mounted, so nothing loads early.
  */
 function Crossfade({
   ids,
   active,
   seen,
-  preloadNext,
+  upcoming,
   priority = false,
 }: {
   ids: string[];
   active: number;
   seen: number;
-  preloadNext: boolean;
+  upcoming: number;
   priority?: boolean;
 }) {
   return ids.map((id, i) =>
-    i <= seen || (preloadNext && i === seen + 1) ? (
+    i <= seen || i === upcoming ? (
       <VillaPhoto
         key={id}
         id={id}
         priority={priority && i === 0}
         decorative={i !== active}
+        upcoming={i === upcoming}
         className={`bumi-slide${i === active ? " bumi-slide-active" : ""}`}
       />
     ) : null,
@@ -267,10 +273,12 @@ export function VillaBumiPreview() {
   const [lightboxPaused, setLightboxPaused] = useState(false);
   const [announcement, setAnnouncement] = useState("");
   const [slidesPaused, setSlidesPaused] = useState(false);
-  // frames: photo shown per slider; seen: furthest photo reached (kept mounted).
+  // frames: photo shown per slider; seen: furthest photo reached (kept mounted);
+  // upcoming: next photo mounted ahead of its turn, or -1.
   const [slides, setSlides] = useState(() => ({
     frames: sliders.map(() => 0),
     seen: sliders.map(() => 0),
+    upcoming: sliders.map(() => -1),
   }));
   // Sliders under the pointer or holding keyboard focus skip their turn.
   const hovered = useRef(new Set<number>());
@@ -343,30 +351,58 @@ export function VillaBumiPreview() {
   useEffect(() => {
     if (!slidesRunning) return;
     let beat = 0;
+    let stopped = false;
     const cycle = SLIDE_INTERVAL / CLOCK_TICK;
+    const lead = PRELOAD_LEAD / CLOCK_TICK;
+    // Which slider changes at a given beat (-1 for none); the first change is one cycle in.
+    const due = (at: number) =>
+      at < cycle
+        ? -1
+        : SLIDE_OFFSETS.findIndex((offset) => (at - offset) % cycle === 0);
     const clock = window.setInterval(() => {
       beat += 1;
-      if (beat < cycle) return;
-      const slider = SLIDE_OFFSETS.findIndex(
-        (offset) => (beat - offset) % cycle === 0,
-      );
+      const preload = due(beat + lead);
+      if (preload >= 0)
+        setSlides((current) => ({
+          ...current,
+          upcoming: current.upcoming.map((value, i) =>
+            i === preload ? (current.frames[i] + 1) % sliders[i].length : value,
+          ),
+        }));
+      const slider = due(beat);
       if (
         slider < 0 ||
         hovered.current.has(slider) ||
         focused.current.has(slider)
       )
         return;
-      setSlides(({ frames, seen }) => {
-        const next = (frames[slider] + 1) % sliders[slider].length;
-        return {
-          frames: frames.map((frame, i) => (i === slider ? next : frame)),
-          seen: seen.map((value, i) =>
-            i === slider ? Math.max(value, next) : value,
-          ),
-        };
-      });
+      // Hold the current photo until the upcoming one has loaded and decoded,
+      // so the fade never reveals an empty frame. It retries on its next turn.
+      const next = siteRef.current?.querySelector<HTMLImageElement>(
+        `[data-slider="${slider}"] img[data-upcoming]`,
+      );
+      if (!next?.complete || !next.naturalWidth) return;
+      next.decode().then(
+        () => {
+          if (stopped) return;
+          setSlides(({ frames, seen, upcoming }) => {
+            const shown = (frames[slider] + 1) % sliders[slider].length;
+            return {
+              frames: frames.map((frame, i) => (i === slider ? shown : frame)),
+              seen: seen.map((value, i) =>
+                i === slider ? Math.max(value, shown) : value,
+              ),
+              upcoming: upcoming.map((value, i) => (i === slider ? -1 : value)),
+            };
+          });
+        },
+        () => {},
+      );
     }, CLOCK_TICK);
-    return () => window.clearInterval(clock);
+    return () => {
+      stopped = true;
+      window.clearInterval(clock);
+    };
   }, [slidesRunning]);
   const sliderOf = (event: { currentTarget: HTMLElement }) =>
     Number(event.currentTarget.dataset.slider);
@@ -543,7 +579,7 @@ export function VillaBumiPreview() {
               ids={villa.heroSlides}
               active={slides.frames[0]}
               seen={slides.seen[0]}
-              preloadNext={motionAllowed}
+              upcoming={slides.upcoming[0]}
               priority
             />
             <span className="bumi-image-tag">
@@ -605,7 +641,7 @@ export function VillaBumiPreview() {
                     ids={tile.photos}
                     active={slides.frames[i + 1]}
                     seen={slides.seen[i + 1]}
-                    preloadNext={motionAllowed}
+                    upcoming={slides.upcoming[i + 1]}
                   />
                   <span>
                     {tile.caption}
