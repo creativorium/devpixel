@@ -432,8 +432,7 @@ export function VillaBumiPreview() {
     );
   };
   useEffect(() => {
-    if (!lightboxOpen || !motionAllowed || lightboxPaused || pageHidden)
-      return;
+    if (!lightboxOpen || !motionAllowed || lightboxPaused || pageHidden) return;
     // Re-armed whenever the photo changes, so prev/next/arrow keys reset it.
     const timer = window.setTimeout(
       () => setActivePhoto((n) => (n + 1) % villa.photos.length),
