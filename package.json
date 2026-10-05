@@ -14,7 +14,8 @@
     "test:room": "node tests/room.mjs",
     "test:theme": "node tests/theme-home.mjs",
     "test:seo": "node tests/seo.mjs",
-    "test:seo:routes": "node tests/seo-routes.mjs"
+    "test:seo:routes": "node tests/seo-routes.mjs",
+    "test:showcase:routes": "node tests/showcase-routes.mjs"
   },
   "dependencies": {
     "@fontsource-variable/space-grotesk": "5.3.0",

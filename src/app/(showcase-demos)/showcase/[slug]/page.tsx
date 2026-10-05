@@ -4,7 +4,9 @@ import { ShowcaseDemo } from "@/components/showcase-demo";
 import { showcases } from "@/lib/showcase";
 import { site } from "@/lib/site";
 import { StructuredData } from "@/components/structured-data";
-export const dynamicParams = false;
+// Permit runtime fallback on Netlify while retaining build-time generation.
+// The showcase lookup rejects unknown slugs with notFound().
+export const dynamicParams = true;
 export function generateStaticParams() {
   return showcases.map((s) => ({ slug: s.slug }));
 }
