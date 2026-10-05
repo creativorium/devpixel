@@ -51,7 +51,7 @@ export async function generateMetadata({
   const { locale, path } = resolve(await params);
   const c = pageCopy[locale],
     t = messages[locale];
-  let title = c.homeTitle.join(" "),
+  let title = c.homeMetaTitle || c.homeTitle.join(" "),
     description = c.homeIntro;
   const root = path.split("/")[1];
   const slug = path.split("/")[2];
@@ -79,7 +79,7 @@ export async function generateMetadata({
     description = c.servicesIntro;
     const i = services.findIndex((s) => s.slug === slug);
     if (i >= 0) {
-      title = t.serviceNames[i];
+      title = c.serviceTitles?.[i] || t.serviceNames[i];
       description = c.serviceDescriptions[i];
     }
   }
@@ -449,7 +449,7 @@ export default async function NativePage({
         <div className="native-banner">
           <div>
             <p className="eyebrow">{t.services}</p>
-            <h1>{t.serviceNames[i]}</h1>
+            <h1>{c.serviceTitles?.[i] || t.serviceNames[i]}</h1>
             <p>{c.serviceDescriptions[i]}</p>
             {cta}
           </div>
@@ -467,6 +467,22 @@ export default async function NativePage({
           </ol>
           <h2>{c.scopeTitle}</h2>
           <p>{c.scope}</p>
+          {c.serviceFaqs?.[s.slug] && (
+            <section className="service-faq">
+              <h2>Pertanyaan tentang layanan website</h2>
+              <div>
+                {c.serviceFaqs[s.slug].map(([question, answer]) => (
+                  <details key={question}>
+                    <summary>
+                      {question}
+                      <span aria-hidden="true">+</span>
+                    </summary>
+                    <p>{answer}</p>
+                  </details>
+                ))}
+              </div>
+            </section>
+          )}
           <Link
             className="button dark"
             href={href("/contact") + "?service=" + s.slug}

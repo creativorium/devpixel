@@ -4,18 +4,24 @@ Preferred hostname: **https://www.devnpixel.com**. On 10 September 2026, the liv
 
 ## Keyword and content map
 
-| Page                      | Main intent                                                        |
-| ------------------------- | ------------------------------------------------------------------ |
-| Home / services           | Independent web design and development studio for small businesses |
-| Development service       | Web development for small businesses                               |
-| Web design service        | Focused web design services                                        |
-| Bali article              | Web development in Bali; planning a business website               |
-| Affordable design article | Affordable web design; scope and total cost                        |
-| Freelancer article        | Freelancer vs small web design agency                              |
-| Remote projects article   | Remote web design for Australia, the US and Singapore              |
-| AI article                | AI coding agents and website development in 2026                   |
+| Page                      | Main intent                                           |
+| ------------------------- | ----------------------------------------------------- |
+| Home / services           | Web design and development for businesses in Bali     |
+| Development service       | Web development in Bali                               |
+| Web design service        | Web design in Bali                                    |
+| Bali article              | Web development in Bali; planning a business website  |
+| Affordable design article | Affordable web design; scope and total cost           |
+| Freelancer article        | Freelancer vs small web design agency                 |
+| Remote projects article   | Remote web design for Australia, the US and Singapore |
+| AI article                | AI coding agents and website development in 2026      |
 
 Location wording describes service audiences, not local offices. No local address, fabricated reviews, client results, or pricing was added. No meta-keywords tag or duplicate location doorway pages are needed.
+
+## October 2026 update
+
+English homepage and web service headings now describe website design and development for Bali businesses. The Indonesian homepage uses “Jasa Pembuatan Website Bali” in its title, with distinct design and development service headings, practical scope information, and service FAQs. Pricing and delivery dates remain dependent on the agreed scope.
+
+On 5 October 2026, 34 of 35 standalone showcase URLs in the production sitemap returned HTTP 404. Exclude standalone demos and rental subpages from the sitemap until their production routes have been verified. Keep the showcase index, studio pages, articles, and client case studies, including their language alternatives. A wider live check also found the seven English article URLs returning 404, while the production build generates them. Verify these routes after deployment; a locally generated route does not establish that production hosting serves it correctly. The preview at `/showcase/villabumi` remains noindex and outside the sitemap.
 
 ## After deployment
 

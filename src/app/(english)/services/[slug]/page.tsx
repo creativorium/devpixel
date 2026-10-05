@@ -18,9 +18,11 @@ export async function generateMetadata({
   const s = services.find((s) => s.slug === slug);
   if (!s) notFound();
   return pageMetadata(
-    s.name === "Development"
-      ? "Web Development for Small Businesses"
-      : `${s.name} Services`,
+    s.slug === "development"
+      ? "Web Development in Bali"
+      : s.slug === "web-design"
+        ? "Web Design in Bali"
+        : `${s.name} Services`,
     s.description,
     `/services/${slug}`,
   );

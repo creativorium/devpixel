@@ -8,8 +8,8 @@ import { ServiceTicker } from "@/components/service-ticker";
 import { posts } from "@/lib/posts";
 import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata(
-  "Web Design & Development for Bali and Beyond",
-  "Independent web design and development for small businesses in Bali, Australia, the US and Singapore. Explore focused websites, branding and creative services.",
+  "Web Design & Development in Bali | DevnPixel",
+  "Web design and development for businesses in Bali. DevnPixel builds responsive business websites, villa websites and online stores, with a clear scope and direct collaboration.",
   "/",
 );
 export default function Home() {
@@ -25,15 +25,16 @@ export default function Home() {
         <div className="hero-grid">
           <div className="hero-copy">
             <h1>
-              Big ideas.
+              Web design.
               <br />
-              Small <span className="pixel-text">pixels</span>
+              Built for <span className="pixel-text">Bali.</span>
               <span className="headline-square" />
             </h1>
             <p>
-              We turn bold ideas into thoughtful digital
-              <br className="desktop-break" /> experiences. A little detail. A
-              lasting impression.
+              Web design and development for businesses in Bali. We build
+              responsive websites that explain your offer and help customers
+              enquire, from business profiles to villa websites and online
+              stores.
             </p>
             <div className="hero-actions">
               <Link href="/work" className="button dark">
@@ -96,9 +97,9 @@ export default function Home() {
         </div>
         <div className="studio-details">
           <p>
-            We’re a digital studio at the intersection of design and
-            development. From the first sketch to the final line of code, we
-            make every pixel count.
+            Work directly with an independent studio on website design,
+            development, and ongoing maintenance. Our client work includes
+            Wonderland Bali, JW Trading Academy, and FZ Film Co.
           </p>
           <Link className="text-link" href="/about">
             Meet the studio <span>↗</span>
@@ -125,15 +126,16 @@ export default function Home() {
             Built to reach beyond.
           </h2>
           <p>
-            We offer web design, development, and branding for small businesses
-            targeting Bali, Australia, the United States, and Singapore. Work
-            directly with an independent studio through a clear remote process,
-            from the first brief to launch.
+            Planning a website for your Bali business? We help organise your
+            services, photos, and contact information into a website your
+            customers can use on mobile and desktop. Forms, WhatsApp enquiries,
+            and booking or payment integrations are agreed around your needs.
           </p>
           <p>
-            Looking for affordable web design or a freelance web development
-            partner? Start with a focused scope: the right pages, useful
-            content, and a reliable way for customers to contact you.
+            Start with a clear scope: the pages you need, who prepares the
+            content, and how the website will be maintained after launch. We
+            also work remotely with businesses in Australia, the United States,
+            and Singapore.
           </p>
           <Link className="text-link" href="/services">
             Find the right service ↗

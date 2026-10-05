@@ -1,6 +1,9 @@
 import type { Locale } from "../i18n";
 export type LocalPageCopy = {
   homeTitle: [string, string];
+  homeMetaTitle?: string;
+  serviceTitles?: string[];
+  serviceFaqs?: Record<string, [string, string][]>;
   homeIntro: string;
   eyebrow: string;
   available: string;
@@ -232,23 +235,30 @@ export const pageCopy: Record<Exclude<Locale, "en">, LocalPageCopy> = {
       "成果物、スケジュール、修正回数、予算は開始前に書面で合意します。追加のご希望は、影響を話し合ってから範囲を調整します。",
   },
   id: {
-    homeTitle: ["Ide besar.", "Piksel kecil."],
+    homeTitle: ["Jasa website.", "Untuk bisnis di Bali."],
+    homeMetaTitle: "Jasa Pembuatan Website Bali",
+    serviceTitles: [
+      "Strategi Merek",
+      "Jasa Desain Website Bali",
+      "Jasa Pembuatan Website Bali",
+      "Kreatif Periklanan",
+    ],
     homeIntro:
-      "Kami mengubah ide berani menjadi merek dan pengalaman web yang penuh pertimbangan. Detail kecil, kesan yang bertahan lama.",
+      "DevnPixel menyediakan jasa pembuatan website untuk bisnis di Bali, mulai dari profil perusahaan, website villa, hingga toko online. Desain responsif, kebutuhan yang jelas, dan komunikasi langsung dari awal sampai peluncuran.",
     eyebrow: "STUDIO DIGITAL INDEPENDEN",
     available: "TERBUKA UNTUK KOLABORASI",
     studioTitle:
       "Desain yang baik ada pada detailnya. Pengalaman hebat menyatukan semuanya.",
     studioIntro:
-      "Kami bekerja di persimpangan desain dan pengembangan. Dari sketsa pertama hingga baris kode terakhir, setiap detail punya peran.",
-    marketTitle: "Desain web untuk Bali. Dibangun untuk menjangkau lebih jauh.",
+      "Bekerja langsung dengan studio independen untuk desain website, pengembangan, dan pemeliharaan. Proyek klien kami mencakup Wonderland Bali, JW Trading Academy, dan FZ Film Co.",
+    marketTitle: "Website untuk usaha lokal dan bisnis di Bali.",
     marketIntro:
-      "Kami menyediakan desain web, pengembangan, dan branding bagi usaha kecil yang menyasar Bali, Australia, Amerika Serikat, dan Singapura. Bekerja langsung dengan studio independen melalui proses jarak jauh yang jelas. Lingkup terarah, konten berguna, dan jalur kontak yang andal membantu menjaga anggaran tetap realistis.",
+      "Butuh website untuk UMKM, villa, restoran, atau bisnis jasa di Bali? Kami membantu menyusun informasi usaha, layanan, foto, dan jalur kontak agar pelanggan mudah memahami penawaran Anda. Formulir, WhatsApp, serta integrasi pemesanan atau pembayaran dibahas sesuai kebutuhan. Kami juga melayani proyek jarak jauh untuk pasar internasional.",
     workTitle: "Ide yang menjadi nyata.",
     conceptNote: "PROYEK KLIEN & KONSEP STUDIO",
-    servicesTitle: "Dari gagasan pertama hingga piksel terakhir.",
+    servicesTitle: "Jasa website dan desain untuk bisnis di Bali.",
     servicesIntro:
-      "Identitas yang jelas. Situs yang dipikirkan matang. Pengalaman yang layak dijelajahi. Libatkan kami untuk satu bagian atau untuk menyatukan keseluruhan proyek.",
+      "Pilih bantuan yang Anda butuhkan: desain website, pembuatan website, strategi merek, atau materi iklan. Kami menyepakati halaman, fitur, konten, dan tanggung jawab sebelum pekerjaan dimulai.",
     contactTitle: "Ide besar Anda berikutnya.",
     contactIntro:
       "Merek baru, website yang lebih baik, atau ide yang berbeda? Ceritakan kebutuhan, audiens, dan waktu yang Anda harapkan.",
@@ -257,8 +267,8 @@ export const pageCopy: Record<Exclude<Locale, "en">, LocalPageCopy> = {
       "Catatan praktis tentang desain web, pengembangan, AI, dan kolaborasi independen untuk usaha kecil yang merencanakan website berikutnya.",
     serviceDescriptions: [
       "Positioning, pesan, dan identitas visual agar bisnis memiliki suara yang jelas dan konsisten.",
-      "Desain website, alur pengguna, dan antarmuka responsif yang berangkat dari merek serta audiens Anda.",
-      "Pengembangan web responsif dengan perhatian pada performa, aksesibilitas, SEO teknis, dan kode yang mudah dirawat.",
+      "Jasa desain website di Bali dengan struktur konten, alur pengunjung, dan tampilan responsif untuk ponsel serta desktop.",
+      "Jasa pembuatan website untuk bisnis di Bali: website responsif, formulir kontak, integrasi sesuai kebutuhan, dan dasar SEO teknis.",
       "Konsep kampanye dan materi iklan digital yang selaras dengan audiens, pesan, dan tujuan bisnis.",
     ],
     serviceDetails: [
@@ -267,18 +277,52 @@ export const pageCopy: Record<Exclude<Locale, "en">, LocalPageCopy> = {
         "Lingkup dapat mencakup susunan pesan, arah logo, tipografi, warna, serta panduan merek yang praktis digunakan sehari-hari.",
       ],
       [
-        "Kami menyusun konten dan alur agar pengunjung memahami penawaran serta tahu langkah berikutnya.",
-        "Layout dirancang untuk ponsel dan desktop, ditinjau pada halaman utama, lalu disiapkan untuk tahap pengembangan.",
+        "Kami merancang website profil perusahaan, villa, restoran, toko online, dan bisnis jasa. Struktur halaman membantu pengunjung menemukan layanan, melihat karya atau produk, dan menghubungi Anda.",
+        "Desain disiapkan untuk ponsel dan desktop, dengan penempatan tombol WhatsApp, formulir, atau tautan pemesanan sesuai kebutuhan. Desain dapat dipesan terpisah atau dilanjutkan ke tahap pembuatan website.",
       ],
       [
-        "Kami membangun desain yang disetujui menjadi website responsif. Teknologi dipilih berdasarkan konten, integrasi, dan kebutuhan pengelolaan.",
-        "Pemeriksaan mencakup formulir, navigasi keyboard, kecepatan muat, metadata, sitemap, serta deployment yang aman. Kredensial rahasia tetap berada di server.",
+        "Kami membangun website dari desain yang disetujui, mulai dari landing page dan profil bisnis hingga website villa atau toko online. Jumlah halaman, formulir, CMS untuk mengubah konten, serta integrasi pemesanan atau pembayaran ditentukan dalam lingkup proyek.",
+        "Sebelum peluncuran, kami memeriksa tampilan ponsel, formulir, navigasi, kecepatan muat, judul halaman, dan sitemap. Pengaturan domain, hosting, akses pengelolaan, serta pemeliharaan setelah peluncuran dibahas sejak awal. Dasar SEO membantu mesin pencari memahami website; posisi pencarian tidak dapat dijamin.",
       ],
       [
         "Kami memulai dari tujuan komunikasi yang jelas lalu mengembangkan arah visual sesuai kanal dan target audiens.",
         "Hasil dapat berupa konsep kampanye, materi media sosial, dan variasi iklan digital. Biaya media dan pengelolaan iklan disepakati terpisah.",
       ],
     ],
+    serviceFaqs: {
+      development: [
+        [
+          "Berapa biaya pembuatan website di Bali?",
+          "Biaya mengikuti jumlah halaman, kesiapan konten, desain, dan fitur yang dibutuhkan. Ceritakan kebutuhan serta kisaran anggaran Anda untuk mendapatkan lingkup dan penawaran. Biaya domain, hosting, dan pemeliharaan dibahas terpisah dari pekerjaan awal.",
+        ],
+        [
+          "Apa yang perlu disiapkan sebelum membuat website?",
+          "Siapkan informasi usaha, daftar layanan atau produk, logo, foto yang boleh digunakan, dan kontak pelanggan. Jika konten belum lengkap, kami akan membahas siapa yang menyiapkan dan menyetujuinya sebelum desain dimulai.",
+        ],
+        [
+          "Berapa lama proses pembuatan website?",
+          "Jadwal ditentukan setelah lingkup dan kesiapan konten diketahui. Jumlah halaman, integrasi, dan waktu persetujuan memengaruhi durasi. Tahapan serta jadwal ditulis dalam kesepakatan proyek.",
+        ],
+        [
+          "Apakah website bisa terhubung ke WhatsApp atau sistem pemesanan?",
+          "Ya. Tombol WhatsApp, formulir, serta integrasi pemesanan atau pembayaran dapat masuk dalam lingkup yang disepakati. Pilihan sistem mengikuti kebutuhan bisnis dan layanan pihak ketiga yang digunakan.",
+        ],
+        [
+          "Apakah tersedia pemeliharaan setelah website diluncurkan?",
+          "Pemeliharaan dapat dibahas sesuai kebutuhan pembaruan konten, pemeriksaan teknis, dan dukungan. Kami menjelaskan pekerjaan yang termasuk serta biaya berulang sebelum Anda memilih layanan.",
+        ],
+      ],
+      "web-design": [
+        [
+          "Apakah desain website sudah termasuk pengembangan?",
+          "Desain dapat dipesan sendiri atau dipasangkan dengan jasa pembuatan website. Penawaran menjelaskan apakah pekerjaan mencakup desain, pengembangan, konten, dan peluncuran.",
+        ],
+        [
+          "Bisakah mendesain ulang website yang sudah ada?",
+          "Ya. Kami meninjau struktur, konten, dan kebutuhan pengunjung sebelum menentukan bagian yang perlu diperbaiki. Halaman serta URL yang sudah berguna ikut dipertimbangkan saat merencanakan perubahan.",
+        ],
+      ],
+    },
     processTitle: "Proses yang jelas dari awal.",
     process: [
       "Pahami: sepakati tujuan, audiens, konten, dan batasan.",
