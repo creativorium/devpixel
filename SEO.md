@@ -23,6 +23,12 @@ English homepage and web service headings now describe website design and develo
 
 On 5 October 2026, 34 of 35 standalone showcase URLs in the production sitemap returned HTTP 404. Exclude standalone demos and rental subpages from the sitemap until their production routes have been verified. Keep the showcase index, studio pages, articles, and client case studies, including their language alternatives. A wider live check also found the seven English article URLs returning 404, while the production build generates them. Verify these routes after deployment; a locally generated route does not establish that production hosting serves it correctly. The preview at `/showcase/villabumi` remains noindex and outside the sitemap.
 
+## Production article routing
+
+The seven English articles are generated during the build. Their route also permits runtime fallback, matching the working service and project routes. Missing article slugs are still rejected by the post lookup in metadata and page rendering. This avoids relying exclusively on the host adapter's handling of routes with `dynamicParams = false`.
+
+Run `TEST_BASE_URL=https://www.devnpixel.com npm run test:seo:routes` after deployment. This verifies every sitemap URL over HTTP, checks English article markup, and requires unknown English and Indonesian articles to return 404. Use a local production server URL for the same check before release.
+
 ## After deployment
 
 1. Verify the devnpixel.com Domain property in Google Search Console using the DNS value supplied by Google. Analytics installation alone does not establish Search Console ownership.
