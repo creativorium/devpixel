@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   availableStay,
   isUnavailable,
@@ -25,6 +25,7 @@ export function VillaBumiBooking({
   const [error, setError] = useState(false);
   const [retry, setRetry] = useState(0);
   const [offset, setOffset] = useState(0);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
   const [arrival, setArrival] = useState("");
   const [departure, setDeparture] = useState("");
   const [notice, setNotice] = useState("");
@@ -141,71 +142,108 @@ export function VillaBumiBooking({
             Choose an arrival, then a departure. Your dates will carry through
             to the enquiry below.
           </p>
-          <div className="bumi-calendar-months">
-            {[offset, offset + 1].map((monthOffset) => {
-              const start = new Date(
-                `${booking.today.slice(0, 7)}-01T00:00:00Z`,
-              );
-              start.setUTCMonth(start.getUTCMonth() + monthOffset);
-              const year = start.getUTCFullYear();
-              const month = start.getUTCMonth();
-              const count = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
-              const leading = (start.getUTCDay() + 6) % 7;
-              const title = new Intl.DateTimeFormat("en", {
-                month: "long",
-                year: "numeric",
-                timeZone: "UTC",
-              }).format(start);
-              return (
-                <section
-                  className="bumi-calendar-month"
-                  key={title}
-                  aria-label={title}
-                >
-                  <h4>{title}</h4>
-                  <div className="bumi-calendar-weekdays" aria-hidden="true">
-                    {weekdays.map((day) => (
-                      <span key={day}>{day}</span>
-                    ))}
-                  </div>
-                  <div className="bumi-calendar-days">
-                    {Array.from({ length: leading }, (_, i) => (
-                      <span key={`blank-${i}`} />
-                    ))}
-                    {Array.from({ length: count }, (_, i) => {
-                      const day = `${year}-${String(month + 1).padStart(2, "0")}-${String(i + 1).padStart(2, "0")}`;
-                      const booked = isUnavailable(day, booking);
-                      // A booked day can be checkout: the final occupied night is the day before.
-                      const checkout =
-                        !!arrival &&
-                        !departure &&
-                        day > arrival &&
-                        availableStay(arrival, day, booking);
-                      const disabled =
-                        day < booking.today || (booked && !checkout);
-                      const selected = day === arrival || day === departure;
-                      const between =
-                        !!departure && day > arrival && day < departure;
-                      return (
-                        <button
-                          type="button"
-                          key={day}
-                          data-date={day}
-                          data-booked={booked}
-                          disabled={disabled}
-                          aria-pressed={selected}
-                          aria-label={`${fullDate(day)}${booked ? (checkout ? ", checkout only" : ", unavailable") : ", available to enquire"}${day === arrival ? ", arrival" : day === departure ? ", departure" : ""}`}
-                          className={`${selected ? "is-selected" : ""} ${between ? "is-between" : ""}`}
-                          onClick={() => select(day)}
-                        >
-                          {i + 1}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </section>
-              );
-            })}
+          <div
+            className="bumi-calendar-months"
+            onTouchStart={(event) => {
+              const touch = event.touches[0];
+              touchStart.current = { x: touch.clientX, y: touch.clientY };
+            }}
+            onTouchEnd={(event) => {
+              if (!touchStart.current) return;
+              const touch = event.changedTouches[0];
+              const dx = touch.clientX - touchStart.current.x;
+              const dy = touch.clientY - touchStart.current.y;
+              touchStart.current = null;
+              if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                setOffset((current) =>
+                  Math.max(0, Math.min(11, current + (dx < 0 ? 1 : -1))),
+                );
+              }
+            }}
+          >
+            {Array.from({ length: 6 }, (_, i) => offset + i).map(
+              (monthOffset) => {
+                const start = new Date(
+                  `${booking.today.slice(0, 7)}-01T00:00:00Z`,
+                );
+                start.setUTCMonth(start.getUTCMonth() + monthOffset);
+                const year = start.getUTCFullYear();
+                const month = start.getUTCMonth();
+                const count = new Date(
+                  Date.UTC(year, month + 1, 0),
+                ).getUTCDate();
+                const leading = (start.getUTCDay() + 6) % 7;
+                const title = new Intl.DateTimeFormat("en", {
+                  month: "long",
+                  year: "numeric",
+                  timeZone: "UTC",
+                }).format(start);
+                return (
+                  <section
+                    className="bumi-calendar-month"
+                    key={title}
+                    aria-label={title}
+                  >
+                    <h4>{title}</h4>
+                    <div className="bumi-calendar-weekdays" aria-hidden="true">
+                      {weekdays.map((day) => (
+                        <span key={day}>{day}</span>
+                      ))}
+                    </div>
+                    <div className="bumi-calendar-days">
+                      {Array.from({ length: leading }, (_, i) => (
+                        <span key={`blank-${i}`} />
+                      ))}
+                      {Array.from({ length: count }, (_, i) => {
+                        const day = `${year}-${String(month + 1).padStart(2, "0")}-${String(i + 1).padStart(2, "0")}`;
+                        const booked = isUnavailable(day, booking);
+                        const starts = booking.unavailable.some(
+                          (range) => range.start === day,
+                        );
+                        const ends = booking.unavailable.some(
+                          (range) => range.end === day,
+                        );
+                        const boundary =
+                          starts && ends
+                            ? "changeover"
+                            : starts
+                              ? "arrival"
+                              : ends
+                                ? "departure"
+                                : "";
+                        // A booked day can be checkout: the final occupied night is the day before.
+                        const checkout =
+                          !!arrival &&
+                          !departure &&
+                          day > arrival &&
+                          availableStay(arrival, day, booking);
+                        const disabled =
+                          day < booking.today || (booked && !checkout);
+                        const selected = day === arrival || day === departure;
+                        const between =
+                          !!departure && day > arrival && day < departure;
+                        return (
+                          <button
+                            type="button"
+                            key={day}
+                            data-date={day}
+                            data-booked={booked}
+                            data-boundary={boundary}
+                            disabled={disabled}
+                            aria-pressed={selected}
+                            aria-label={`${fullDate(day)}${booked ? (checkout ? ", checkout only" : ", unavailable") : ", available to enquire"}${day === arrival ? ", arrival" : day === departure ? ", departure" : ""}`}
+                            className={`${selected ? "is-selected" : ""} ${between ? "is-between" : ""}`}
+                            onClick={() => select(day)}
+                          >
+                            {i + 1}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </section>
+                );
+              },
+            )}
           </div>
           <div className="bumi-calendar-legend">
             <span>
@@ -215,6 +253,10 @@ export function VillaBumiBooking({
             <span>
               <i className="is-booked" />
               Unavailable
+            </span>
+            <span>
+              <i className="is-changeover" />
+              Arrival / departure day
             </span>
             <span>
               <i className="is-selected" />
@@ -243,6 +285,14 @@ export function VillaBumiBooking({
             {notice ||
               "Availability supplied by Total Bali. Dates are an enquiry, not a reservation; please confirm with the villa."}
           </p>
+          <a
+            className="bumi-calendar-source bumi-text-link"
+            href="https://villabumi.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View Villa Bumi’s original rates & availability ↗
+          </a>
           <div className="bumi-nightly-heading">
             <h3>Stay a little. Stay a while.</h3>
             <label>

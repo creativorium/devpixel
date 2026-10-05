@@ -100,8 +100,9 @@ export function publicBooking(
 }
 
 export function isUnavailable(day: string, booking: VillaBooking) {
-  // The original calendar marks the provider's end date unavailable too.
-  return booking.unavailable.some((r) => day >= r.start && day <= r.end);
+  // The original calendar shows check-in on the right half and checkout on
+  // the left half. The checkout date is free for the following night.
+  return booking.unavailable.some((r) => day >= r.start && day < r.end);
 }
 
 export function availableStay(

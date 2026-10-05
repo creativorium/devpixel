@@ -33,8 +33,17 @@ try {
     });
   });
   await page.goto(`${base}/showcase/villabumi`);
-  await expect(page.locator(".bumi-calendar-month")).toHaveCount(2);
+  await expect(page.locator(".bumi-calendar-month")).toHaveCount(6);
   await expect(page.locator('[data-date="2026-10-10"]')).toBeDisabled();
+  await expect(page.locator('[data-date="2026-10-12"]')).toBeEnabled();
+  await expect(page.locator('[data-date="2026-10-10"]')).toHaveAttribute(
+    "data-boundary",
+    "arrival",
+  );
+  await expect(page.locator('[data-date="2026-10-12"]')).toHaveAttribute(
+    "data-boundary",
+    "departure",
+  );
   await page.locator('[data-date="2026-10-06"]').click();
   await page.locator('[data-date="2026-10-09"]').click();
   await expect(page.locator('input[name="arrival"]')).toHaveValue("2026-10-06");
@@ -64,6 +73,12 @@ try {
   for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 950 });
     await page.evaluate(() => document.fonts.ready);
+    const expectedMonths = width > 1100 ? 6 : width > 760 ? 4 : 1;
+    assert.equal(
+      await page.locator(".bumi-calendar-month:visible").count(),
+      expectedMonths,
+      `${width}px visible months`,
+    );
     assert.ok(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth + 1,
@@ -71,6 +86,30 @@ try {
       `${width}px overflow`,
     );
   }
+  await page.setViewportSize({ width: 390, height: 950 });
+  await page.locator(".bumi-calendar-months").evaluate((element) => {
+    const touch = (x, y) =>
+      new Touch({ identifier: 1, target: element, clientX: x, clientY: y });
+    element.dispatchEvent(
+      new TouchEvent("touchstart", {
+        bubbles: true,
+        touches: [touch(280, 400)],
+      }),
+    );
+    element.dispatchEvent(
+      new TouchEvent("touchend", {
+        bubbles: true,
+        changedTouches: [touch(120, 410)],
+      }),
+    );
+  });
+  await expect(page.locator(".bumi-calendar-month h4").first()).toHaveText(
+    "November 2026",
+  );
+  await page
+    .getByRole("button", { name: "Previous month", exact: true })
+    .click();
+  await page.setViewportSize({ width: 1440, height: 950 });
   await page.locator('input[name="name"]').fill("Preview Guest");
   await page.locator('input[name="email"]').fill("guest@example.com");
   await page
@@ -112,7 +151,7 @@ try {
   await expect(page.locator(".bumi-nightly-rates")).toHaveCount(0);
   failProvider = false;
   await page.getByRole("button", { name: "Try again", exact: true }).click();
-  await expect(page.locator(".bumi-calendar-month")).toHaveCount(2);
+  await expect(page.locator(".bumi-calendar-month")).toHaveCount(6);
   console.log(
     "Villa Bumi checks passed: date selection, booked nights, checkout boundary, USD/IDR, five widths, enquiry preview, Instagram links, noindex, and provider failure/retry.",
   );

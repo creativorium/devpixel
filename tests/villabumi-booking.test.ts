@@ -54,7 +54,8 @@ test("only dates and published rates leave the server; expired offers and HTML a
 test("date boundaries match the calendar; checkout is allowed before an unavailable night", () => {
   const booking = publicBooking(provider, "USD", "2026-10-05");
   assert.ok(isUnavailable("2026-10-10", booking));
-  assert.ok(isUnavailable("2026-10-12", booking));
+  assert.ok(!isUnavailable("2026-10-12", booking));
+  assert.ok(availableStay("2026-10-12", "2026-10-15", booking));
   assert.ok(!isUnavailable("2026-10-13", booking));
   assert.ok(availableStay("2026-10-08", "2026-10-10", booking));
   assert.ok(!availableStay("2026-10-08", "2026-10-13", booking));
