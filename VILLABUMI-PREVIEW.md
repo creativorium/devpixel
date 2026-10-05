@@ -11,9 +11,15 @@ The supplied **Villa bumi layouts 1 (1).pdf** guides the ivory/terracotta palett
 - `src/app/(showcase-demos)/showcase/villabumi/`: thin Next.js route, review metadata and scoped CSS.
 - `public/villabumi/`: optimized client images, responsive sizes and source manifest.
 
-The enquiry form validates locally and displays an explicit preview message. It does not send, log or persist guest information. Email, telephone, Instagram and WhatsApp links open the corresponding real contact destination. The location illustration is explicitly schematic and links to the address search used on the source website. There is no embedded map or third-party booking script.
+The enquiry form validates locally and displays an explicit preview message. It does not send, log or persist guest information. Email, telephone, Instagram and WhatsApp links open the corresponding real contact destination. The location illustration is explicitly schematic and links to the address search used on the source website. There is no embedded map or third-party booking script. The custom availability calendar and nightly rate table read the public Total Bali villa endpoint through `/api/villabumi/booking`, restricted to Villa Bumi (villa ID 53) and USD/IDR. The server returns only unavailable date ranges and rate details, stripping reservation names and all unrelated fields. Provider failures show an unavailable state with retry and contact links; no dates or prices are invented. Data is cached for up to 60 seconds. Expired special-rate offers are omitted, and published seasonal detail is preserved without turning it into a date-specific quote.
 
-Rates in the supplied PDF use USD 5,500 / 6,500 / 7,500 per month. The current website also contains older, differing IDR rates and a promotion ending February 2026. The preview labels its rates indicative; the client must approve current rates, taxes, inclusions, contact information and availability before production. The source site's regular housekeeping wording is used instead of an unverified full-time claim.
+Monthly rates on the source site and supplied PDF use USD 5,500 / 6,500 / 7,500 per month. The current website also contains older, differing IDR rates and a promotion ending February 2026. The preview labels its rates indicative; the client must approve current rates, taxes, inclusions, contact information and availability before production. The source site's regular housekeeping wording is used instead of an unverified full-time claim.
+
+## Calendar and Instagram update
+
+`src/components/villabumi-booking.tsx` renders the ivory/ink month grids, date selection, provider-backed nightly pricing, and USD/IDR selection. Dates populate the local enquiry form; no reservation or enquiry is sent. The provider marks booked ranges inclusive of their end date. Checkout on the first unavailable date is allowed because the previous night is the last occupied night. Minimum stays and the final applicable price remain subject to villa confirmation.
+
+The Instagram section uses existing Villa Bumi photographs with links to `@villabumibali`. It is a linked photographic section, not a live Instagram feed. No account token, Instagram script, or tracking iframe is required. A live feed needs a separately configured owner-authorized Instagram integration.
 
 ## Later: Vite + headless WordPress on shared hosting
 
