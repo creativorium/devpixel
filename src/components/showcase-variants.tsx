@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import type { Showcase } from "@/lib/showcase";
+import { VillaOpening, VillaJourney } from "./villa-direction";
 
 type Props = { s: Showcase };
 const subscribe = () => () => {};
@@ -481,14 +482,8 @@ export function VariantVilla({ s }: Props) {
         }
       />
       <main id="main" className={`v-site v-villa v-variant-${s.variant}`}>
-        <Hero
-          s={s}
-          action={
-            <a className="v-button" href="#collection">
-              Step inside ↗
-            </a>
-          }
-        />
+        <VillaOpening s={s} />
+        <VillaJourney s={s} />
         <div className="v-property-stats">
           <span>
             <b>04</b>Bedrooms / concept

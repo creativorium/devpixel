@@ -16,7 +16,8 @@
     "test:seo": "node tests/seo.mjs",
     "test:seo:routes": "node tests/seo-routes.mjs",
     "test:showcase:routes": "node tests/showcase-routes.mjs",
-    "test:villabumi": "node tests/villabumi.mjs"
+    "test:villabumi": "node tests/villabumi.mjs",
+    "test:villa:directions": "node tests/villa-directions.mjs"
   },
   "dependencies": {
     "@fontsource-variable/space-grotesk": "5.3.0",

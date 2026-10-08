@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Showcase } from "@/lib/showcase";
+import { VillaOpening, VillaJourney } from "./villa-direction";
 
 type Props = { s: Showcase };
 const money = (n: number) =>
@@ -1337,18 +1338,8 @@ export function VillaExperience({ s }: Props) {
         }
       />
       <main id="main" className="villa-main">
-        <section className="villa-heading">
-          <p className="demo-kicker">
-            ONE HOUSE. YOUR OWN HORIZON. / ULUWATU, BALI
-          </p>
-          <h1>
-            Room to <em>be together.</em>
-          </h1>
-          <div>
-            <span>Private villa concept</span>
-            <span>Up to 8 guests · 4 bedrooms · Private pool</span>
-          </div>
-        </section>
+        <VillaOpening s={s} />
+        <VillaJourney s={s} />
         <section className="villa-gallery" aria-label="Villa photographs">
           <button
             onClick={() => {
