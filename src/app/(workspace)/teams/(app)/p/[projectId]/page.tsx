@@ -25,6 +25,7 @@ export default async function BoardPage({
   const tasks = await getTasks(projectId);
   return (
     <KanbanBoard
+      key={task ?? "board"}
       projectId={projectId}
       tasks={tasks}
       team={team}

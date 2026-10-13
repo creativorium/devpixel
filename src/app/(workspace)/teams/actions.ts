@@ -63,6 +63,7 @@ export async function createTask(
   status: string,
   title: string,
   parentId: string | null = null,
+  atTop = false,
 ): Promise<ActionResult> {
   const { supabase } = await requireMember();
   const input = taskCreateInput.safeParse({
@@ -73,19 +74,21 @@ export async function createTask(
   });
   if (!input.success)
     return failed("Give the task a title (up to 200 characters).");
-  const { data: last } = await supabase
+  const { data: edge } = await supabase
     .from("tasks")
     .select("position")
     .eq("project_id", input.data.projectId)
     .eq("status", input.data.status)
-    .order("position", { ascending: false })
+    .order("position", { ascending: atTop })
     .limit(1)
     .maybeSingle();
   const { error } = await supabase.from("tasks").insert({
     project_id: input.data.projectId,
     title: input.data.title,
     status: input.data.status,
-    position: positionBetween(last?.position),
+    position: atTop
+      ? positionBetween(undefined, edge?.position)
+      : positionBetween(edge?.position),
     ...(input.data.parentId ? { parent_id: input.data.parentId } : {}),
   });
   if (error) return failed("Could not add the task.");
@@ -505,4 +508,101 @@ export async function deleteChannel(id: string): Promise<ActionResult> {
   if (error || !data) return failed("Could not delete the channel.");
   revalidatePath("/teams", "layout");
   return { ok: true };
+}
+
+type TaskRow = {
+  id: string;
+  project_id: string;
+  parent_id: string | null;
+  title: string;
+  details: string;
+  status: string;
+  priority: string;
+  assignee: string | null;
+  assignees: string[];
+  labels: string[];
+  due_date: string | null;
+  position: number;
+};
+
+/**
+ * Copies a task and all its subtasks (titles, descriptions, labels, assignees,
+ * priority, due dates and statuses). Files and "blocked by" links are not copied.
+ */
+export async function duplicateTask(
+  id: string,
+): Promise<ActionResult & { id?: string }> {
+  const { supabase } = await requireMember();
+  if (!uuid.safeParse(id).success) return failed("Unknown task.");
+  const { data: original } = await supabase
+    .from("tasks")
+    .select("project_id")
+    .eq("id", id)
+    .maybeSingle();
+  if (!original) return failed("Unknown task.");
+  const { data } = await supabase
+    .from("tasks")
+    .select(
+      "id, project_id, parent_id, title, details, status, priority, assignee, assignees, labels, due_date, position",
+    )
+    .eq("project_id", original.project_id);
+  const rows = (data ?? []) as TaskRow[];
+  const root = rows.find((t) => t.id === id);
+  if (!root) return failed("Unknown task.");
+
+  // The copy goes right after the original among its siblings.
+  const next = rows
+    .filter(
+      (t) =>
+        t.status === root.status &&
+        t.parent_id === root.parent_id &&
+        t.position > root.position,
+    )
+    .sort((a, b) => a.position - b.position)[0];
+  const copy = (t: TaskRow, parentId: string | null, position: number) => ({
+    project_id: t.project_id,
+    parent_id: parentId,
+    title: t === root ? `${t.title} (copy)`.slice(0, 200) : t.title,
+    details: t.details,
+    status: t.status,
+    priority: t.priority,
+    assignee: t.assignee,
+    assignees: t.assignees,
+    labels: t.labels,
+    due_date: t.due_date,
+    position,
+  });
+
+  const { data: created, error } = await supabase
+    .from("tasks")
+    .insert(
+      copy(
+        root,
+        root.parent_id,
+        positionBetween(root.position, next?.position),
+      ),
+    )
+    .select("id")
+    .single();
+  if (error || !created) return failed("Could not duplicate the task.");
+
+  // Copy the subtask tree one level at a time, mapping old ids to new ones.
+  let level = [{ from: root.id, to: created.id as string }];
+  for (let depth = 0; level.length && depth < 8; depth++) {
+    const nextLevel: { from: string; to: string }[] = [];
+    for (const { from, to } of level) {
+      const children = rows.filter((t) => t.parent_id === from);
+      if (!children.length) continue;
+      const { data: inserted } = await supabase
+        .from("tasks")
+        .insert(children.map((c) => copy(c, to, c.position)))
+        .select("id");
+      (inserted ?? []).forEach((row, i) =>
+        nextLevel.push({ from: children[i]!.id, to: row.id as string }),
+      );
+    }
+    level = nextLevel;
+  }
+  revalidatePath("/teams", "layout");
+  return { ok: true, id: created.id as string };
 }

@@ -12,6 +12,7 @@ import {
   Assignees,
   LabelChips,
   SubtaskProgress,
+  TaskMenu,
   DueLabel,
   PriorityPill,
   StatusDot,
@@ -32,6 +33,10 @@ export default function TaskList({
 }) {
   const store = useTaskStore(projectId, serverTasks);
   const { open, dialog } = useTaskDialog(store, team);
+  const [menu, setMenu] = useState<{
+    id: string;
+    at: { x: number; y: number };
+  } | null>(null);
   const [collapsed, setCollapsed] = useState<Set<TaskStatus>>(new Set());
 
   const toggle = (status: TaskStatus) =>
@@ -83,6 +88,14 @@ export default function TaskList({
                         role="row"
                         key={task.id}
                         className={`ws-row${pending ? " pending" : ""}`}
+                        onContextMenu={(event) => {
+                          if (pending) return;
+                          event.preventDefault();
+                          setMenu({
+                            id: task.id,
+                            at: { x: event.clientX, y: event.clientY },
+                          });
+                        }}
                       >
                         <span role="cell" className="ws-row-name">
                           <span
@@ -168,6 +181,19 @@ export default function TaskList({
           );
         })}
       </div>
+      {menu &&
+        (() => {
+          const task = store.tasks.find((t) => t.id === menu.id);
+          return task ? (
+            <TaskMenu
+              task={task}
+              store={store}
+              onOpen={open}
+              position={menu.at}
+              onClose={() => setMenu(null)}
+            />
+          ) : null;
+        })()}
       {dialog}
     </>
   );
