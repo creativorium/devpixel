@@ -89,3 +89,33 @@ test("member helpers", () => {
   assert.equal(initials("Ayu Putri"), "AP");
   assert.equal(initials("nego@devnpixel.com"), "ND");
 });
+
+test("direct Google sign-in builds a safe authorisation request", async () => {
+  const { googleAuthUrl, hashNonce, newAttempt, parseAttempt, sameState } =
+    await import("../src/lib/workspace/google");
+  const attempt = newAttempt("/teams/p/1");
+  const other = newAttempt("/teams");
+  assert.notEqual(attempt.state, other.state);
+  assert.notEqual(attempt.nonce, other.nonce);
+  const url = googleAuthUrl(
+    "client-id",
+    "https://www.devnpixel.com/teams/auth/google/callback",
+    attempt,
+  );
+  assert.equal(url.origin, "https://accounts.google.com");
+  assert.equal(
+    url.searchParams.get("redirect_uri"),
+    "https://www.devnpixel.com/teams/auth/google/callback",
+  );
+  assert.equal(url.searchParams.get("state"), attempt.state);
+  // Google gets only the hash; the raw nonce stays in the httpOnly cookie.
+  assert.equal(url.searchParams.get("nonce"), hashNonce(attempt.nonce));
+  assert.notEqual(url.searchParams.get("nonce"), attempt.nonce);
+  assert.deepEqual(parseAttempt(JSON.stringify(attempt)), attempt);
+  assert.equal(parseAttempt("not json"), null);
+  assert.equal(parseAttempt(JSON.stringify({ state: 1 })), null);
+  assert.equal(parseAttempt(undefined), null);
+  assert.equal(sameState(attempt.state, attempt.state), true);
+  assert.equal(sameState(attempt.state, other.state), false);
+  assert.equal(sameState(attempt.state, null), false);
+});

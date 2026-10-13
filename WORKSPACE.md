@@ -82,3 +82,11 @@ Never use the `service_role` / secret key here; the workspace does not need it.
 - `src/app/(workspace)/teams/`: pages, `actions.ts` (all writes), `login/`, `auth/callback`, `auth/google`.
 - `src/components/workspace/`: kanban board, note editor and other UI.
 - Tests: `npm test` covers validation, safe redirects and ordering (`tests/workspace.test.ts`).
+
+## Optional: show "devnpixel.com" on Google's account picker (free)
+By default Google's picker says "continue to <project>.supabase.co", because Supabase hosts the Google step. To make Google return to devnpixel.com instead (no paid Supabase add-on needed):
+1. Google Cloud → Google Auth Platform → **Clients** → your web client → **Authorized redirect URIs** → add
+   `https://www.devnpixel.com/teams/auth/google/callback` and `http://localhost:3000/teams/auth/google/callback` (keep the Supabase one too) → **Save**. Changes can take a few minutes.
+2. Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` (same client as in Supabase) in `.env.local` and in Netlify.
+
+The site then exchanges Google's code itself and hands the verified ID token to Supabase (`signInWithIdToken`), so the allowlist, sign-up lock and sessions are unchanged. Remove the two variables to fall back to the Supabase-hosted flow.

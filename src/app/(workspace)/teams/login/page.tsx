@@ -14,7 +14,8 @@ const errors: Record<string, string> = {
   setup:
     "The workspace is not connected to Supabase yet. Add SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY (see WORKSPACE.md).",
   link: "That sign-in link is invalid or has expired. Request a new one.",
-  google: "Google sign-in could not start. Try again or use an email link.",
+  google:
+    "Google sign-in did not complete. Use the Google account on the team list, or try again.",
   "not-allowed":
     "This account is not on the DevnPixel team list. Ask the workspace owner to add your email.",
 };
