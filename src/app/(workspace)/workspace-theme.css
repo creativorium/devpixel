@@ -1,0 +1,356 @@
+/*
+ * Soft UI theme for the team workspace: a calm gradient backdrop, frosted-glass
+ * chrome (sidebar, top bar, menus, dialogs) and gently raised, neumorphic work
+ * surfaces (columns, cards, panels). Text stays on near-opaque surfaces for
+ * contrast; reduced-transparency users get solid surfaces.
+ */
+.ws-body {
+  --ws-bg: #eef1f6;
+  --ws-panel: rgb(255 255 255 / 0.86);
+  --ws-glass: rgb(255 255 255 / 0.62);
+  --ws-glass-strong: rgb(255 255 255 / 0.88);
+  --ws-glass-border: rgb(255 255 255 / 0.75);
+  --ws-side: rgb(255 255 255 / 0.55);
+  --ws-soft: #e8ecf3;
+  --ws-hover: rgb(42 120 214 / 0.07);
+  --line: #dde3ec;
+  --ws-raise:
+    6px 6px 16px rgb(163 177 198 / 0.32), -6px -6px 16px rgb(255 255 255 / 0.9);
+  --ws-raise-sm:
+    3px 3px 8px rgb(163 177 198 / 0.28), -3px -3px 8px rgb(255 255 255 / 0.85);
+  --ws-press:
+    inset 2px 2px 5px rgb(163 177 198 / 0.35),
+    inset -2px -2px 5px rgb(255 255 255 / 0.9);
+  --ws-float: 0 18px 50px rgb(31 45 72 / 0.18), 0 2px 6px rgb(31 45 72 / 0.06);
+  --ws-radius: 16px;
+  --ws-accent-grad: linear-gradient(135deg, #2b2f3a 0%, #121418 100%);
+  background:
+    radial-gradient(1200px 700px at 8% -10%, #dfe9ff 0%, transparent 60%),
+    radial-gradient(900px 600px at 105% 10%, #ffe9dc 0%, transparent 55%),
+    radial-gradient(900px 700px at 60% 115%, #dcf5ec 0%, transparent 60%),
+    var(--ws-bg);
+  background-attachment: fixed;
+}
+
+/* ---------- Glass chrome ---------- */
+.ws-side,
+.ws-topbar,
+.ws-mobilebar {
+  background: var(--ws-glass);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+}
+.ws-side {
+  border-right: 1px solid var(--ws-glass-border);
+  box-shadow: 1px 0 0 rgb(163 177 198 / 0.25);
+}
+.ws-topbar {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.ws-mobilebar {
+  border-bottom: 1px solid var(--ws-glass-border);
+}
+.ws-menu,
+.ws-mention-menu,
+.ws-palette,
+.ws-dialog {
+  background: var(--ws-glass-strong);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  border: 1px solid var(--ws-glass-border);
+  box-shadow: var(--ws-float);
+}
+.ws-dialog {
+  border-radius: 22px;
+}
+.ws-dialog::backdrop,
+.ws-palette-backdrop {
+  background: rgb(30 38 56 / 0.28);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.ws-palette {
+  border-radius: 18px;
+}
+
+/* ---------- Sidebar ---------- */
+.ws-logo {
+  background: var(--ws-accent-grad);
+  box-shadow: var(--ws-raise-sm);
+  border-radius: 10px;
+}
+.ws-side-link {
+  border-radius: 10px;
+}
+.ws-side-link[aria-current="page"] {
+  background: var(--ws-glass-strong);
+  box-shadow: var(--ws-raise-sm);
+}
+.ws-search-button {
+  border: 0;
+  border-radius: 12px;
+  background: var(--ws-soft);
+  box-shadow: var(--ws-press);
+}
+.ws-search-button:hover {
+  box-shadow:
+    var(--ws-press),
+    0 0 0 2px rgb(42 120 214 / 0.18);
+}
+
+/* ---------- Raised work surfaces ---------- */
+.ws-column {
+  background: rgb(255 255 255 / 0.42);
+  border: 1px solid var(--ws-glass-border);
+  border-radius: 20px;
+  box-shadow: var(--ws-raise);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.ws-column.over {
+  background: rgb(232 241 255 / 0.75);
+  outline-color: #2a78d6;
+}
+.ws-task,
+.ws-card,
+.ws-panel,
+.ws-tile,
+.ws-page-card,
+.ws-new-project,
+.ws-cal-side {
+  background: var(--ws-panel);
+  border: 1px solid var(--ws-glass-border);
+  border-radius: 14px;
+  box-shadow: var(--ws-raise-sm);
+}
+.ws-panel,
+.ws-tile,
+.ws-card {
+  border-radius: 18px;
+}
+.ws-task {
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.ws-task:hover,
+a.ws-card:hover,
+.ws-page-card:hover {
+  border-color: var(--ws-glass-border);
+  transform: translateY(-2px);
+  box-shadow:
+    8px 10px 22px rgb(163 177 198 / 0.38),
+    -6px -6px 16px rgb(255 255 255 / 0.9);
+}
+.ws-task-cover {
+  border-radius: 13px 13px 0 0;
+}
+.ws-card-menu {
+  border: 0;
+  border-radius: 8px;
+  background: var(--ws-glass-strong);
+  box-shadow: var(--ws-raise-sm);
+}
+.ws-new-card,
+.ws-page-new {
+  background: rgb(255 255 255 / 0.4);
+  border: 1.5px dashed #c6d0de;
+  box-shadow: none;
+}
+.ws-cal-grid,
+.ws-list .ws-group {
+  background: var(--ws-panel);
+  border: 1px solid var(--ws-glass-border);
+  border-radius: 18px;
+  box-shadow: var(--ws-raise-sm);
+}
+.ws-list .ws-group {
+  padding: 10px 12px 6px;
+}
+.ws-cal-weekdays span {
+  background: rgb(232 236 243 / 0.7);
+}
+.ws-doc {
+  padding: 18px 36px 40px;
+  background: var(--ws-panel);
+  border: 1px solid var(--ws-glass-border);
+  border-radius: 22px;
+  box-shadow: var(--ws-raise);
+}
+
+/* ---------- Controls ---------- */
+.ws-button {
+  border: 0;
+  border-radius: 12px;
+  background: var(--ws-accent-grad);
+  box-shadow: 0 6px 14px rgb(18 20 24 / 0.22);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+.ws-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 9px 20px rgb(18 20 24 / 0.26);
+}
+.ws-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+.ws-button.ghost {
+  background: var(--ws-panel);
+  color: var(--ink);
+  box-shadow: var(--ws-raise-sm);
+}
+.ws-button.ghost:hover:not(:disabled) {
+  box-shadow:
+    4px 4px 10px rgb(163 177 198 / 0.36),
+    -4px -4px 10px rgb(255 255 255 / 0.95);
+}
+.ws-button.danger {
+  background: transparent;
+  box-shadow: none;
+}
+.ws-input,
+.ws-composer-box,
+.ws-feed-composer textarea {
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: #f3f5f9;
+  box-shadow: var(--ws-press);
+}
+.ws-input:focus,
+.ws-composer-box:focus-within {
+  border-color: #9cc0ee;
+  outline: none;
+  box-shadow:
+    var(--ws-press),
+    0 0 0 3px rgb(42 120 214 / 0.16);
+}
+.ws-composer-box textarea {
+  background: transparent;
+  box-shadow: none;
+}
+.ws-filter-chip,
+.ws-chip-check {
+  background: var(--ws-panel);
+  box-shadow: var(--ws-raise-sm);
+  border-color: transparent;
+}
+.ws-filter-chip[aria-pressed="true"],
+.ws-chip-check:has(input:checked) {
+  background: var(--ws-accent-grad);
+  color: #fff;
+  border-color: transparent;
+}
+.ws-views {
+  gap: 4px;
+  width: max-content;
+  max-width: 100%;
+  padding: 4px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--ws-soft);
+  box-shadow: var(--ws-press);
+}
+.ws-views a {
+  margin: 0;
+  border: 0;
+  border-radius: 10px;
+}
+.ws-views a[aria-current="page"] {
+  background: var(--ws-glass-strong);
+  box-shadow: var(--ws-raise-sm);
+}
+.ws-profile-button,
+.ws-bell-button {
+  border: 0;
+  background: var(--ws-glass-strong);
+  box-shadow: var(--ws-raise-sm);
+}
+.ws-avatar {
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.9);
+}
+.ws-progress {
+  background: var(--ws-soft);
+  box-shadow: var(--ws-press);
+}
+
+/* ---------- Chat ---------- */
+.ws-chat-head {
+  border-bottom: 1px solid var(--ws-glass-border);
+}
+.ws-msg:hover {
+  background: rgb(255 255 255 / 0.5);
+}
+.ws-chat-day span {
+  background: var(--ws-glass-strong);
+  box-shadow: var(--ws-raise-sm);
+  border-color: transparent;
+}
+
+/* ---------- Comfort ---------- */
+@media (prefers-reduced-transparency: reduce) {
+  .ws-body {
+    --ws-glass: #f7f8fb;
+    --ws-glass-strong: #ffffff;
+    --ws-panel: #ffffff;
+    --ws-side: #f7f8fb;
+  }
+  .ws-side,
+  .ws-mobilebar,
+  .ws-menu,
+  .ws-mention-menu,
+  .ws-palette,
+  .ws-dialog,
+  .ws-column {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .ws-column {
+    background: #f4f6fa;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ws-task,
+  .ws-button {
+    transition: none;
+  }
+  .ws-task:hover,
+  a.ws-card:hover,
+  .ws-page-card:hover,
+  .ws-button:hover:not(:disabled) {
+    transform: none;
+  }
+}
+@media (max-width: 900px) {
+  .ws-doc {
+    padding: 14px 18px 28px;
+    border-radius: 18px;
+  }
+}
+
+/* Readability first: content-heavy overlays stay nearly opaque; the frosted
+   blur shows only at their edges and on the backdrop. */
+.ws-dialog {
+  background: rgb(255 255 255 / 0.97);
+}
+.ws-menu,
+.ws-mention-menu,
+.ws-palette {
+  background: rgb(255 255 255 / 0.95);
+}
+@media (max-width: 900px) {
+  .ws-topbar + .ws-page {
+    padding-top: 18px;
+  }
+  .ws-filter {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .ws-filter > * {
+    flex: none;
+  }
+}

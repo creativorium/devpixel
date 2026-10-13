@@ -804,3 +804,157 @@ kbd {
     height: calc(100dvh - 49px);
   }
 }
+
+/* ---------- Notifications bell + inbox ---------- */
+.ws-top-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ws-bell {
+  position: relative;
+}
+.ws-bell-button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--ws-panel);
+  color: var(--ink);
+}
+.ws-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: #d92d20;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  box-shadow: 0 0 0 2px #fff;
+}
+.ws-inbox {
+  width: min(380px, calc(100vw - 24px));
+  padding: 0;
+}
+.ws-inbox-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--ws-soft);
+  font-size: 14px;
+}
+.ws-inbox-empty {
+  padding: 18px 14px;
+  font-size: 13px;
+}
+.ws-inbox-list {
+  max-height: min(440px, 60vh);
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  list-style: none;
+}
+.ws-inbox-item {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  text-align: left;
+  font-size: 13px;
+  color: var(--ink);
+}
+.ws-inbox-item:hover {
+  background: var(--ws-hover);
+}
+.ws-inbox-item.unread {
+  background: rgb(42 120 214 / 0.07);
+}
+.ws-inbox-item.unread strong::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: #2a78d6;
+  vertical-align: middle;
+}
+.ws-inbox-text {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.ws-inbox-preview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #52514e;
+}
+
+/* ---------- Task activity feed ---------- */
+.ws-feed-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ws-feed-event {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-left: 8px;
+  font-size: 13px;
+  color: #52514e;
+}
+.ws-feed-dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: #b8c2d2;
+}
+.ws-feed-comment {
+  display: flex;
+  gap: 10px;
+}
+.ws-feed-bubble {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: 4px 14px 14px 14px;
+  background: var(--ws-soft);
+}
+.ws-feed-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+}
+.ws-feed-delete {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--ws-danger);
+}
+.ws-feed-composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.ws-feed-composer textarea {
+  flex: 1;
+}

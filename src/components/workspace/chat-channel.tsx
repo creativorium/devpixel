@@ -17,12 +17,14 @@ import { ACCEPT, type Attachment } from "@/lib/workspace/files";
 import { AttachmentList, namePasted, uploadFile } from "./attachments";
 import ChannelHeader from "./channel-header";
 import { markRead } from "./read-marks";
+import { useRealtime } from "./realtime";
 import Icon from "./icons";
 import LocalTime from "./local-time";
 import { useMentionPicker } from "./mention-picker";
 import { RichText } from "./team-context";
 
-const POLL_MS = 3000;
+// Realtime pushes new messages instantly; polling is the fallback.
+const POLL_MS = 5000;
 type Shown = Message & { pending?: boolean; failed?: boolean };
 
 function byCreated(a: Message, b: Message) {
@@ -69,7 +71,12 @@ export default function ChatChannel({
   >([]);
   const [dragging, setDragging] = useState(false);
 
-  // Poll for new, edited or deleted messages while the tab is visible.
+  const [kick, setKick] = useState(0);
+  useRealtime("messages", `channel_id=eq.${channel.id}`, () =>
+    setKick((k) => k + 1),
+  );
+
+  // Fetch new, edited or deleted messages: on realtime pushes, and by polling.
   useEffect(() => {
     let stopped = false;
     async function poll() {
@@ -94,6 +101,7 @@ export default function ChatChannel({
         // Offline or asleep; the next poll catches up.
       }
     }
+    if (kick) void poll();
     const timer = setInterval(poll, POLL_MS);
     const onVisible = () => !document.hidden && poll();
     document.addEventListener("visibilitychange", onVisible);
@@ -102,7 +110,7 @@ export default function ChatChannel({
       clearInterval(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [channel.id]);
+  }, [channel.id, kick]);
 
   // Reading the channel clears its unread dot in the sidebar.
   useEffect(() => {

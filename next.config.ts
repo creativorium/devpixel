@@ -1,4 +1,20 @@
 import type { NextConfig } from "next";
+
+// The team workspace's live updates (Supabase Realtime) connect from the browser
+// to this one project only.
+const supabaseHost = (() => {
+  try {
+    return process.env.SUPABASE_URL
+      ? new URL(process.env.SUPABASE_URL).host
+      : "";
+  } catch {
+    return "";
+  }
+})();
+const supabaseConnect = supabaseHost
+  ? ` https://${supabaseHost} wss://${supabaseHost}`
+  : "";
+
 const config: NextConfig = {
   poweredByHeader: false,
   async redirects() {
@@ -32,6 +48,7 @@ const config: NextConfig = {
               "default-src 'self'; script-src 'self' 'unsafe-inline' https://*.googletagmanager.com" +
               (process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "") +
               "; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self'; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com" +
+              supabaseConnect +
               (process.env.NODE_ENV === "development" ? " ws: wss:" : "") +
               "; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
           },

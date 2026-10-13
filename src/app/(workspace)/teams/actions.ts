@@ -606,3 +606,54 @@ export async function duplicateTask(
   revalidatePath("/teams", "layout");
   return { ok: true, id: created.id as string };
 }
+
+export async function addComment(
+  taskId: string,
+  body: string,
+): Promise<ActionResult & { id?: string; at?: string }> {
+  const { supabase } = await requireMember();
+  const text = body.trim();
+  if (!uuid.safeParse(taskId).success || !text || text.length > 4000)
+    return failed("Comments need 1–4,000 characters.");
+  // author defaults to the signed-in email; RLS rejects anything else.
+  const { data, error } = await supabase
+    .from("task_comments")
+    .insert({ task_id: taskId, body: text })
+    .select("id, created_at")
+    .single();
+  if (error || !data) return failed("Could not post the comment.");
+  return { ok: true, id: data.id as string, at: data.created_at as string };
+}
+
+export async function deleteComment(id: string): Promise<ActionResult> {
+  const { supabase } = await requireMember();
+  if (!uuid.safeParse(id).success) return failed("Unknown comment.");
+  const { data, error } = await supabase
+    .from("task_comments")
+    .delete()
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
+  if (error || !data) return failed("You can only delete your own comments.");
+  return { ok: true };
+}
+
+/** Marks the given notifications (or all of them) as read for the signed-in member. */
+export async function markNotificationsRead(
+  ids: number[] | "all",
+): Promise<ActionResult> {
+  const { supabase } = await requireMember();
+  const now = new Date().toISOString();
+  let query = supabase
+    .from("notifications")
+    .update({ read_at: now })
+    .is("read_at", null);
+  if (ids !== "all") {
+    const clean = ids.filter((n) => Number.isInteger(n) && n > 0).slice(0, 100);
+    if (!clean.length) return { ok: true };
+    query = query.in("id", clean);
+  }
+  const { error } = await query;
+  if (error) return failed("Could not update notifications.");
+  return { ok: true };
+}

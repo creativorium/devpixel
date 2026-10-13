@@ -25,6 +25,8 @@ import { projectColor } from "@/lib/workspace/note-format";
 import type { SidebarProject } from "@/lib/workspace/queries";
 import Icon, { type IconName } from "./icons";
 import CommandPalette from "./command-palette";
+import NotificationBell from "./notification-bell";
+import { RealtimeProvider } from "./realtime";
 import { useReadMarks } from "./read-marks";
 import { TeamProvider } from "./team-context";
 
@@ -37,12 +39,14 @@ export default function AppShell({
   projects,
   channels,
   team,
+  realtime,
   children,
 }: {
   me: Member;
   team: Member[];
   projects: SidebarProject[];
   channels: (Channel & { latest?: { created_at: string; author: string }[] })[];
+  realtime: { url: string; key: string } | null;
   children: React.ReactNode;
 }) {
   const [palette, setPalette] = useState(false);
@@ -120,252 +124,263 @@ export default function AppShell({
     );
   }
 
-  const profile = <ProfileMenu me={me} onNavigate={close} />;
+  const profile = (
+    <span className="ws-top-actions">
+      <NotificationBell me={me} team={team} />
+      <ProfileMenu me={me} onNavigate={close} />
+    </span>
+  );
 
   return (
-    <div className="ws-app" data-drawer={drawer ? "open" : undefined}>
-      <header className="ws-mobilebar">
-        <button
-          type="button"
-          className="ws-icon-button"
-          aria-label="Open navigation"
-          aria-expanded={drawer}
-          aria-controls="ws-sidebar"
-          onClick={() => setDrawer(true)}
-        >
-          <Icon name="menu" size={20} />
-        </button>
-        <Link href="/teams" className="ws-brand">
-          DevnPixel <span>Teams</span>
-        </Link>
-        <span className="ws-push">{profile}</span>
-      </header>
-      <div className="ws-scrim" onClick={close} aria-hidden="true" />
-
-      <aside id="ws-sidebar" className="ws-side" aria-label="Workspace">
-        <div className="ws-side-top">
-          <Link href="/teams" className="ws-workspace" onClick={close}>
-            <span className="ws-logo" aria-hidden="true">
-              D
-            </span>
-            <span>
-              DevnPixel
-              <small>Team workspace</small>
-            </span>
-          </Link>
+    <RealtimeProvider config={realtime}>
+      <div className="ws-app" data-drawer={drawer ? "open" : undefined}>
+        <header className="ws-mobilebar">
           <button
             type="button"
-            className="ws-icon-button ws-side-close"
-            aria-label="Close navigation"
-            onClick={close}
+            className="ws-icon-button"
+            aria-label="Open navigation"
+            aria-expanded={drawer}
+            aria-controls="ws-sidebar"
+            onClick={() => setDrawer(true)}
           >
-            <Icon name="close" />
+            <Icon name="menu" size={20} />
           </button>
-        </div>
+          <Link href="/teams" className="ws-brand">
+            DevnPixel <span>Teams</span>
+          </Link>
+          <span className="ws-push">{profile}</span>
+        </header>
+        <div className="ws-scrim" onClick={close} aria-hidden="true" />
 
-        <button
-          type="button"
-          className="ws-search-button"
-          onClick={() => setPalette(true)}
-        >
-          <Icon name="search" />
-          <span>Search or jump to…</span>
-          <kbd>Ctrl K</kbd>
-        </button>
-
-        <nav className="ws-side-scroll">
-          <SideLink
-            href="/teams"
-            icon="home"
-            current={pathname === "/teams"}
-            onNavigate={close}
-          >
-            Home
-          </SideLink>
-          <SideLink
-            href="/teams/dashboard"
-            icon="chart"
-            current={pathname === "/teams/dashboard"}
-            onNavigate={close}
-          >
-            Dashboard
-          </SideLink>
-          <SideLink
-            href="/teams/calendar"
-            icon="calendar"
-            current={pathname === "/teams/calendar"}
-            onNavigate={close}
-          >
-            Calendar
-          </SideLink>
-
-          {error && (
-            <p className="ws-side-error" role="alert">
-              {error}
-            </p>
-          )}
-
-          <div className="ws-side-section">
-            <span>Projects</span>
-            <InlineCreate
-              label="New project"
-              placeholder="Project name, then Enter"
-              maxLength={120}
-              action={createProject}
-            />
+        <aside id="ws-sidebar" className="ws-side" aria-label="Workspace">
+          <div className="ws-side-top">
+            <Link href="/teams" className="ws-workspace" onClick={close}>
+              <span className="ws-logo" aria-hidden="true">
+                D
+              </span>
+              <span>
+                DevnPixel
+                <small>Team workspace</small>
+              </span>
+            </Link>
+            <button
+              type="button"
+              className="ws-icon-button ws-side-close"
+              aria-label="Close navigation"
+              onClick={close}
+            >
+              <Icon name="close" />
+            </button>
           </div>
-          {active.length === 0 && (
-            <p className="ws-side-empty">Create a project with +</p>
-          )}
-          <ul className="ws-tree">
-            {active.map((project) => (
-              <ProjectNode
-                key={project.id}
-                project={project}
-                pathname={pathname}
-                onNavigate={close}
-                label={label}
-                hidden={hidden}
-                onRenameProject={(v) =>
-                  rename(project.id, v, (n) => renameProject(project.id, n))
-                }
-                onArchiveProject={() =>
-                  confirm(
-                    `Archive "${label(project.id, project.name)}"? You can restore it from Archived.`,
-                  ) &&
-                  hide(
-                    project.id,
-                    () => setProjectArchived(project.id, true),
-                    "/teams",
-                  )
-                }
-                onRenameNote={(id, v) =>
-                  rename(id, v, (n) => renameNote(id, n))
-                }
-                onDeleteNote={(id, title) =>
-                  confirm(`Delete the page "${title}" for everyone?`) &&
-                  hide(id, () => removeNote(id), `/teams/p/${project.id}/notes`)
-                }
-              />
-            ))}
-          </ul>
 
-          <div className="ws-side-section">
-            <span>Channels</span>
-            {admin && (
-              <InlineCreate
-                label="New channel"
-                placeholder="channel-name, then Enter"
-                maxLength={40}
-                action={createChannel}
-              />
+          <button
+            type="button"
+            className="ws-search-button"
+            onClick={() => setPalette(true)}
+          >
+            <Icon name="search" />
+            <span>Search or jump to…</span>
+            <kbd>Ctrl K</kbd>
+          </button>
+
+          <nav className="ws-side-scroll">
+            <SideLink
+              href="/teams"
+              icon="home"
+              current={pathname === "/teams"}
+              onNavigate={close}
+            >
+              Home
+            </SideLink>
+            <SideLink
+              href="/teams/dashboard"
+              icon="chart"
+              current={pathname === "/teams/dashboard"}
+              onNavigate={close}
+            >
+              Dashboard
+            </SideLink>
+            <SideLink
+              href="/teams/calendar"
+              icon="calendar"
+              current={pathname === "/teams/calendar"}
+              onNavigate={close}
+            >
+              Calendar
+            </SideLink>
+
+            {error && (
+              <p className="ws-side-error" role="alert">
+                {error}
+              </p>
             )}
-          </div>
-          <ul className="ws-tree">
-            {channels
-              .filter((c) => !hidden.has(c.id))
-              .map((channel) => {
-                const href = `/teams/c/${channel.id}`;
-                const name = label(channel.id, channel.name);
-                return (
-                  <li key={channel.id}>
-                    <SideItem
-                      href={href}
-                      current={pathname === href}
-                      onNavigate={close}
-                      name={name}
-                      className={unread(channel) ? "unread" : ""}
-                      suffix={
-                        unread(channel) ? (
-                          <span
-                            className="ws-unread-dot"
-                            aria-label="Unread messages"
-                          />
-                        ) : null
-                      }
-                      prefix={
-                        <span className="ws-hash" aria-hidden="true">
-                          #
-                        </span>
-                      }
-                      onRename={
-                        admin
-                          ? (v) =>
-                              rename(channel.id, v, (n) =>
-                                renameChannel(channel.id, n, channel.topic),
-                              )
-                          : undefined
-                      }
-                      menu={
-                        admin
-                          ? [
-                              {
-                                label: "Delete channel",
-                                danger: true,
-                                onSelect: () =>
-                                  confirm(
-                                    `Delete #${name} and all its messages and files for everyone?`,
-                                  ) &&
-                                  hide(
-                                    channel.id,
-                                    () => deleteChannel(channel.id),
-                                    "/teams",
-                                  ),
-                              },
-                            ]
-                          : []
-                      }
-                    />
-                  </li>
-                );
-              })}
-          </ul>
 
-          {archived.length > 0 && (
-            <details className="ws-side-archived">
-              <summary>
-                <Icon name="archive" /> Archived ({archived.length})
-              </summary>
-              <ul className="ws-tree">
-                {archived.map((p) => (
-                  <li key={p.id}>
-                    <SideItem
-                      href={`/teams/p/${p.id}`}
-                      current={pathname.startsWith(`/teams/p/${p.id}`)}
-                      onNavigate={close}
-                      name={label(p.id, p.name)}
-                      menu={[
-                        {
-                          label: "Restore",
-                          onSelect: () =>
-                            act(
-                              () => setProjectArchived(p.id, false),
-                              () => {},
-                            ),
-                        },
-                      ]}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </details>
-          )}
-        </nav>
-      </aside>
+            <div className="ws-side-section">
+              <span>Projects</span>
+              <InlineCreate
+                label="New project"
+                placeholder="Project name, then Enter"
+                maxLength={120}
+                action={createProject}
+              />
+            </div>
+            {active.length === 0 && (
+              <p className="ws-side-empty">Create a project with +</p>
+            )}
+            <ul className="ws-tree">
+              {active.map((project) => (
+                <ProjectNode
+                  key={project.id}
+                  project={project}
+                  pathname={pathname}
+                  onNavigate={close}
+                  label={label}
+                  hidden={hidden}
+                  onRenameProject={(v) =>
+                    rename(project.id, v, (n) => renameProject(project.id, n))
+                  }
+                  onArchiveProject={() =>
+                    confirm(
+                      `Archive "${label(project.id, project.name)}"? You can restore it from Archived.`,
+                    ) &&
+                    hide(
+                      project.id,
+                      () => setProjectArchived(project.id, true),
+                      "/teams",
+                    )
+                  }
+                  onRenameNote={(id, v) =>
+                    rename(id, v, (n) => renameNote(id, n))
+                  }
+                  onDeleteNote={(id, title) =>
+                    confirm(`Delete the page "${title}" for everyone?`) &&
+                    hide(
+                      id,
+                      () => removeNote(id),
+                      `/teams/p/${project.id}/notes`,
+                    )
+                  }
+                />
+              ))}
+            </ul>
 
-      <div className="ws-content">
-        <header className="ws-topbar">{profile}</header>
-        <TeamProvider team={team} me={me}>
-          {children}
-        </TeamProvider>
+            <div className="ws-side-section">
+              <span>Channels</span>
+              {admin && (
+                <InlineCreate
+                  label="New channel"
+                  placeholder="channel-name, then Enter"
+                  maxLength={40}
+                  action={createChannel}
+                />
+              )}
+            </div>
+            <ul className="ws-tree">
+              {channels
+                .filter((c) => !hidden.has(c.id))
+                .map((channel) => {
+                  const href = `/teams/c/${channel.id}`;
+                  const name = label(channel.id, channel.name);
+                  return (
+                    <li key={channel.id}>
+                      <SideItem
+                        href={href}
+                        current={pathname === href}
+                        onNavigate={close}
+                        name={name}
+                        className={unread(channel) ? "unread" : ""}
+                        suffix={
+                          unread(channel) ? (
+                            <span
+                              className="ws-unread-dot"
+                              aria-label="Unread messages"
+                            />
+                          ) : null
+                        }
+                        prefix={
+                          <span className="ws-hash" aria-hidden="true">
+                            #
+                          </span>
+                        }
+                        onRename={
+                          admin
+                            ? (v) =>
+                                rename(channel.id, v, (n) =>
+                                  renameChannel(channel.id, n, channel.topic),
+                                )
+                            : undefined
+                        }
+                        menu={
+                          admin
+                            ? [
+                                {
+                                  label: "Delete channel",
+                                  danger: true,
+                                  onSelect: () =>
+                                    confirm(
+                                      `Delete #${name} and all its messages and files for everyone?`,
+                                    ) &&
+                                    hide(
+                                      channel.id,
+                                      () => deleteChannel(channel.id),
+                                      "/teams",
+                                    ),
+                                },
+                              ]
+                            : []
+                        }
+                      />
+                    </li>
+                  );
+                })}
+            </ul>
+
+            {archived.length > 0 && (
+              <details className="ws-side-archived">
+                <summary>
+                  <Icon name="archive" /> Archived ({archived.length})
+                </summary>
+                <ul className="ws-tree">
+                  {archived.map((p) => (
+                    <li key={p.id}>
+                      <SideItem
+                        href={`/teams/p/${p.id}`}
+                        current={pathname.startsWith(`/teams/p/${p.id}`)}
+                        onNavigate={close}
+                        name={label(p.id, p.name)}
+                        menu={[
+                          {
+                            label: "Restore",
+                            onSelect: () =>
+                              act(
+                                () => setProjectArchived(p.id, false),
+                                () => {},
+                              ),
+                          },
+                        ]}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </nav>
+        </aside>
+
+        <div className="ws-content">
+          <header className="ws-topbar">{profile}</header>
+          <TeamProvider team={team} me={me}>
+            {children}
+          </TeamProvider>
+        </div>
+        <CommandPalette
+          projects={projects}
+          channels={channels}
+          open={palette}
+          onOpenChange={setPalette}
+        />
       </div>
-      <CommandPalette
-        projects={projects}
-        channels={channels}
-        open={palette}
-        onOpenChange={setPalette}
-      />
-    </div>
+    </RealtimeProvider>
   );
 }
 
