@@ -25,14 +25,20 @@ export default async function ProjectLayout({
             <span aria-hidden="true">/</span>
             <span>Projects</span>
           </nav>
-          <h1 className="ws-title">
-            <span
-              className="ws-project-dot large"
-              style={{ background: projectColor(project.id) }}
-              aria-hidden="true"
+          <div className="ws-project-heading-row">
+            <h1 className="ws-title">
+              <span
+                className="ws-project-dot large"
+                style={{ background: projectColor(project.id) }}
+                aria-hidden="true"
+              />
+              {project.name}
+            </h1>
+            <ArchiveButton
+              projectId={project.id}
+              archived={Boolean(project.archived_at)}
             />
-            {project.name}
-          </h1>
+          </div>
           {project.archived_at ? (
             <p className="ws-meta">Archived project</p>
           ) : (
@@ -41,10 +47,6 @@ export default async function ProjectLayout({
             )
           )}
         </div>
-        <ArchiveButton
-          projectId={project.id}
-          archived={Boolean(project.archived_at)}
-        />
       </header>
       <ProjectTabs projectId={project.id} />
       {children}

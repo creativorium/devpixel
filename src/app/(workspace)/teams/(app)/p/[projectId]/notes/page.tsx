@@ -1,11 +1,10 @@
 import Link from "next/link";
 import Icon from "@/components/workspace/icons";
-import ImportNote from "@/components/workspace/import-note";
+import AddNote from "@/components/workspace/add-note";
 import LocalTime from "@/components/workspace/local-time";
 import { memberName } from "@/lib/workspace/model";
 import { getNotes } from "@/lib/workspace/queries";
 import { requireMember } from "@/lib/workspace/session";
-import { createNote } from "../../../../actions";
 
 export default async function NotesIndex({
   params,
@@ -27,13 +26,7 @@ export default async function NotesIndex({
         </p>
       )}
       <div className="ws-gallery">
-        <form action={createNote.bind(null, projectId)}>
-          <button type="submit" className="ws-page-card ws-page-new">
-            <Icon name="plus" size={20} />
-            New page
-          </button>
-        </form>
-        <ImportNote projectId={projectId} />
+        <AddNote projectId={projectId} />
         {notes.map((note) => (
           <Link
             key={note.id}

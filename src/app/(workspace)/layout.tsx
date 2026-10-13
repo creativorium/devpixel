@@ -5,6 +5,8 @@ import "./workspace.css";
 import "./workspace-views.css";
 import "./workspace-extras.css";
 import "./workspace-theme.css";
+import "./task-detail.css";
+import "./mobile-navigation.css";
 import { site } from "@/lib/site";
 
 const sans = localFont({

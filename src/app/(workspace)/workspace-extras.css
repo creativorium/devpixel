@@ -1,6 +1,28 @@
 /* Menus, labels, subtasks, files, note toolbar and loading states. */
 
 /* ---------- Top bar + menus ---------- */
+.ws-add-page {
+  position: relative;
+  min-width: 0;
+}
+.ws-add-page > summary {
+  list-style: none;
+  cursor: pointer;
+}
+.ws-add-page > summary::-webkit-details-marker {
+  display: none;
+}
+.ws-add-page > summary:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+.ws-add-page .ws-add-page-options {
+  width: 100%;
+  min-width: 0;
+}
+.ws-add-page-options .ws-error-text {
+  padding: 8px;
+}
 .ws-topbar {
   position: sticky;
   top: 0;
@@ -19,6 +41,7 @@
 }
 .ws-profile-button {
   display: flex;
+  height: 38px;
   align-items: center;
   gap: 8px;
   padding: 4px 10px 4px 4px;
@@ -784,13 +807,33 @@ kbd {
   gap: 8px;
 }
 .ws-topbar {
-  padding: 8px 20px 0;
+  max-width: 1320px;
+  min-height: 62px;
+  align-items: center;
+  padding: 12px 36px;
 }
 .ws-topbar + .ws-page {
-  padding-top: 0;
+  padding-top: 16px;
 }
 .ws-topbar + .ws-chat {
-  height: calc(100dvh - 44px);
+  height: calc(100dvh - 62px);
+}
+.ws-project-title {
+  min-width: 0;
+  width: 100%;
+}
+.ws-project-heading-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+}
+.ws-project-heading-row .ws-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.ws-project-heading-row > .ws-button {
+  flex-shrink: 0;
 }
 .ws-filter-chip {
   border-color: transparent;

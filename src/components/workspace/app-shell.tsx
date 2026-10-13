@@ -63,6 +63,31 @@ export default function AppShell({
   const pathname = usePathname();
   const router = useRouter();
   const [drawer, setDrawer] = useState(false);
+  const sidebar = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!drawer) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    sidebar.current
+      ?.querySelector<HTMLButtonElement>(".ws-side-close")
+      ?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !event.defaultPrevented) setDrawer(false);
+    };
+    const desktop = window.matchMedia("(min-width: 901px)");
+    const onResize = () => {
+      if (desktop.matches) setDrawer(false);
+    };
+    document.addEventListener("keydown", onKey);
+    desktop.addEventListener("change", onResize);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKey);
+      desktop.removeEventListener("change", onResize);
+      previousFocus?.focus();
+    };
+  }, [drawer]);
   const [error, setError] = useState("");
   const [, start] = useTransition();
   // Optimistic names/removals so the sidebar reacts instantly.
@@ -134,7 +159,7 @@ export default function AppShell({
   return (
     <RealtimeProvider config={realtime}>
       <div className="ws-app" data-drawer={drawer ? "open" : undefined}>
-        <header className="ws-mobilebar">
+        <header className="ws-mobilebar" inert={drawer}>
           <button
             type="button"
             className="ws-icon-button"
@@ -152,7 +177,12 @@ export default function AppShell({
         </header>
         <div className="ws-scrim" onClick={close} aria-hidden="true" />
 
-        <aside id="ws-sidebar" className="ws-side" aria-label="Workspace">
+        <aside
+          ref={sidebar}
+          id="ws-sidebar"
+          className="ws-side"
+          aria-label="Workspace"
+        >
           <div className="ws-side-top">
             <Link href="/teams" className="ws-workspace" onClick={close}>
               <span className="ws-logo" aria-hidden="true">
@@ -176,7 +206,10 @@ export default function AppShell({
           <button
             type="button"
             className="ws-search-button"
-            onClick={() => setPalette(true)}
+            onClick={() => {
+              close();
+              setPalette(true);
+            }}
           >
             <Icon name="search" />
             <span>Search or jump to…</span>
@@ -367,7 +400,7 @@ export default function AppShell({
           </nav>
         </aside>
 
-        <div className="ws-content">
+        <div className="ws-content" inert={drawer}>
           <header className="ws-topbar">{profile}</header>
           <TeamProvider team={team} me={me}>
             {children}

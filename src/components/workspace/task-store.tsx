@@ -576,7 +576,7 @@ export function TaskDialog({
         dialog.current = node;
         if (node && !node.open) node.showModal();
       }}
-      className="ws-dialog"
+      className="ws-dialog ws-task-detail"
       aria-labelledby="ws-task-heading"
       onClose={onClose}
       onClick={(event) =>
@@ -584,306 +584,332 @@ export function TaskDialog({
       }
     >
       <form
+        className="ws-task-detail-form"
         onSubmit={(event) => {
           event.preventDefault();
           onSave(new FormData(event.currentTarget));
         }}
       >
-        <h2 id="ws-task-heading" className="ws-sr-only">
-          Edit task
-        </h2>
-        {ancestors.length > 0 && (
-          <nav className="ws-task-crumbs" aria-label="Parent tasks">
-            {ancestors.map((a) => (
-              <button key={a.id} type="button" onClick={() => onOpen(a.id)}>
-                {a.title}
-              </button>
-            ))}
-            <span aria-hidden="true">›</span>
-          </nav>
-        )}
-        <input type="hidden" name="id" value={task.id} />
-        <input
-          className="ws-dialog-title"
-          name="title"
-          aria-label="Task name"
-          defaultValue={task.title}
-          required
-          maxLength={200}
-        />
-        {waitingOn.length > 0 && (
-          <p className="ws-notice warn" role="status">
-            🔒 Blocked: waiting on {waitingOn.length} unfinished{" "}
-            {waitingOn.length === 1 ? "task" : "tasks"}. It can only leave To do
-            once they are done.
-          </p>
-        )}
-        <div className="ws-dialog-row">
-          <label className="ws-field">
-            Status
-            <select
-              className="ws-input"
-              name="status"
-              defaultValue={task.status}
-            >
-              {statuses.map((s) => (
-                <option
-                  key={s.id}
-                  value={s.id}
-                  disabled={
-                    waitingOn.length > 0 &&
-                    s.id !== "todo" &&
-                    s.id !== task.status
-                  }
-                >
-                  {s.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="ws-field">
-            Due date
-            <input
-              className="ws-input"
-              type="date"
-              name="dueDate"
-              defaultValue={task.due_date ?? ""}
-            />
-          </label>
-          <label className="ws-field">
-            Priority
-            <select
-              className="ws-input"
-              name="priority"
-              defaultValue={task.priority}
-            >
-              {priorities.map((p) => (
-                <option key={p} value={p}>
-                  {p[0]!.toUpperCase() + p.slice(1)}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        <fieldset className="ws-chip-set">
-          <legend className="ws-field">Assignees</legend>
-          {team.map((m) => (
-            <label key={m.email} className="ws-chip-check">
-              <input
-                type="checkbox"
-                name="assignees"
-                value={m.email}
-                defaultChecked={assigned.has(m.email)}
-              />
-              <span
-                className="ws-avatar"
-                style={{ background: projectColor(m.email) }}
-                aria-hidden="true"
-              >
-                {initials(m.display_name || m.email)}
-              </span>
-              {m.display_name || m.email.split("@")[0]}
-            </label>
-          ))}
-        </fieldset>
-
-        <fieldset className="ws-chip-set">
-          <legend className="ws-field">Labels</legend>
-          {labelOptions.map((l) => (
-            <label key={l.id} className="ws-chip-check">
-              <input
-                type="checkbox"
-                name="labels"
-                value={l.id}
-                defaultChecked={task.labels?.includes(l.id)}
-              />
-              <span
-                className="ws-swatch"
-                style={{ background: l.color }}
-                aria-hidden="true"
-              />
-              {l.label}
-            </label>
-          ))}
-        </fieldset>
-
-        <label className="ws-field ws-mention-host">
-          Description
-          {mentions.popup}
-          <textarea
-            className="ws-input"
-            name="details"
-            rows={5}
-            value={details}
-            maxLength={10000}
-            placeholder="Links, acceptance criteria, client feedback… Type @ to tag someone."
-            {...mentions.fieldProps}
-            onChange={(event) => setDetails(event.target.value)}
-            onKeyDown={(event) => {
-              mentions.onKeyDown(event);
-            }}
-            onPaste={(event) => {
-              const pasted = [...event.clipboardData.files];
-              if (pasted.length === 0 || !saved) return;
-              event.preventDefault();
-              void addFiles(pasted);
-            }}
-          />
-        </label>
-        {tagged.length > 0 && (
-          <p className="ws-tagged">
-            Tagged:{" "}
-            {tagged.map((email) => (
-              <Mention key={email} email={email} fallback={email} />
-            ))}
-          </p>
-        )}
-
-        <section className="ws-task-section" aria-label="Subtasks">
-          <div className="ws-task-files-head">
-            <span className="ws-field">
-              Subtasks <SubtaskProgress task={task} tasks={all} />
-            </span>
-          </div>
-          <SubtaskTree
-            parentId={task.id}
-            tasks={all}
-            team={team}
-            depth={0}
-            onOpen={onOpen}
-            onToggle={store.toggleDone}
-            isBlocked={store.isBlocked}
-          />
-          {saved && (
-            <AddTask
-              label="+ Add subtask"
-              placeholder="Subtask name, then Enter"
-              onAdd={(title) => store.add("todo", title, task.id)}
-            />
-          )}
-        </section>
-
-        <section className="ws-task-section" aria-label="Linked tasks">
-          <span className="ws-field">Blocked by (must be done first)</span>
-          {blockers.length > 0 && (
-            <ul className="ws-links">
-              {blockers.map((b) => (
-                <li key={b.id}>
-                  <StatusDot status={b.status} />
-                  <button type="button" onClick={() => onOpen(b.id)}>
-                    {b.title}
-                  </button>
-                  <span className="ws-meta">
-                    {statuses.find((s) => s.id === b.status)!.label}
-                  </span>
-                  <button
-                    type="button"
-                    className="ws-link-remove"
-                    aria-label={`Remove link to ${b.title}`}
-                    onClick={() => store.unlink(task, b.id)}
-                  >
-                    ×
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          {saved && linkable.length > 0 && (
-            <select
-              className="ws-input"
-              aria-label="Add a task this one waits for"
-              value=""
-              onChange={(event) => {
-                if (event.target.value) store.link(task, event.target.value);
-              }}
-            >
-              <option value="">+ Add a task that must finish first…</option>
-              {linkable.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.parent_id ? "↳ " : ""}
-                  {t.title}
-                </option>
-              ))}
-            </select>
-          )}
-          {blocks.length > 0 && (
-            <p className="ws-meta">
-              Blocks:{" "}
-              {blocks.map((b, i) => (
-                <span key={b.id}>
-                  {i > 0 && ", "}
-                  <button
-                    type="button"
-                    className="ws-inline-link"
-                    onClick={() => onOpen(b.id)}
-                  >
-                    {b.title}
-                  </button>
-                </span>
-              ))}
-            </p>
-          )}
-        </section>
-
-        <div
-          className="ws-task-files"
-          onDragOver={(event) => {
-            if (saved && event.dataTransfer.types.includes("Files"))
-              event.preventDefault();
-          }}
-          onDrop={(event) => {
-            if (!event.dataTransfer.files.length) return;
-            event.preventDefault();
-            void addFiles([...event.dataTransfer.files]);
-          }}
-        >
-          <div className="ws-task-files-head">
-            <span className="ws-field">Attachments</span>
-            <input
-              ref={picker}
-              type="file"
-              accept={ACCEPT}
-              multiple
-              hidden
-              onChange={(event) => {
-                void addFiles([...(event.target.files ?? [])]);
-                event.target.value = "";
-              }}
-            />
+        <header className="ws-task-detail-header">
+          <div className="ws-task-detail-toolbar">
+            <h2 id="ws-task-heading">Task details</h2>
             <button
               type="button"
-              className="ws-button ghost small"
-              disabled={!saved || uploading > 0}
-              onClick={() => picker.current?.click()}
+              className="ws-icon-button"
+              aria-label="Close task details"
+              onClick={() => dialog.current?.close()}
             >
-              <Icon name="clip" size={14} />
-              {uploading > 0 ? `Uploading ${uploading}…` : "Add files"}
+              <Icon name="close" size={20} />
             </button>
           </div>
-          {files.length === 0 ? (
-            <p className="ws-meta">
-              Drop files here, use Add files, or paste a screenshot into the
-              description. Up to 4 MB each.
-            </p>
-          ) : (
-            <AttachmentList attachments={files} onRemove={removeFile} />
+          {ancestors.length > 0 && (
+            <nav className="ws-task-crumbs" aria-label="Parent tasks">
+              {ancestors.map((a) => (
+                <button key={a.id} type="button" onClick={() => onOpen(a.id)}>
+                  {a.title}
+                </button>
+              ))}
+              <span aria-hidden="true">›</span>
+            </nav>
           )}
-          {fileError && (
-            <p className="ws-error-text" role="alert">
-              {fileError}
+          <input type="hidden" name="id" value={task.id} />
+          <textarea
+            className="ws-dialog-title"
+            rows={2}
+            name="title"
+            aria-label="Task name"
+            defaultValue={task.title}
+            required
+            maxLength={200}
+          />
+        </header>
+        <div className="ws-task-detail-body">
+          <div className="ws-task-detail-main">
+            {waitingOn.length > 0 && (
+              <p className="ws-notice warn" role="status">
+                🔒 Blocked: waiting on {waitingOn.length} unfinished{" "}
+                {waitingOn.length === 1 ? "task" : "tasks"}. It can only leave
+                To do once they are done.
+              </p>
+            )}
+            <div className="ws-dialog-row">
+              <label className="ws-field">
+                Status
+                <select
+                  className="ws-input"
+                  name="status"
+                  defaultValue={task.status}
+                >
+                  {statuses.map((s) => (
+                    <option
+                      key={s.id}
+                      value={s.id}
+                      disabled={
+                        waitingOn.length > 0 &&
+                        s.id !== "todo" &&
+                        s.id !== task.status
+                      }
+                    >
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="ws-field">
+                Due date
+                <input
+                  className="ws-input"
+                  type="date"
+                  name="dueDate"
+                  defaultValue={task.due_date ?? ""}
+                />
+              </label>
+              <label className="ws-field">
+                Priority
+                <select
+                  className="ws-input"
+                  name="priority"
+                  defaultValue={task.priority}
+                >
+                  {priorities.map((p) => (
+                    <option key={p} value={p}>
+                      {p[0]!.toUpperCase() + p.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <fieldset className="ws-chip-set">
+              <legend className="ws-field">Assignees</legend>
+              {team.map((m) => (
+                <label key={m.email} className="ws-chip-check">
+                  <input
+                    type="checkbox"
+                    name="assignees"
+                    value={m.email}
+                    defaultChecked={assigned.has(m.email)}
+                  />
+                  <span
+                    className="ws-avatar"
+                    style={{ background: projectColor(m.email) }}
+                    aria-hidden="true"
+                  >
+                    {initials(m.display_name || m.email)}
+                  </span>
+                  {m.display_name || m.email.split("@")[0]}
+                </label>
+              ))}
+            </fieldset>
+
+            <fieldset className="ws-chip-set">
+              <legend className="ws-field">Labels</legend>
+              {labelOptions.map((l) => (
+                <label key={l.id} className="ws-chip-check">
+                  <input
+                    type="checkbox"
+                    name="labels"
+                    value={l.id}
+                    defaultChecked={task.labels?.includes(l.id)}
+                  />
+                  <span
+                    className="ws-swatch"
+                    style={{ background: l.color }}
+                    aria-hidden="true"
+                  />
+                  {l.label}
+                </label>
+              ))}
+            </fieldset>
+
+            <label className="ws-field ws-mention-host">
+              Description
+              {mentions.popup}
+              <textarea
+                className="ws-input"
+                name="details"
+                rows={8}
+                value={details}
+                maxLength={10000}
+                placeholder="Links, acceptance criteria, client feedback… Type @ to tag someone."
+                {...mentions.fieldProps}
+                onChange={(event) => setDetails(event.target.value)}
+                onKeyDown={(event) => {
+                  mentions.onKeyDown(event);
+                }}
+                onPaste={(event) => {
+                  const pasted = [...event.clipboardData.files];
+                  if (pasted.length === 0 || !saved) return;
+                  event.preventDefault();
+                  void addFiles(pasted);
+                }}
+              />
+            </label>
+            {tagged.length > 0 && (
+              <p className="ws-tagged">
+                Tagged:{" "}
+                {tagged.map((email) => (
+                  <Mention key={email} email={email} fallback={email} />
+                ))}
+              </p>
+            )}
+
+            <section className="ws-task-section" aria-label="Subtasks">
+              <div className="ws-task-files-head">
+                <span className="ws-field">
+                  Subtasks <SubtaskProgress task={task} tasks={all} />
+                </span>
+              </div>
+              <SubtaskTree
+                parentId={task.id}
+                tasks={all}
+                team={team}
+                depth={0}
+                onOpen={onOpen}
+                onToggle={store.toggleDone}
+                isBlocked={store.isBlocked}
+              />
+              {saved && (
+                <AddTask
+                  label="+ Add subtask"
+                  placeholder="Subtask name, then Enter"
+                  onAdd={(title) => store.add("todo", title, task.id)}
+                />
+              )}
+            </section>
+
+            <section className="ws-task-section" aria-label="Linked tasks">
+              <span className="ws-field">Blocked by (must be done first)</span>
+              {blockers.length > 0 && (
+                <ul className="ws-links">
+                  {blockers.map((b) => (
+                    <li key={b.id}>
+                      <StatusDot status={b.status} />
+                      <button type="button" onClick={() => onOpen(b.id)}>
+                        {b.title}
+                      </button>
+                      <span className="ws-meta">
+                        {statuses.find((s) => s.id === b.status)!.label}
+                      </span>
+                      <button
+                        type="button"
+                        className="ws-link-remove"
+                        aria-label={`Remove link to ${b.title}`}
+                        onClick={() => store.unlink(task, b.id)}
+                      >
+                        ×
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {saved && linkable.length > 0 && (
+                <select
+                  className="ws-input"
+                  aria-label="Add a task this one waits for"
+                  value=""
+                  onChange={(event) => {
+                    if (event.target.value)
+                      store.link(task, event.target.value);
+                  }}
+                >
+                  <option value="">+ Add a task that must finish first…</option>
+                  {linkable.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.parent_id ? "↳ " : ""}
+                      {t.title}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {blocks.length > 0 && (
+                <p className="ws-meta">
+                  Blocks:{" "}
+                  {blocks.map((b, i) => (
+                    <span key={b.id}>
+                      {i > 0 && ", "}
+                      <button
+                        type="button"
+                        className="ws-inline-link"
+                        onClick={() => onOpen(b.id)}
+                      >
+                        {b.title}
+                      </button>
+                    </span>
+                  ))}
+                </p>
+              )}
+            </section>
+
+            <div
+              className="ws-task-files"
+              onDragOver={(event) => {
+                if (saved && event.dataTransfer.types.includes("Files"))
+                  event.preventDefault();
+              }}
+              onDrop={(event) => {
+                if (!event.dataTransfer.files.length) return;
+                event.preventDefault();
+                void addFiles([...event.dataTransfer.files]);
+              }}
+            >
+              <div className="ws-task-files-head">
+                <span className="ws-field">Attachments</span>
+                <input
+                  ref={picker}
+                  type="file"
+                  accept={ACCEPT}
+                  multiple
+                  hidden
+                  onChange={(event) => {
+                    void addFiles([...(event.target.files ?? [])]);
+                    event.target.value = "";
+                  }}
+                />
+                <button
+                  type="button"
+                  className="ws-button ghost small"
+                  disabled={!saved || uploading > 0}
+                  onClick={() => picker.current?.click()}
+                >
+                  <Icon name="clip" size={14} />
+                  {uploading > 0 ? `Uploading ${uploading}…` : "Add files"}
+                </button>
+              </div>
+              {files.length === 0 ? (
+                <p className="ws-meta">
+                  Drop files here, use Add files, or paste a screenshot into the
+                  description. Up to 4 MB each.
+                </p>
+              ) : (
+                <AttachmentList attachments={files} onRemove={removeFile} />
+              )}
+              {fileError && (
+                <p className="ws-error-text" role="alert">
+                  {fileError}
+                </p>
+              )}
+            </div>
+
+            <p className="ws-meta">
+              Added by {memberName(team, task.created_by)} ·{" "}
+              <LocalTime
+                iso={task.created_at}
+                options={{ dateStyle: "medium" }}
+              />{" "}
+              · updated <LocalTime iso={task.updated_at} />
             </p>
+          </div>
+          {saved && (
+            <aside
+              className="ws-task-detail-activity"
+              aria-label="Task discussion and history"
+            >
+              <TaskFeed taskId={task.id} />
+            </aside>
           )}
         </div>
-
-        {saved && <TaskFeed taskId={task.id} />}
-
-        <p className="ws-meta">
-          Added by {memberName(team, task.created_by)} ·{" "}
-          <LocalTime iso={task.created_at} options={{ dateStyle: "medium" }} />{" "}
-          · updated <LocalTime iso={task.updated_at} />
-        </p>
-        <div className="ws-dialog-actions">
+        <footer className="ws-dialog-actions ws-task-detail-footer">
           <button
             type="button"
             className="ws-button ghost small"
@@ -935,7 +961,7 @@ export function TaskDialog({
           <button type="submit" className="ws-button">
             Save
           </button>
-        </div>
+        </footer>
       </form>
     </dialog>
   );

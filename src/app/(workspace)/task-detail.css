@@ -1,0 +1,139 @@
+/* A task opens as a workspace, with persistent title and save controls. */
+.ws-dialog.ws-task-detail {
+  width: min(1320px, calc(100vw - 48px));
+  height: calc(100dvh - 48px);
+  max-height: none;
+  max-width: none;
+  overflow: hidden;
+  background: #fff;
+}
+.ws-task-detail > form.ws-task-detail-form {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 0;
+  padding: 0;
+}
+.ws-task-detail-header {
+  padding: 16px 32px 22px;
+  border-bottom: 1px solid var(--line);
+}
+.ws-task-detail-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.ws-task-detail-toolbar h2 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.ws-task-detail .ws-dialog-title {
+  display: block;
+  resize: none;
+  field-sizing: content;
+  min-height: 1.3em;
+  max-height: 3.9em;
+  font-size: clamp(22px, 2.3vw, 32px);
+  line-height: 1.3;
+}
+.ws-task-detail-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(320px, 1fr);
+  min-height: 0;
+  overflow: hidden;
+}
+.ws-task-detail-main,
+.ws-task-detail-activity {
+  min-width: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding: 28px 32px;
+}
+.ws-task-detail-main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.ws-task-detail-main > * {
+  flex-shrink: 0;
+}
+.ws-task-detail-activity {
+  background: #f7f8fb;
+  border-left: 1px solid var(--line);
+  padding: 28px 24px;
+}
+.ws-task-detail-activity .ws-feed {
+  border-top: 0;
+  padding-top: 0;
+}
+.ws-task-detail-activity .ws-feed-list {
+  max-height: none;
+  overflow: visible;
+}
+.ws-task-detail-activity .ws-feed-composer {
+  flex-wrap: wrap;
+}
+.ws-task-detail-activity .ws-feed-composer textarea {
+  flex-basis: 100%;
+  min-height: 110px;
+}
+.ws-task-detail .ws-task-detail-footer {
+  padding: 16px 32px;
+  border-top: 1px solid var(--line);
+  background: #fff;
+}
+@media (max-width: 900px) {
+  .ws-dialog.ws-task-detail {
+    width: 100%;
+    height: 100dvh;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
+  .ws-task-detail-header {
+    padding: 12px 20px 18px;
+  }
+  .ws-task-detail-body {
+    display: block;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .ws-task-detail-main,
+  .ws-task-detail-activity {
+    overflow: visible;
+    padding: 24px 20px;
+    scrollbar-gutter: auto;
+  }
+  .ws-task-detail-activity {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .ws-task-detail .ws-task-detail-footer {
+    padding: 12px 16px max(12px, env(safe-area-inset-bottom));
+    gap: 6px;
+  }
+  .ws-task-detail-footer .ws-button {
+    padding: 9px 10px;
+  }
+}
+@media (max-width: 480px) {
+  .ws-task-detail .ws-task-detail-footer {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .ws-task-detail-footer .ws-button:first-child {
+    margin-right: 0;
+  }
+  .ws-task-detail-footer .ws-button:nth-last-child(2) {
+    grid-column: 2;
+  }
+  .ws-task-detail .ws-dialog-row {
+    grid-template-columns: 1fr;
+  }
+}

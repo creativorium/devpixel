@@ -56,7 +56,7 @@ export default function ImportNote({ projectId }: { projectId: string }) {
       />
       <button
         type="button"
-        className="ws-page-card ws-page-new"
+        className="ws-menu-item"
         disabled={busy}
         onClick={() => input.current?.click()}
       >
