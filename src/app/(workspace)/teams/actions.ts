@@ -32,7 +32,7 @@ export async function createProject(formData: FormData) {
     .select("id")
     .single();
   if (error || !data) redirect("/teams?error=project");
-  revalidatePath("/teams");
+  revalidatePath("/teams", "layout");
   redirect(`/teams/p/${data.id}`);
 }
 
@@ -44,7 +44,7 @@ export async function setProjectArchived(projectId: string, archived: boolean) {
     .update({ archived_at: archived ? new Date().toISOString() : null })
     .eq("id", projectId);
   if (error) return failed("Could not update the project.");
-  revalidatePath("/teams");
+  revalidatePath("/teams", "layout");
   return { ok: true } as const;
 }
 
@@ -72,7 +72,7 @@ export async function createTask(
     position: positionBetween(last?.position),
   });
   if (error) return failed("Could not add the task.");
-  revalidatePath(`/teams/p/${input.data.projectId}`);
+  revalidatePath("/teams", "layout");
   return { ok: true };
 }
 
@@ -97,7 +97,7 @@ export async function updateTask(formData: FormData): Promise<ActionResult> {
     .select("project_id")
     .single();
   if (error || !data) return failed("Could not save the task.");
-  revalidatePath(`/teams/p/${data.project_id}`);
+  revalidatePath("/teams", "layout");
   return { ok: true };
 }
 
@@ -116,7 +116,7 @@ export async function moveTask(
     .select("project_id")
     .single();
   if (error || !data) return failed("Could not move the task.");
-  revalidatePath(`/teams/p/${data.project_id}`);
+  revalidatePath("/teams", "layout");
   return { ok: true };
 }
 
@@ -130,7 +130,7 @@ export async function deleteTask(id: string): Promise<ActionResult> {
     .select("project_id")
     .single();
   if (error || !data) return failed("Could not delete the task.");
-  revalidatePath(`/teams/p/${data.project_id}`);
+  revalidatePath("/teams", "layout");
   return { ok: true };
 }
 
@@ -143,7 +143,7 @@ export async function createNote(projectId: string) {
     .select("id")
     .single();
   if (error || !data) redirect(`/teams/p/${projectId}/notes?error=create`);
-  revalidatePath(`/teams/p/${projectId}/notes`);
+  revalidatePath("/teams", "layout");
   redirect(`/teams/p/${projectId}/notes/${data.id}?edit=1`);
 }
 
@@ -165,7 +165,7 @@ export async function saveNote(
     .select("project_id")
     .single();
   if (error || !data) return failed("Could not save the note.");
-  revalidatePath(`/teams/p/${data.project_id}/notes`, "layout");
+  revalidatePath("/teams", "layout");
   return { ok: true };
 }
 
@@ -179,6 +179,6 @@ export async function deleteNote(id: string) {
     .select("project_id")
     .single();
   if (!data) redirect("/teams");
-  revalidatePath(`/teams/p/${data.project_id}/notes`, "layout");
+  revalidatePath("/teams", "layout");
   redirect(`/teams/p/${data.project_id}/notes`);
 }

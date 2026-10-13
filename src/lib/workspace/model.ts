@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export const statuses = [
-  { id: "todo", label: "To do" },
-  { id: "in_progress", label: "In progress" },
-  { id: "review", label: "Review" },
-  { id: "done", label: "Done" },
+  { id: "todo", label: "To do", color: "#8a8a83" },
+  { id: "in_progress", label: "In progress", color: "#3f8fc4" },
+  { id: "review", label: "Review", color: "#c9952c" },
+  { id: "done", label: "Done", color: "#4fa36b" },
 ] as const;
 export type TaskStatus = (typeof statuses)[number]["id"];
 export const statusIds = statuses.map((s) => s.id) as [
@@ -98,6 +98,22 @@ export const noteInput = z.object({
   title: requiredText(200),
   body: z.string().max(100000).default(""),
 });
+
+/** Today's date (YYYY-MM-DD) in the team's time zone (Bali), on server and browser alike. */
+export function workspaceToday(now = new Date()) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Makassar",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+}
+
+export function addDays(date: string, days: number) {
+  const d = new Date(`${date}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
 
 /** A sort key that places a card between two neighbours (either may be missing). */
 export function positionBetween(before?: number, after?: number): number {

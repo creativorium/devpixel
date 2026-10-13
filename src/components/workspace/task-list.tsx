@@ -1,0 +1,155 @@
+"use client";
+
+import { useState } from "react";
+import {
+  statuses,
+  type Member,
+  type Task,
+  type TaskStatus,
+} from "@/lib/workspace/model";
+import {
+  AddTask,
+  Assignee,
+  DueLabel,
+  PriorityPill,
+  StatusDot,
+  StoreError,
+  useTaskDialog,
+  useTaskStore,
+} from "./task-store";
+
+// ClickUp-style list: tasks grouped by status with sortable-looking columns.
+export default function TaskList({
+  projectId,
+  tasks: serverTasks,
+  team,
+}: {
+  projectId: string;
+  tasks: Task[];
+  team: Member[];
+}) {
+  const store = useTaskStore(projectId, serverTasks);
+  const { open, dialog } = useTaskDialog(store, team);
+  const [collapsed, setCollapsed] = useState<Set<TaskStatus>>(new Set());
+
+  const toggle = (status: TaskStatus) =>
+    setCollapsed((current) => {
+      const next = new Set(current);
+      if (next.has(status)) next.delete(status);
+      else next.add(status);
+      return next;
+    });
+
+  return (
+    <>
+      <StoreError message={store.error} />
+      <div className="ws-list">
+        {statuses.map(({ id: status, label }) => {
+          const items = store.column(status);
+          const isOpen = !collapsed.has(status);
+          return (
+            <section key={status} className="ws-group" aria-label={label}>
+              <div className="ws-group-head">
+                <button
+                  type="button"
+                  className="ws-group-toggle"
+                  aria-expanded={isOpen}
+                  onClick={() => toggle(status)}
+                >
+                  <span className="ws-caret" aria-hidden="true">
+                    {isOpen ? "▾" : "▸"}
+                  </span>
+                  <span className="ws-status-chip">
+                    <StatusDot status={status} />
+                    {label}
+                  </span>
+                  <span className="ws-meta">{items.length}</span>
+                </button>
+              </div>
+              {isOpen && (
+                <div role="table" aria-label={`${label} tasks`}>
+                  <div role="row" className="ws-row ws-row-head">
+                    <span role="columnheader">Name</span>
+                    <span role="columnheader">Assignee</span>
+                    <span role="columnheader">Due date</span>
+                    <span role="columnheader">Priority</span>
+                  </div>
+                  {items.map((task) => {
+                    const pending = task.id.startsWith("pending-");
+                    return (
+                      <div
+                        role="row"
+                        key={task.id}
+                        className={`ws-row${pending ? " pending" : ""}`}
+                      >
+                        <span role="cell" className="ws-row-name">
+                          <span
+                            className="ws-status-pick"
+                            style={{
+                              background: statuses.find(
+                                (s) => s.id === task.status,
+                              )!.color,
+                            }}
+                          >
+                            <select
+                              className="ws-status-select"
+                              aria-label={`Status of ${task.title}`}
+                              value={task.status}
+                              disabled={pending}
+                              onChange={(event) =>
+                                store.moveTo(
+                                  task.id,
+                                  event.target.value as TaskStatus,
+                                )
+                              }
+                            >
+                              {statuses.map((s) => (
+                                <option key={s.id} value={s.id}>
+                                  {s.label}
+                                </option>
+                              ))}
+                            </select>
+                          </span>
+                          <button
+                            type="button"
+                            className="ws-row-title"
+                            disabled={pending}
+                            onClick={() => open(task.id)}
+                          >
+                            {task.title}
+                            {task.details && (
+                              <span
+                                className="ws-meta"
+                                aria-label="Has description"
+                              >
+                                {" "}
+                                ≡
+                              </span>
+                            )}
+                          </button>
+                        </span>
+                        <span role="cell" data-label="Assignee">
+                          <Assignee team={team} email={task.assignee} />
+                        </span>
+                        <span role="cell" data-label="Due">
+                          <DueLabel task={task} />
+                        </span>
+                        <span role="cell" data-label="Priority">
+                          <PriorityPill priority={task.priority} />
+                        </span>
+                      </div>
+                    );
+                  })}
+                  <div className="ws-row ws-row-add">
+                    <AddTask onAdd={(title) => store.add(status, title)} />
+                  </div>
+                </div>
+              )}
+            </section>
+          );
+        })}
+      </div>
+      {dialog}
+    </>
+  );
+}
