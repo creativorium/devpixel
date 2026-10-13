@@ -31,7 +31,7 @@ The browser never talks to Supabase directly: pages and Server Actions in `src/a
 
 1. **Sign In / Providers → User Signups:** turn **off** "Allow new users to sign up". Strangers then cannot even create an account.
 2. **Users → Add user → Create new user** for each team member (same emails as the members table), with a random password and **Auto Confirm User** ticked. No email is sent; nobody uses that password. Google sign-in and magic links attach to this account because the email matches. (Avoid "Send invitation": it uses the rate-limited mailer and its link does not return to `/teams`.)
-3. **URL Configuration:** Site URL `https://www.devnpixel.com`; add Redirect URLs `https://www.devnpixel.com/teams/auth/callback` and `http://localhost:3000/teams/auth/callback` (plus your Netlify preview domain if you use one, e.g. `https://*--devnpixel.netlify.app/teams/auth/callback`).
+3. **URL Configuration:** Site URL `https://www.devnpixel.com`; add Redirect URLs `https://www.devnpixel.com/teams/auth/callback**` and `http://localhost:3000/teams/auth/callback**` (plus your Netlify preview domain if you use one, e.g. `https://*--devnpixel.netlify.app/teams/auth/callback**`). Keep the trailing `**`: the callback carries a `?next=` query, and without it Supabase falls back to the Site URL (the homepage).
 
 ### 3. Google sign-in (free)
 
