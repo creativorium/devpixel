@@ -1,26 +1,5 @@
-import { Fragment } from "react";
-import { parseInline, type Block } from "@/lib/workspace/note-format";
-
-function InlineText({ text }: { text: string }) {
-  return parseInline(text).map((part, i) => {
-    switch (part.type) {
-      case "bold":
-        return <strong key={i}>{part.text}</strong>;
-      case "italic":
-        return <em key={i}>{part.text}</em>;
-      case "code":
-        return <code key={i}>{part.text}</code>;
-      case "link":
-        return (
-          <a key={i} href={part.href} target="_blank" rel="noopener noreferrer">
-            {part.text}
-          </a>
-        );
-      default:
-        return <Fragment key={i}>{part.text}</Fragment>;
-    }
-  });
-}
+import { type Block } from "@/lib/workspace/note-format";
+import { InlineText } from "./team-context";
 
 // Renders parsed note blocks as plain React elements (no HTML injection).
 export default function NoteBlocks({

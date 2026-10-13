@@ -18,7 +18,11 @@ import {
   type Task,
   type TaskStatus,
 } from "@/lib/workspace/model";
+import { mentionedEmails } from "@/lib/workspace/insights";
+import { projectColor } from "@/lib/workspace/note-format";
 import LocalTime from "./local-time";
+import { useMentionPicker } from "./mention-picker";
+import { Mention } from "./team-context";
 
 // Shared by the Board and List views: optimistic task state plus the task dialog.
 
@@ -172,6 +176,7 @@ export function Assignee({
   return (
     <span
       className={`ws-avatar${email ? "" : " none"}`}
+      style={email ? { background: projectColor(email) } : undefined}
       title={name}
       aria-label={`Assignee: ${name}`}
     >
@@ -236,6 +241,9 @@ export function TaskDialog({
   onDelete: () => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const [details, setDetails] = useState(task.details);
+  const mentions = useMentionPicker(details, setDetails);
+  const tagged = [...new Set(mentionedEmails(details))];
   return (
     <dialog
       ref={(node) => {
@@ -321,17 +329,31 @@ export function TaskDialog({
             </select>
           </label>
         </div>
-        <label className="ws-field">
+        <label className="ws-field ws-mention-host">
           Description
+          {mentions.popup}
           <textarea
             className="ws-input"
             name="details"
             rows={7}
-            defaultValue={task.details}
+            value={details}
             maxLength={10000}
-            placeholder="Links, acceptance criteria, client feedback…"
+            placeholder="Links, acceptance criteria, client feedback… Type @ to tag someone."
+            {...mentions.fieldProps}
+            onChange={(event) => setDetails(event.target.value)}
+            onKeyDown={(event) => {
+              mentions.onKeyDown(event);
+            }}
           />
         </label>
+        {tagged.length > 0 && (
+          <p className="ws-tagged">
+            Tagged:{" "}
+            {tagged.map((email) => (
+              <Mention key={email} email={email} fallback={email} />
+            ))}
+          </p>
+        )}
         <p className="ws-meta">
           Added by {memberName(team, task.created_by)} ·{" "}
           <LocalTime iso={task.created_at} options={{ dateStyle: "medium" }} />{" "}

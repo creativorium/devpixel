@@ -11,6 +11,10 @@ const paths = {
   chevron: "m9 6 6 6-6 6",
   archive: "M3 5h18v4H3zM5 9v10h14V9M10 13h4",
   check: "m5 12 5 5L20 7",
+  chart: "M4 20V10M10 20V4M16 20v-7M22 20H2",
+  calendar: "M4 6h16v14H4zM4 10h16M8 3v4M16 3v4",
+  overview: "M4 4h7v7H4zM13 4h7v4h-7zM13 10h7v10h-7zM4 13h7v7H4z",
+  user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0",
 } as const;
 
 export type IconName = keyof typeof paths;

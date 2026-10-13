@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export const statuses = [
-  { id: "todo", label: "To do", color: "#8a8a83" },
-  { id: "in_progress", label: "In progress", color: "#3f8fc4" },
-  { id: "review", label: "Review", color: "#c9952c" },
-  { id: "done", label: "Done", color: "#4fa36b" },
+  { id: "todo", label: "To do", color: "#e87ba4" },
+  { id: "in_progress", label: "In progress", color: "#2a78d6" },
+  { id: "review", label: "Review", color: "#eda100" },
+  { id: "done", label: "Done", color: "#1baf7a" },
 ] as const;
 export type TaskStatus = (typeof statuses)[number]["id"];
 export const statusIds = statuses.map((s) => s.id) as [
@@ -37,6 +37,7 @@ export type Task = {
   created_by: string;
   created_at: string;
   updated_at: string;
+  completed_at?: string | null;
 };
 export type Note = {
   id: string;
@@ -219,3 +220,10 @@ export function startsGroup(previous: Message | undefined, message: Message) {
     5 * 60 * 1000
   );
 }
+
+export const displayNameInput = z.string().trim().min(1).max(80);
+
+export const taskDueInput = z.object({
+  id,
+  dueDate: z.iso.date().nullable(),
+});

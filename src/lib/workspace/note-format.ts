@@ -59,12 +59,13 @@ export function toggleTodo(body: string, line: number): string {
 export type Inline =
   | { type: "text"; text: string }
   | { type: "bold" | "italic" | "code"; text: string }
-  | { type: "link"; text: string; href: string };
+  | { type: "link"; text: string; href: string }
+  | { type: "mention"; text: string; email: string };
 
 const inlinePattern =
-  /(\*\*([^*]+)\*\*)|(`([^`]+)`)|(\[([^\]]+)\]\((https?:\/\/[^\s)]+)\))|(https?:\/\/[^\s)]+)|(_([^_]+)_)/g;
+  /(\*\*([^*]+)\*\*)|(`([^`]+)`)|(\[([^\]]+)\]\((https?:\/\/[^\s)]+)\))|(https?:\/\/[^\s)]+)|(_([^_]+)_)|(@\[([^\]]{1,80})\]\(([^()\s]+@[^()\s]+)\))/g;
 
-/** Bold, italic, code and http(s) links only; anything else stays plain text. */
+/** Bold, italic, code, http(s) links and @mentions; anything else stays plain text. */
 export function parseInline(text: string): Inline[] {
   const parts: Inline[] = [];
   let last = 0;
@@ -76,6 +77,8 @@ export function parseInline(text: string): Inline[] {
     else if (m[6]) parts.push({ type: "link", text: m[6], href: m[7]! });
     else if (m[8]) parts.push({ type: "link", text: m[8], href: m[8] });
     else if (m[10]) parts.push({ type: "italic", text: m[10] });
+    else if (m[12])
+      parts.push({ type: "mention", text: m[12], email: m[13]!.toLowerCase() });
     last = m.index! + m[0].length;
   }
   if (last < text.length) parts.push({ type: "text", text: text.slice(last) });

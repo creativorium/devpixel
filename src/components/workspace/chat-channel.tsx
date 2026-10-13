@@ -12,8 +12,11 @@ import {
   type Member,
   type Message,
 } from "@/lib/workspace/model";
-import { parseInline, projectColor } from "@/lib/workspace/note-format";
+import { projectColor } from "@/lib/workspace/note-format";
+import ChannelHeader from "./channel-header";
 import LocalTime from "./local-time";
+import { useMentionPicker } from "./mention-picker";
+import { RichText } from "./team-context";
 
 const POLL_MS = 3000;
 type Shown = Message & { pending?: boolean; failed?: boolean };
@@ -29,29 +32,6 @@ function merge(current: Shown[], incoming: Message[]) {
     else map.set(m.id, m);
   }
   return [...map.values()].sort(byCreated);
-}
-
-function MessageText({ body }: { body: string }) {
-  return body.split("\n").map((line, i) => (
-    <Fragment key={i}>
-      {i > 0 && <br />}
-      {parseInline(line).map((part, j) =>
-        part.type === "link" ? (
-          <a key={j} href={part.href} target="_blank" rel="noopener noreferrer">
-            {part.text}
-          </a>
-        ) : part.type === "bold" ? (
-          <strong key={j}>{part.text}</strong>
-        ) : part.type === "italic" ? (
-          <em key={j}>{part.text}</em>
-        ) : part.type === "code" ? (
-          <code key={j}>{part.text}</code>
-        ) : (
-          <Fragment key={j}>{part.text}</Fragment>
-        ),
-      )}
-    </Fragment>
-  ));
 }
 
 // Slack-style channel: grouped messages, day dividers, polling for new messages.
@@ -78,6 +58,7 @@ export default function ChatChannel({
   const scroller = useRef<HTMLDivElement>(null);
   const stick = useRef(true);
   const input = useRef<HTMLTextAreaElement>(null);
+  const mentions = useMentionPicker(draft, setDraft);
 
   // Poll for new, edited or deleted messages while the tab is visible.
   useEffect(() => {
@@ -168,13 +149,7 @@ export default function ChatChannel({
 
   return (
     <section className="ws-chat" aria-label={`#${channel.name}`}>
-      <header className="ws-chat-head">
-        <h1>
-          <span aria-hidden="true">#</span>
-          {channel.name}
-        </h1>
-        {channel.topic && <p>{channel.topic}</p>}
-      </header>
+      <ChannelHeader channel={channel} />
 
       <div
         ref={scroller}
@@ -242,7 +217,7 @@ export default function ChatChannel({
                       </div>
                     )}
                     <div className="ws-msg-body">
-                      <MessageText body={message.body} />
+                      <RichText text={message.body} />
                       {message.failed && (
                         <span className="ws-error-text"> · not sent</span>
                       )}
@@ -278,6 +253,7 @@ export default function ChatChannel({
           </p>
         )}
         <div className="ws-composer-box">
+          {mentions.popup}
           <textarea
             ref={input}
             value={draft}
@@ -285,8 +261,10 @@ export default function ChatChannel({
             maxLength={4000}
             aria-label={`Message #${channel.name}`}
             placeholder={`Message #${channel.name}`}
+            {...mentions.fieldProps}
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={(event) => {
+              if (mentions.onKeyDown(event)) return;
               if (
                 event.key === "Enter" &&
                 !event.shiftKey &&
@@ -306,8 +284,8 @@ export default function ChatChannel({
           </button>
         </div>
         <p className="ws-meta">
-          Enter to send · Shift + Enter for a new line · **bold**, `code` and
-          links work
+          Enter to send · Shift + Enter for a new line · @ to mention ·
+          **bold**, `code` and links work
         </p>
       </form>
     </section>

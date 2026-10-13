@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import {
   channelInput,
+  displayNameInput,
+  taskDueInput,
   messageInput,
   noteInput,
   type Message,
@@ -241,5 +243,65 @@ export async function deleteMessage(id: string): Promise<ActionResult> {
     .select("id")
     .maybeSingle();
   if (error || !data) return failed("You can only delete your own messages.");
+  return { ok: true };
+}
+
+export async function updateMyName(
+  _previous: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  const { supabase, me } = await requireMember();
+  const input = displayNameInput.safeParse(formData.get("displayName") ?? "");
+  if (!input.success) return failed("Use 1–80 characters for your name.");
+  // RLS only lets a member update their own row, and only display_name.
+  const { data, error } = await supabase
+    .from("members")
+    .update({ display_name: input.data })
+    .eq("email", me.email)
+    .select("email")
+    .maybeSingle();
+  if (error || !data) return failed("Could not save your name.");
+  revalidatePath("/teams", "layout");
+  return { ok: true };
+}
+
+export async function renameChannel(
+  channelId: string,
+  name: string,
+  topic: string,
+): Promise<ActionResult> {
+  const { supabase } = await requireMember();
+  const input = channelInput.safeParse({ name, topic });
+  if (!uuid.safeParse(channelId).success || !input.success)
+    return failed("Use letters, numbers and dashes (up to 40) for the name.");
+  const { data: clash } = await supabase
+    .from("channels")
+    .select("id")
+    .eq("name", input.data.name)
+    .neq("id", channelId)
+    .maybeSingle();
+  if (clash) return failed(`#${input.data.name} already exists.`);
+  const { error } = await supabase
+    .from("channels")
+    .update(input.data)
+    .eq("id", channelId);
+  if (error) return failed("Could not rename the channel.");
+  revalidatePath("/teams", "layout");
+  return { ok: true };
+}
+
+export async function setTaskDue(
+  id: string,
+  dueDate: string | null,
+): Promise<ActionResult> {
+  const { supabase } = await requireMember();
+  const input = taskDueInput.safeParse({ id, dueDate });
+  if (!input.success) return failed("Could not change the due date.");
+  const { error } = await supabase
+    .from("tasks")
+    .update({ due_date: input.data.dueDate })
+    .eq("id", input.data.id);
+  if (error) return failed("Could not change the due date.");
+  revalidatePath("/teams", "layout");
   return { ok: true };
 }

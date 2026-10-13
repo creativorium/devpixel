@@ -9,6 +9,7 @@ import {
   toggleTodo,
 } from "@/lib/workspace/note-format";
 import LocalTime from "./local-time";
+import { useMentionPicker } from "./mention-picker";
 import NoteBlocks from "./note-blocks";
 
 const AUTOSAVE_MS = 1200;
@@ -33,6 +34,7 @@ export default function NoteEditor({
   const [deleting, startDelete] = useTransition();
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const latest = useRef({ title, body });
+  const mentions = useMentionPicker(body, (next) => edit({ body: next }));
 
   // While reading, follow the server copy (a teammate may have edited the page).
   const [syncedAt, setSyncedAt] = useState(note.updated_at);
@@ -164,14 +166,23 @@ export default function NoteEditor({
             maxLength={100000}
             autoFocus={!startEditing}
             placeholder={"Start writing…\n\n# Heading\n- Bullet\n[ ] To-do"}
+            {...mentions.fieldProps}
             onChange={(event) => edit({ body: event.target.value })}
-            onBlur={() => status === "dirty" && save()}
+            onKeyDown={(event) => {
+              mentions.onKeyDown(event);
+            }}
+            onBlur={() => {
+              mentions.fieldProps.onBlur();
+              if (status === "dirty") void save();
+            }}
           />
+          {mentions.popup}
           <p id="ws-format-hint" className="ws-format-hint">
             <code># </code>heading · <code>## </code>subheading ·{" "}
             <code>- </code>bullet · <code>1. </code>numbered · <code>[ ] </code>
-            to-do · <code>&gt; </code>quote · <code>---</code> divider ·{" "}
-            <code>**bold**</code> · <code>`code`</code> · links
+            to-do · <code>@</code> mention · <code>&gt; </code>quote ·{" "}
+            <code>---</code> divider · <code>**bold**</code> ·{" "}
+            <code>`code`</code> · links
           </p>
         </>
       ) : (

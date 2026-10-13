@@ -96,3 +96,6 @@ The site then exchanges Google's code itself and hands the verified ID token to 
 ## Chat channels
 
 Slack-style channels live under **Channels** in the sidebar (`#general` is created for you). Run `supabase/migrations/20261013000000_chat.sql` once in the SQL editor (after the workspace migration). Anyone on the team can create a channel; people can only post as themselves and delete their own messages (enforced by row level security). Open chats check for new messages every 3 seconds while the tab is visible, so the browser never connects to Supabase directly and the site's CSP is unchanged.
+
+## Profiles, mentions, calendar and dashboard
+Run `supabase/migrations/20261014000000_profiles_and_completion.sql` once (after the earlier two). It lets each member change **only their own display name** (Profile page, from the name at the bottom of the sidebar) and records when a task is completed for the dashboard. Type `@` in chat, task descriptions or pages to tag a teammate; tags are stored as `@[Name](email)` and always show the current name. Home lists recent mentions of you.

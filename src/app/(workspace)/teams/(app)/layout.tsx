@@ -7,10 +7,10 @@ export default async function WorkspaceAppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { me } = await requireMember();
+  const { me, team } = await requireMember();
   const [projects, channels] = await Promise.all([getSidebar(), getChannels()]);
   return (
-    <AppShell me={me} projects={projects} channels={channels}>
+    <AppShell me={me} team={team} projects={projects} channels={channels}>
       {children}
     </AppShell>
   );

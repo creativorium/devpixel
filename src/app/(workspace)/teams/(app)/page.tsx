@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import LocalTime from "@/components/workspace/local-time";
+import { InlineText } from "@/components/workspace/team-context";
 import {
   addDays,
   memberName,
@@ -12,6 +13,7 @@ import {
 import { projectColor } from "@/lib/workspace/note-format";
 import {
   getMyTasks,
+  getMentions,
   getRecentNotes,
   type TaskWithProject,
 } from "@/lib/workspace/queries";
@@ -29,7 +31,7 @@ export default async function HomePage({
 }) {
   const { supabase, me, team } = await requireMember();
   const { error } = await searchParams;
-  const [{ data }, myTasks, recentNotes] = await Promise.all([
+  const [{ data }, myTasks, recentNotes, mentions] = await Promise.all([
     supabase
       .from("projects")
       .select("*, tasks(status)")
@@ -37,6 +39,7 @@ export default async function HomePage({
       .order("created_at", { ascending: false }),
     getMyTasks(me.email),
     getRecentNotes(),
+    getMentions(me.email),
   ]);
   const projects = (data ?? []) as ProjectRow[];
   const projectName = new Map(projects.map((p) => [p.id, p.name]));
@@ -72,6 +75,14 @@ export default async function HomePage({
         </div>
       </header>
 
+      {!me.display_name && (
+        <p className="ws-notice">
+          Set your display name so teammates can recognise and @mention you.{" "}
+          <Link href="/teams/settings" className="ws-link">
+            Open your profile
+          </Link>
+        </p>
+      )}
       {error && (
         <p className="ws-notice error" role="alert">
           {error === "channel"
@@ -135,39 +146,82 @@ export default async function HomePage({
           )}
         </section>
 
-        <section className="ws-panel" aria-labelledby="recent-notes">
-          <div className="ws-panel-head">
-            <h2 id="recent-notes">Recently edited pages</h2>
-          </div>
-          {recentNotes.length === 0 ? (
-            <p className="ws-empty">
-              No pages yet. Open a project and add a page from the sidebar.
-            </p>
-          ) : (
-            <ul className="ws-recent">
-              {recentNotes.map((note) => (
-                <li key={note.id}>
-                  <Link
-                    href={`/teams/p/${note.project_id}/notes/${note.id}`}
-                    className="ws-mytask"
-                  >
-                    <span className="ws-ellipsis">{note.title}</span>
-                    <span className="ws-mytask-project">
-                      {projectName.get(note.project_id)}
-                    </span>
-                    <span className="ws-meta">
-                      {memberName(team, note.updated_by)} ·{" "}
-                      <LocalTime
-                        iso={note.updated_at}
-                        options={{ day: "numeric", month: "short" }}
-                      />
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+        <div className="ws-stack-col">
+          <section className="ws-panel" aria-labelledby="mentions">
+            <div className="ws-panel-head">
+              <h2 id="mentions">Mentions</h2>
+            </div>
+            {mentions.length === 0 ? (
+              <p className="ws-meta">
+                When someone types @ and picks you in chat or a task, it shows
+                up here.
+              </p>
+            ) : (
+              <ul className="ws-recent">
+                {mentions.map((item) => (
+                  <li key={item.kind + item.id}>
+                    <Link
+                      href={
+                        item.kind === "message"
+                          ? `/teams/c/${item.channelId}`
+                          : `/teams/p/${item.projectId}?task=${item.id}`
+                      }
+                      className="ws-mention-item"
+                    >
+                      <span className="ws-meta">
+                        {memberName(team, item.author)} ·{" "}
+                        {item.kind === "message"
+                          ? `#${item.channelName}`
+                          : `task in ${item.projectName}`}{" "}
+                        ·{" "}
+                        <LocalTime
+                          iso={item.at}
+                          options={{ day: "numeric", month: "short" }}
+                        />
+                      </span>
+                      <span className="ws-mention-text">
+                        <InlineText text={item.text} />
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+          <section className="ws-panel" aria-labelledby="recent-notes">
+            <div className="ws-panel-head">
+              <h2 id="recent-notes">Recently edited pages</h2>
+            </div>
+            {recentNotes.length === 0 ? (
+              <p className="ws-empty">
+                No pages yet. Open a project and add a page from the sidebar.
+              </p>
+            ) : (
+              <ul className="ws-recent">
+                {recentNotes.map((note) => (
+                  <li key={note.id}>
+                    <Link
+                      href={`/teams/p/${note.project_id}/notes/${note.id}`}
+                      className="ws-mytask"
+                    >
+                      <span className="ws-ellipsis">{note.title}</span>
+                      <span className="ws-mytask-project">
+                        {projectName.get(note.project_id)}
+                      </span>
+                      <span className="ws-meta">
+                        {memberName(team, note.updated_by)} ·{" "}
+                        <LocalTime
+                          iso={note.updated_at}
+                          options={{ day: "numeric", month: "short" }}
+                        />
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
       </div>
 
       <section aria-labelledby="projects-heading" className="ws-home-projects">

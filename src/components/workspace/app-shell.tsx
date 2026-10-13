@@ -14,15 +14,18 @@ import { projectColor } from "@/lib/workspace/note-format";
 import type { Channel } from "@/lib/workspace/model";
 import type { SidebarProject } from "@/lib/workspace/queries";
 import Icon from "./icons";
+import { TeamProvider } from "./team-context";
 
 // ClickUp-style workspace sidebar with Notion-style page tree under each project.
 export default function AppShell({
   me,
   projects,
   channels,
+  team,
   children,
 }: {
   me: Member;
+  team: Member[];
   projects: SidebarProject[];
   channels: Channel[];
   children: React.ReactNode;
@@ -82,6 +85,22 @@ export default function AppShell({
             onNavigate={close}
           >
             Home
+          </SideLink>
+          <SideLink
+            href="/teams/dashboard"
+            icon="chart"
+            current={pathname === "/teams/dashboard"}
+            onNavigate={close}
+          >
+            Dashboard
+          </SideLink>
+          <SideLink
+            href="/teams/calendar"
+            icon="calendar"
+            current={pathname === "/teams/calendar"}
+            onNavigate={close}
+          >
+            Calendar
           </SideLink>
 
           <div className="ws-side-section">
@@ -159,10 +178,22 @@ export default function AppShell({
         </nav>
 
         <div className="ws-side-foot">
-          <span className="ws-avatar" aria-hidden="true">
-            {initials(name)}
-          </span>
-          <span className="ws-side-me">{name}</span>
+          <Link
+            href="/teams/settings"
+            className="ws-side-profile"
+            aria-current={pathname === "/teams/settings" ? "page" : undefined}
+            onClick={close}
+            title="Your profile"
+          >
+            <span
+              className="ws-avatar"
+              style={{ background: projectColor(me.email) }}
+              aria-hidden="true"
+            >
+              {initials(name)}
+            </span>
+            <span className="ws-side-me">{name}</span>
+          </Link>
           <form action={signOut}>
             <button type="submit" className="ws-button ghost small">
               Sign out
@@ -171,7 +202,11 @@ export default function AppShell({
         </div>
       </aside>
 
-      <div className="ws-content">{children}</div>
+      <div className="ws-content">
+        <TeamProvider team={team} me={me}>
+          {children}
+        </TeamProvider>
+      </div>
     </div>
   );
 }
@@ -256,6 +291,17 @@ function ProjectNode({
         <ul className="ws-tree">
           <li>
             <SideLink
+              href={`${base}/overview`}
+              icon="overview"
+              depth={1}
+              current={pathname === `${base}/overview`}
+              onNavigate={onNavigate}
+            >
+              Overview
+            </SideLink>
+          </li>
+          <li>
+            <SideLink
               href={base}
               icon="board"
               depth={1}
@@ -274,6 +320,17 @@ function ProjectNode({
               onNavigate={onNavigate}
             >
               List
+            </SideLink>
+          </li>
+          <li>
+            <SideLink
+              href={`${base}/calendar`}
+              icon="calendar"
+              depth={1}
+              current={pathname === `${base}/calendar`}
+              onNavigate={onNavigate}
+            >
+              Calendar
             </SideLink>
           </li>
           <li>

@@ -142,3 +142,100 @@ export async function getMessageChanges(channelId: string, since: string) {
     .limit(MESSAGE_PAGE);
   return (data ?? []) as Message[];
 }
+
+export type TaskInProject = Task & { projects: { name: string } };
+
+/** All tasks in active projects (for the workspace calendar and dashboard). */
+export async function getAllTasks() {
+  const { supabase } = await requireMember();
+  const { data } = await supabase
+    .from("tasks")
+    .select("*, projects!inner(name, archived_at)")
+    .is("projects.archived_at", null)
+    .order("position");
+  return (data ?? []) as TaskInProject[];
+}
+
+export type Mentioned =
+  | {
+      kind: "message";
+      id: string;
+      at: string;
+      text: string;
+      author: string;
+      channelId: string;
+      channelName: string;
+    }
+  | {
+      kind: "task";
+      id: string;
+      at: string;
+      text: string;
+      author: string;
+      projectId: string;
+      projectName: string;
+    };
+
+/** Recent chat messages and open task descriptions that @mention this member. */
+export async function getMentions(email: string, limit = 8) {
+  const { supabase } = await requireMember();
+  const token = `%](${email})%`;
+  const [messages, tasks] = await Promise.all([
+    supabase
+      .from("messages")
+      .select("id, body, author, created_at, channel_id, channels(name)")
+      .is("deleted_at", null)
+      .ilike("body", token)
+      .order("created_at", { ascending: false })
+      .limit(limit),
+    supabase
+      .from("tasks")
+      .select(
+        "id, title, created_by, updated_at, project_id, projects!inner(name, archived_at)",
+      )
+      .neq("status", "done")
+      .is("projects.archived_at", null)
+      .ilike("details", token)
+      .order("updated_at", { ascending: false })
+      .limit(limit),
+  ]);
+  const found: Mentioned[] = [
+    ...(
+      (messages.data ?? []) as unknown as {
+        id: string;
+        body: string;
+        author: string;
+        created_at: string;
+        channel_id: string;
+        channels: { name: string } | null;
+      }[]
+    ).map((m) => ({
+      kind: "message" as const,
+      id: m.id,
+      at: m.created_at,
+      text: m.body,
+      author: m.author,
+      channelId: m.channel_id,
+      channelName: m.channels?.name ?? "",
+    })),
+    ...(
+      (tasks.data ?? []) as unknown as {
+        id: string;
+        title: string;
+        created_by: string;
+        updated_at: string;
+        project_id: string;
+        projects: { name: string };
+      }[]
+    ).map((t) => ({
+      kind: "task" as const,
+      id: t.id,
+      at: t.updated_at,
+      text: t.title,
+      author: t.created_by,
+      projectId: t.project_id,
+      projectName: t.projects.name,
+    })),
+  ];
+  return found.sort((a, b) => (a.at < b.at ? 1 : -1)).slice(0, limit);
+}

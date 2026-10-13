@@ -7,14 +7,17 @@ import Icon, { type IconName } from "./icons";
 export default function ProjectTabs({ projectId }: { projectId: string }) {
   const pathname = usePathname();
   const base = `/teams/p/${projectId}`;
+  const view = (path: string, label: string, icon: IconName) => ({
+    href: `${base}/${path}`,
+    label,
+    icon,
+    on: pathname === `${base}/${path}`,
+  });
   const tabs: { href: string; label: string; icon: IconName; on: boolean }[] = [
+    view("overview", "Overview", "overview"),
     { href: base, label: "Board", icon: "board", on: pathname === base },
-    {
-      href: `${base}/list`,
-      label: "List",
-      icon: "list",
-      on: pathname === `${base}/list`,
-    },
+    view("list", "List", "list"),
+    view("calendar", "Calendar", "calendar"),
     {
       href: `${base}/notes`,
       label: "Notes",
