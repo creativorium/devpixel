@@ -10,3 +10,6 @@ playwright-report/
 *.log
 output/
 .playwright-cli/
+
+# Local secrets and setup notes (never commit)
+.supabasenote/
