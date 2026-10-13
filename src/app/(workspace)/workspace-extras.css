@@ -958,3 +958,20 @@ kbd {
 .ws-feed-composer textarea {
   flex: 1;
 }
+
+/* ---------- Error screen ---------- */
+.ws-error-panel {
+  display: grid;
+  gap: 14px;
+  max-width: 720px;
+}
+.ws-error-details {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--ws-soft);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
