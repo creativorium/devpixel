@@ -16,6 +16,7 @@ import { projectColor } from "@/lib/workspace/note-format";
 import { ACCEPT, type Attachment } from "@/lib/workspace/files";
 import { AttachmentList, namePasted, uploadFile } from "./attachments";
 import ChannelHeader from "./channel-header";
+import { markRead } from "./read-marks";
 import Icon from "./icons";
 import LocalTime from "./local-time";
 import { useMentionPicker } from "./mention-picker";
@@ -102,6 +103,11 @@ export default function ChatChannel({
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, [channel.id]);
+
+  // Reading the channel clears its unread dot in the sidebar.
+  useEffect(() => {
+    if (!document.hidden) markRead(channel.id);
+  }, [channel.id, messages]);
 
   // Keep the view pinned to the newest message unless the reader scrolled up.
   useLayoutEffect(() => {

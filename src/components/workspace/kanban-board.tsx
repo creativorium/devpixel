@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   labels as labelOptions,
   statuses,
+  taskAssignees,
   type Member,
   type Task,
   type TaskLabel,
@@ -15,6 +16,7 @@ import {
   DueLabel,
   LabelChips,
   SubtaskProgress,
+  TaskMenu,
   PriorityPill,
   StatusDot,
   StoreError,
@@ -23,6 +25,16 @@ import {
 } from "./task-store";
 import { fileUrl } from "./attachments";
 import { isImage } from "@/lib/workspace/files";
+import Icon from "./icons";
+
+/** Only show the card footer when it has something to say. */
+const hasFoot = (task: Task, all: Task[]) =>
+  task.priority !== "medium" ||
+  Boolean(task.due_date) ||
+  Boolean(task.details) ||
+  (task.attachments?.length ?? 0) > 0 ||
+  taskAssignees(task).length > 0 ||
+  all.some((t) => t.parent_id === task.id);
 
 const cover = (task: Task) =>
   task.attachments?.find((a) => isImage(a.mime)) ?? null;
@@ -42,6 +54,31 @@ export default function KanbanBoard({
   const { open, dialog } = useTaskDialog(store, team, openTaskId);
   const [dragId, setDragId] = useState<string | null>(null);
   const [filter, setFilter] = useState<TaskLabel | null>(null);
+  const [topAdd, setTopAdd] = useState<TaskStatus | null>(null);
+  const [menu, setMenu] = useState<{
+    id: string;
+    at: { x: number; y: number } | null;
+  } | null>(null);
+
+  // "N" (or "C") adds a task to the top of To do, like Plane and ClickUp.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      const el = event.target as HTMLElement;
+      if (
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey ||
+        el.closest("input, textarea, select, [contenteditable], dialog")
+      )
+        return;
+      if (event.key === "n" || event.key === "c") {
+        event.preventDefault();
+        setTopAdd("todo");
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
   const visible = (task: Task) => !filter || !!task.labels?.includes(filter);
   const [over, setOver] = useState<{
     status: TaskStatus;
@@ -122,20 +159,33 @@ export default function KanbanBoard({
                 <span className="ws-status-chip">
                   <StatusDot status={status} />
                   {label}
+                  <span className="ws-count">{items.length}</span>
                 </span>
-                <span>{items.length}</span>
+                <button
+                  type="button"
+                  className="ws-icon-button small"
+                  aria-label={`Add a task to ${label}`}
+                  title={`Add a task to ${label}${status === "todo" ? " (N)" : ""}`}
+                  onClick={() => setTopAdd(status)}
+                >
+                  <Icon name="plus" size={15} />
+                </button>
               </h2>
+              {topAdd === status && (
+                <QuickAdd
+                  label={label}
+                  onAdd={(title) => store.add(status, title, null, true)}
+                  onClose={() => setTopAdd(null)}
+                />
+              )}
               {items.map((task) => {
                 const pending = task.id.startsWith("pending-");
                 return (
-                  <button
+                  <div
                     key={task.id}
-                    type="button"
                     data-task-id={task.id}
-                    className={`ws-task${dragId === task.id ? " dragging" : ""}${pending ? " pending" : ""}`}
+                    className={`ws-task-wrap${dragId === task.id ? " dragging" : ""}`}
                     draggable={!pending}
-                    disabled={pending}
-                    onClick={() => open(task.id)}
                     onDragStart={(event) => {
                       event.dataTransfer.setData("text/plain", task.id);
                       event.dataTransfer.effectAllowed = "move";
@@ -145,46 +195,83 @@ export default function KanbanBoard({
                       setDragId(null);
                       setOver(null);
                     }}
+                    onContextMenu={(event) => {
+                      if (pending) return;
+                      event.preventDefault();
+                      setMenu({
+                        id: task.id,
+                        at: { x: event.clientX, y: event.clientY },
+                      });
+                    }}
                   >
-                    {cover(task) && (
-                      // eslint-disable-next-line @next/next/no-img-element -- private, auth-checked file
-                      <img
-                        className="ws-task-cover"
-                        src={fileUrl(cover(task)!.id)}
-                        alt=""
-                        loading="lazy"
-                        draggable={false}
+                    <button
+                      type="button"
+                      className={`ws-task${pending ? " pending" : ""}`}
+                      disabled={pending}
+                      onClick={() => open(task.id)}
+                    >
+                      {cover(task) && (
+                        // eslint-disable-next-line @next/next/no-img-element -- private, auth-checked file
+                        <img
+                          className="ws-task-cover"
+                          src={fileUrl(cover(task)!.id)}
+                          alt=""
+                          loading="lazy"
+                          draggable={false}
+                        />
+                      )}
+                      <LabelChips task={task} />
+                      <span className="ws-task-title">
+                        {store.isBlocked(task) && task.status !== "done" && (
+                          <span
+                            title="Blocked by unfinished tasks"
+                            aria-label="Blocked"
+                          >
+                            🔒{" "}
+                          </span>
+                        )}
+                        {task.title}
+                      </span>
+                      {hasFoot(task, store.tasks) && (
+                        <span className="ws-task-foot">
+                          <PriorityPill priority={task.priority} />
+                          <DueLabel task={task} />
+                          {task.details && (
+                            <span aria-label="Has description">≡</span>
+                          )}
+                          {(task.attachments?.length ?? 0) > 0 && (
+                            <span
+                              aria-label={`${task.attachments!.length} attachments`}
+                            >
+                              📎 {task.attachments!.length}
+                            </span>
+                          )}
+                          <SubtaskProgress task={task} tasks={store.tasks} />
+                          <Assignees team={team} task={task} hideEmpty />
+                        </span>
+                      )}
+                    </button>
+                    {!pending && (
+                      <button
+                        type="button"
+                        className="ws-card-menu"
+                        aria-label={`More actions for ${task.title}`}
+                        aria-haspopup="menu"
+                        onClick={() => setMenu({ id: task.id, at: null })}
+                      >
+                        <Icon name="more" size={16} />
+                      </button>
+                    )}
+                    {menu?.id === task.id && (
+                      <TaskMenu
+                        task={task}
+                        store={store}
+                        onOpen={open}
+                        position={menu.at}
+                        onClose={() => setMenu(null)}
                       />
                     )}
-                    <LabelChips task={task} />
-                    <span className="ws-task-title">
-                      {store.isBlocked(task) && task.status !== "done" && (
-                        <span
-                          title="Blocked by unfinished tasks"
-                          aria-label="Blocked"
-                        >
-                          🔒{" "}
-                        </span>
-                      )}
-                      {task.title}
-                    </span>
-                    <span className="ws-task-foot">
-                      <PriorityPill priority={task.priority} />
-                      <DueLabel task={task} />
-                      {task.details && (
-                        <span aria-label="Has description">≡</span>
-                      )}
-                      {(task.attachments?.length ?? 0) > 0 && (
-                        <span
-                          aria-label={`${task.attachments!.length} attachments`}
-                        >
-                          📎 {task.attachments!.length}
-                        </span>
-                      )}
-                      <SubtaskProgress task={task} tasks={store.tasks} />
-                      <Assignees team={team} task={task} />
-                    </span>
-                  </button>
+                  </div>
                 );
               })}
               <AddTask onAdd={(title) => store.add(status, title)} />
@@ -194,5 +281,40 @@ export default function KanbanBoard({
       </div>
       {dialog}
     </>
+  );
+}
+
+/** Inline "new task" field shown at the top of a column from its + button. */
+function QuickAdd({
+  label,
+  onAdd,
+  onClose,
+}: {
+  label: string;
+  onAdd: (title: string) => void;
+  onClose: () => void;
+}) {
+  const input = useRef<HTMLInputElement>(null);
+  return (
+    <div className="ws-add-task ws-quick-add">
+      <input
+        ref={input}
+        className="ws-input"
+        aria-label={`New task in ${label}`}
+        placeholder="Task name, Enter to add · Esc to close"
+        maxLength={200}
+        autoFocus
+        onKeyDown={(event) => {
+          if (event.key === "Escape") onClose();
+          if (event.key !== "Enter") return;
+          event.preventDefault();
+          const title = event.currentTarget.value.trim();
+          if (!title) return;
+          onAdd(title.slice(0, 200));
+          event.currentTarget.value = "";
+        }}
+        onBlur={(event) => !event.currentTarget.value.trim() && onClose()}
+      />
+    </div>
   );
 }

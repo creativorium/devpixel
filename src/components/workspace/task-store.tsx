@@ -1,12 +1,19 @@
 "use client";
 
-import { useOptimistic, useRef, useState, useTransition } from "react";
+import {
+  useEffect,
+  useOptimistic,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { useRouter } from "next/navigation";
 import {
   addDependency,
   createTask,
   deleteAttachment,
   deleteTask,
+  duplicateTask,
   moveTask,
   removeDependency,
   updateTask,
@@ -126,6 +133,7 @@ export function useTaskStore(projectId: string, serverTasks: Task[]) {
     status: TaskStatus,
     title: string,
     parentId: string | null = null,
+    atTop = false,
   ) {
     const now = new Date().toISOString();
     const task: Task = {
@@ -141,13 +149,15 @@ export function useTaskStore(projectId: string, serverTasks: Task[]) {
       parent_id: parentId,
       blockers: [],
       due_date: null,
-      position: positionBetween(column(status).at(-1)?.position),
+      position: atTop
+        ? positionBetween(undefined, column(status)[0]?.position)
+        : positionBetween(column(status).at(-1)?.position),
       created_by: "",
       created_at: now,
       updated_at: now,
     };
     run({ type: "add", task }, () =>
-      createTask(projectId, status, title, parentId),
+      createTask(projectId, status, title, parentId, atTop),
     );
   }
 
@@ -187,6 +197,14 @@ export function useTaskStore(projectId: string, serverTasks: Task[]) {
     );
   }
 
+  /** Copies a task and its subtasks; resolves with the new task's id. */
+  async function duplicate(id: string) {
+    setError("");
+    const result = await duplicateTask(id);
+    if (!result.ok) setError(result.message);
+    return result.ok ? (result.id ?? null) : null;
+  }
+
   function toggleDone(id: string) {
     const task = tasks.find((t) => t.id === id);
     if (task) moveTo(id, task.status === "done" ? "todo" : "done");
@@ -202,6 +220,7 @@ export function useTaskStore(projectId: string, serverTasks: Task[]) {
     link,
     unlink,
     toggleDone,
+    duplicate,
     isBlocked,
     error,
     setError,
@@ -268,9 +287,18 @@ export function Assignee({
 }
 
 /** Overlapping avatars for everyone on a task. */
-export function Assignees({ team, task }: { team: Member[]; task: Task }) {
+export function Assignees({
+  team,
+  task,
+  hideEmpty = false,
+}: {
+  team: Member[];
+  task: Task;
+  hideEmpty?: boolean;
+}) {
   const people = taskAssignees(task);
-  if (people.length === 0) return <Assignee team={team} email={null} />;
+  if (people.length === 0)
+    return hideEmpty ? null : <Assignee team={team} email={null} />;
   const shown = people.slice(0, 3);
   return (
     <span
@@ -310,7 +338,7 @@ export function LabelChips({ task }: { task: Task }) {
           <span
             key={l.id}
             className="ws-label"
-            style={{ color: l.color, borderColor: l.color }}
+            style={{ color: l.color, background: `${l.color}17` }}
           >
             {l.label}
           </span>
@@ -477,6 +505,8 @@ export function TaskDialog({
   onDelete: () => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const [copied, setCopied] = useState(false);
+  const [duplicating, setDuplicating] = useState(false);
   const [details, setDetails] = useState(task.details);
   const mentions = useMentionPicker(details, setDetails);
   const tagged = [...new Set(mentionedEmails(details))];
@@ -853,6 +883,34 @@ export function TaskDialog({
         <div className="ws-dialog-actions">
           <button
             type="button"
+            className="ws-button ghost small"
+            disabled={!saved}
+            onClick={() => {
+              void copyTaskLink(task).then(() => {
+                setCopied(true);
+                setTimeout(() => setCopied(false), 1600);
+              });
+            }}
+          >
+            <Icon name="link" size={14} />{" "}
+            {copied ? "Link copied" : "Copy link"}
+          </button>
+          <button
+            type="button"
+            className="ws-button ghost small"
+            disabled={!saved || duplicating}
+            onClick={async () => {
+              setDuplicating(true);
+              const id = await store.duplicate(task.id);
+              setDuplicating(false);
+              if (id) onOpen(id);
+            }}
+          >
+            <Icon name="copy" size={14} />{" "}
+            {duplicating ? "Duplicating…" : "Duplicate"}
+          </button>
+          <button
+            type="button"
             className="ws-button danger small"
             onClick={() =>
               confirm(
@@ -909,11 +967,129 @@ export function useTaskDialog(
   return { open: setOpenId, dialog };
 }
 
+/** Copies a link that opens this task's dialog on the board. */
+export async function copyTaskLink(task: Pick<Task, "id" | "project_id">) {
+  const url = `${location.origin}/teams/p/${task.project_id}?task=${task.id}`;
+  try {
+    await navigator.clipboard.writeText(url);
+  } catch {
+    prompt("Copy this link", url);
+  }
+}
+
 export function StoreError({ message }: { message: string }) {
   if (!message) return null;
   return (
     <p className="ws-notice error" role="alert" style={{ marginBottom: 12 }}>
       {message}
     </p>
+  );
+}
+
+/** ⋯ menu for a task card or row: open, duplicate, copy link, move, delete. */
+export function TaskMenu({
+  task,
+  store,
+  onOpen,
+  position,
+  onClose,
+}: {
+  task: Task;
+  store: TaskStore;
+  onOpen: (id: string) => void;
+  position?: { x: number; y: number } | null;
+  onClose: () => void;
+}) {
+  const box = useRef<HTMLDivElement>(null);
+  const [copied, setCopied] = useState(false);
+  const closeRef = useRef(onClose);
+  useEffect(() => {
+    closeRef.current = onClose;
+  });
+  useEffect(() => {
+    const onDown = (event: MouseEvent) => {
+      if (!box.current?.contains(event.target as Node)) closeRef.current();
+    };
+    const onKey = (event: KeyboardEvent) =>
+      event.key === "Escape" && closeRef.current();
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    box.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+  const item = (label: string, action: () => void, danger = false) => (
+    <button
+      key={label}
+      type="button"
+      role="menuitem"
+      className={`ws-menu-item${danger ? " danger" : ""}`}
+      onClick={() => {
+        action();
+      }}
+    >
+      {label}
+    </button>
+  );
+  return (
+    <div
+      ref={box}
+      className="ws-menu ws-task-menu"
+      role="menu"
+      aria-label={`Actions for ${task.title}`}
+      style={
+        position
+          ? {
+              position: "fixed",
+              left: Math.min(position.x, window.innerWidth - 200),
+              top: Math.min(position.y, window.innerHeight - 330),
+            }
+          : undefined
+      }
+      onClick={(event) => event.stopPropagation()}
+    >
+      {item("Open", () => {
+        onClose();
+        onOpen(task.id);
+      })}
+      {item("Duplicate", async () => {
+        onClose();
+        const id = await store.duplicate(task.id);
+        if (id) onOpen(id);
+      })}
+      {item(copied ? "Link copied" : "Copy link", () => {
+        void copyTaskLink(task).then(() => {
+          setCopied(true);
+          setTimeout(onClose, 700);
+        });
+      })}
+      <div className="ws-menu-label">Move to</div>
+      {statuses
+        .filter((s) => s.id !== task.status)
+        .map((s) =>
+          item(`→ ${s.label}`, () => {
+            onClose();
+            store.moveTo(task.id, s.id);
+          }),
+        )}
+      <div className="ws-menu-sep" />
+      {item(
+        "Delete",
+        () => {
+          onClose();
+          if (
+            confirm(
+              descendants(task.id, store.tasks).length
+                ? "Delete this task and all its subtasks?"
+                : "Delete this task?",
+            )
+          )
+            store.remove(task.id);
+        },
+        true,
+      )}
+    </div>
   );
 }

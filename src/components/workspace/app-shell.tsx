@@ -24,6 +24,8 @@ import {
 import { projectColor } from "@/lib/workspace/note-format";
 import type { SidebarProject } from "@/lib/workspace/queries";
 import Icon, { type IconName } from "./icons";
+import CommandPalette from "./command-palette";
+import { useReadMarks } from "./read-marks";
 import { TeamProvider } from "./team-context";
 
 type Result = { ok: boolean; message?: string };
@@ -40,9 +42,20 @@ export default function AppShell({
   me: Member;
   team: Member[];
   projects: SidebarProject[];
-  channels: Channel[];
+  channels: (Channel & { latest?: { created_at: string; author: string }[] })[];
   children: React.ReactNode;
 }) {
+  const [palette, setPalette] = useState(false);
+  const marks = useReadMarks();
+  const unread = (channel: (typeof channels)[number]) => {
+    const latest = channel.latest?.[0];
+    return Boolean(
+      latest &&
+      latest.author !== me.email &&
+      latest.created_at > (marks[channel.id] ?? "") &&
+      pathname !== `/teams/c/${channel.id}`,
+    );
+  };
   const pathname = usePathname();
   const router = useRouter();
   const [drawer, setDrawer] = useState(false);
@@ -150,6 +163,16 @@ export default function AppShell({
           </button>
         </div>
 
+        <button
+          type="button"
+          className="ws-search-button"
+          onClick={() => setPalette(true)}
+        >
+          <Icon name="search" />
+          <span>Search or jump to…</span>
+          <kbd>Ctrl K</kbd>
+        </button>
+
         <nav className="ws-side-scroll">
           <SideLink
             href="/teams"
@@ -251,6 +274,15 @@ export default function AppShell({
                       current={pathname === href}
                       onNavigate={close}
                       name={name}
+                      className={unread(channel) ? "unread" : ""}
+                      suffix={
+                        unread(channel) ? (
+                          <span
+                            className="ws-unread-dot"
+                            aria-label="Unread messages"
+                          />
+                        ) : null
+                      }
                       prefix={
                         <span className="ws-hash" aria-hidden="true">
                           #
@@ -327,6 +359,12 @@ export default function AppShell({
           {children}
         </TeamProvider>
       </div>
+      <CommandPalette
+        projects={projects}
+        channels={channels}
+        open={palette}
+        onOpenChange={setPalette}
+      />
     </div>
   );
 }
@@ -453,6 +491,7 @@ function SideItem({
   onRename,
   menu = [],
   className = "",
+  suffix,
 }: {
   href: string;
   current: boolean;
@@ -464,6 +503,7 @@ function SideItem({
   onRename?: (value: string) => void;
   menu?: MenuItem[];
   className?: string;
+  suffix?: React.ReactNode;
 }) {
   const [editing, setEditing] = useState(false);
   const [open, setOpen] = useState(false);
@@ -517,6 +557,7 @@ function SideItem({
         {icon && <Icon name={icon} />}
         {prefix}
         <span className="ws-ellipsis">{name}</span>
+        {suffix}
       </Link>
       {items.length > 0 && (
         <>

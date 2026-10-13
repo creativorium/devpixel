@@ -110,11 +110,21 @@ export async function getNote(projectId: string, noteId: string) {
 
 export const getChannels = cache(async () => {
   const { supabase } = await requireMember();
-  const { data } = await supabase
+  const columns = "id, name, topic, created_by, created_at";
+  // The newest message per channel powers the sidebar's unread dots.
+  const withLatest = await supabase
     .from("channels")
-    .select("id, name, topic, created_by, created_at")
-    .order("name");
-  return (data ?? []) as Channel[];
+    .select(`${columns}, latest:messages(created_at, author)`)
+    .is("latest.deleted_at", null)
+    .order("name")
+    .order("created_at", { referencedTable: "latest", ascending: false })
+    .limit(1, { referencedTable: "latest" });
+  const data = withLatest.error
+    ? (await supabase.from("channels").select(columns).order("name")).data
+    : withLatest.data;
+  return (data ?? []) as (Channel & {
+    latest?: { created_at: string; author: string }[];
+  })[];
 });
 
 export const getChannel = cache(async (id: string) => {
