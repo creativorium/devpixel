@@ -1,6 +1,7 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 import { safeWorkspacePath } from "@/lib/workspace/model";
+import { publicUrl } from "@/lib/workspace/origin";
 import {
   createWorkspaceClient,
   supabaseConfig,
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const next = safeWorkspacePath(params.get("next"));
   const fail = NextResponse.redirect(
-    new URL("/teams/login?error=link", request.url),
+    publicUrl("/teams/login?error=link", request),
   );
   if (!supabaseConfig()) return fail;
 
@@ -30,5 +31,5 @@ export async function GET(request: NextRequest) {
       ? await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
       : { error: new Error("Missing code") };
   if (error) return fail;
-  return NextResponse.redirect(new URL(next, request.url));
+  return NextResponse.redirect(publicUrl(next, request));
 }

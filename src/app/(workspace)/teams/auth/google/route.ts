@@ -7,6 +7,7 @@ import {
   newAttempt,
 } from "@/lib/workspace/google";
 import { safeWorkspacePath } from "@/lib/workspace/model";
+import { publicUrl } from "@/lib/workspace/origin";
 import {
   createWorkspaceClient,
   supabaseConfig,
@@ -18,7 +19,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
   if (!supabaseConfig())
     return NextResponse.redirect(
-      new URL("/teams/login?error=setup", request.url),
+      publicUrl("/teams/login?error=setup", request),
     );
   const next = safeWorkspacePath(request.nextUrl.searchParams.get("next"));
 
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
   const google = googleConfig();
   if (google) {
     const attempt = newAttempt(next);
-    const redirectUri = new URL(GOOGLE_CALLBACK_PATH, request.url).toString();
+    const redirectUri = publicUrl(GOOGLE_CALLBACK_PATH, request).toString();
     const response = NextResponse.redirect(
       googleAuthUrl(google.clientId, redirectUri, attempt),
     );
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Fallback: Supabase-hosted Google flow (the picker shows the Supabase domain).
-  const callback = new URL("/teams/auth/callback", request.url);
+  const callback = publicUrl("/teams/auth/callback", request);
   callback.searchParams.set("next", next);
   const supabase = await createWorkspaceClient();
   const { data, error } = await supabase.auth.signInWithOAuth({
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
   });
   if (error || !data.url)
     return NextResponse.redirect(
-      new URL("/teams/login?error=google", request.url),
+      publicUrl("/teams/login?error=google", request),
     );
   return NextResponse.redirect(data.url);
 }

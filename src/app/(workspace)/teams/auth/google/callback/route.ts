@@ -8,6 +8,7 @@ import {
   sameState,
 } from "@/lib/workspace/google";
 import { safeWorkspacePath } from "@/lib/workspace/model";
+import { publicUrl } from "@/lib/workspace/origin";
 import {
   createWorkspaceClient,
   supabaseConfig,
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const google = googleConfig();
   const finish = (path: string) => {
-    const response = NextResponse.redirect(new URL(path, request.url));
+    const response = NextResponse.redirect(publicUrl(path, request));
     response.cookies.delete({ name: GOOGLE_COOKIE, path: "/teams/auth" });
     return response;
   };
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
   )
     return finish("/teams/login?error=google");
 
-  const redirectUri = new URL(GOOGLE_CALLBACK_PATH, request.url).toString();
+  const redirectUri = publicUrl(GOOGLE_CALLBACK_PATH, request).toString();
   const idToken = await exchangeCode(code, redirectUri, google).catch(
     () => null,
   );
