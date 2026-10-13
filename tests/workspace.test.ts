@@ -43,16 +43,29 @@ test("task inputs normalise blanks and reject bad values", () => {
     title: "  Build kanban  ",
     details: "",
     priority: "high",
-    assignee: "  Nego@DevnPixel.com ",
+    assignees: ["  Nego@DevnPixel.com ", "nego@devnpixel.com", "a@b.co"],
+    labels: ["bug", "bug", "blocker"],
     dueDate: "",
   });
   assert.equal(ok.title, "Build kanban");
-  assert.equal(ok.assignee, "nego@devnpixel.com");
+  assert.deepEqual(ok.assignees, ["nego@devnpixel.com", "a@b.co"]);
+  assert.deepEqual(ok.labels, ["bug", "blocker"]);
   assert.equal(ok.dueDate, null);
+  assert.deepEqual(
+    taskUpdateInput.parse({ ...ok, assignees: [], dueDate: "2026-10-12" })
+      .assignees,
+    [],
+  );
   assert.equal(
-    taskUpdateInput.parse({ ...ok, assignee: "", dueDate: "2026-10-12" })
-      .assignee,
-    null,
+    taskUpdateInput.safeParse({ ...ok, labels: ["urgent-ish"] }).success,
+    false,
+  );
+  assert.equal(
+    taskUpdateInput.safeParse({
+      ...ok,
+      assignees: ["a@x.co", "b@x.co", "c@x.co", "d@x.co", "e@x.co", "f@x.co"],
+    }).success,
+    false,
   );
   assert.equal(
     taskUpdateInput.safeParse({ ...ok, priority: "whenever" }).success,

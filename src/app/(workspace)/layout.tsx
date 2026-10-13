@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "@/app/globals.css";
 import "./workspace.css";
 import "./workspace-views.css";
+import "./workspace-extras.css";
 import { site } from "@/lib/site";
 
 const sans = localFont({

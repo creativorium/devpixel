@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Icon from "@/components/workspace/icons";
+import ImportNote from "@/components/workspace/import-note";
 import LocalTime from "@/components/workspace/local-time";
 import { memberName } from "@/lib/workspace/model";
 import { getNotes } from "@/lib/workspace/queries";
@@ -32,6 +33,7 @@ export default async function NotesIndex({
             New page
           </button>
         </form>
+        <ImportNote projectId={projectId} />
         {notes.map((note) => (
           <Link
             key={note.id}

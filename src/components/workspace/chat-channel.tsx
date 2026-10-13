@@ -13,7 +13,10 @@ import {
   type Message,
 } from "@/lib/workspace/model";
 import { projectColor } from "@/lib/workspace/note-format";
+import { ACCEPT, type Attachment } from "@/lib/workspace/files";
+import { AttachmentList, namePasted, uploadFile } from "./attachments";
 import ChannelHeader from "./channel-header";
+import Icon from "./icons";
 import LocalTime from "./local-time";
 import { useMentionPicker } from "./mention-picker";
 import { RichText } from "./team-context";
@@ -59,6 +62,11 @@ export default function ChatChannel({
   const stick = useRef(true);
   const input = useRef<HTMLTextAreaElement>(null);
   const mentions = useMentionPicker(draft, setDraft);
+  const picker = useRef<HTMLInputElement>(null);
+  const [uploads, setUploads] = useState<
+    { key: string; name: string; attachment?: Attachment }[]
+  >([]);
+  const [dragging, setDragging] = useState(false);
 
   // Poll for new, edited or deleted messages while the tab is visible.
   useEffect(() => {
@@ -101,10 +109,35 @@ export default function ChatChannel({
     if (el && stick.current) el.scrollTop = el.scrollHeight;
   }, [messages]);
 
+  async function addFiles(files: File[]) {
+    if (files.length === 0) return;
+    setError("");
+    for (const original of files) {
+      const file = namePasted(original);
+      const key = `${file.name}-${Date.now()}-${Math.random()}`;
+      setUploads((current) => [...current, { key, name: file.name }]);
+      try {
+        const attachment = await uploadFile(file, { channelId: channel.id });
+        setUploads((current) =>
+          current.map((u) => (u.key === key ? { ...u, attachment } : u)),
+        );
+      } catch (err) {
+        setUploads((current) => current.filter((u) => u.key !== key));
+        setError(err instanceof Error ? err.message : "Upload failed.");
+      }
+    }
+    input.current?.focus();
+  }
+
+  const ready = uploads.flatMap((u) => (u.attachment ? [u.attachment] : []));
+  const uploading = uploads.some((u) => !u.attachment);
+
   async function send() {
     const body = draft.trim();
-    if (!body) return;
+    if ((!body && ready.length === 0) || uploading) return;
+    const attachments = ready;
     setDraft("");
+    setUploads([]);
     setError("");
     stick.current = true;
     const now = new Date().toISOString();
@@ -116,10 +149,15 @@ export default function ChatChannel({
       created_at: now,
       updated_at: now,
       deleted_at: null,
+      attachments,
       pending: true,
     };
     setMessages((current) => [...current, temp]);
-    const result = await sendMessage(channel.id, body);
+    const result = await sendMessage(
+      channel.id,
+      body,
+      attachments.map((a) => a.id),
+    );
     setMessages((current) =>
       result.ok
         ? merge(
@@ -218,6 +256,7 @@ export default function ChatChannel({
                     )}
                     <div className="ws-msg-body">
                       <RichText text={message.body} />
+                      <AttachmentList attachments={message.attachments ?? []} />
                       {message.failed && (
                         <span className="ws-error-text"> · not sent</span>
                       )}
@@ -252,9 +291,73 @@ export default function ChatChannel({
             {error}
           </p>
         )}
-        <div className="ws-composer-box">
+        {uploads.length > 0 && (
+          <div className="ws-pending-files" aria-live="polite">
+            {uploads.map((u) => (
+              <span key={u.key} className="ws-file-chip">
+                <span className="ws-ellipsis">
+                  {u.attachment ? "📎" : "⏳"} {u.name}
+                </span>
+                {u.attachment && (
+                  <button
+                    type="button"
+                    aria-label={`Remove ${u.name}`}
+                    onClick={() =>
+                      setUploads((current) =>
+                        current.filter((x) => x.key !== u.key),
+                      )
+                    }
+                  >
+                    ×
+                  </button>
+                )}
+              </span>
+            ))}
+          </div>
+        )}
+        <div
+          className={`ws-composer-box${dragging ? " over" : ""}`}
+          onDragOver={(event) => {
+            if (!event.dataTransfer.types.includes("Files")) return;
+            event.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(event) => {
+            if (!event.dataTransfer.files.length) return;
+            event.preventDefault();
+            setDragging(false);
+            void addFiles([...event.dataTransfer.files]);
+          }}
+        >
           {mentions.popup}
+          <input
+            ref={picker}
+            type="file"
+            accept={ACCEPT}
+            multiple
+            hidden
+            onChange={(event) => {
+              void addFiles([...(event.target.files ?? [])]);
+              event.target.value = "";
+            }}
+          />
+          <button
+            type="button"
+            className="ws-icon-button"
+            aria-label="Attach files"
+            title="Attach files (or paste a screenshot)"
+            onClick={() => picker.current?.click()}
+          >
+            <Icon name="clip" size={18} />
+          </button>
           <textarea
+            onPaste={(event) => {
+              const files = [...event.clipboardData.files];
+              if (files.length === 0) return;
+              event.preventDefault();
+              void addFiles(files);
+            }}
             ref={input}
             value={draft}
             rows={1}
@@ -278,14 +381,14 @@ export default function ChatChannel({
           <button
             type="submit"
             className="ws-button small"
-            disabled={!draft.trim()}
+            disabled={(!draft.trim() && ready.length === 0) || uploading}
           >
-            Send
+            {uploading ? "Uploading…" : "Send"}
           </button>
         </div>
         <p className="ws-meta">
-          Enter to send · Shift + Enter for a new line · @ to mention ·
-          **bold**, `code` and links work
+          Enter to send · Shift + Enter for a new line · @ to mention · paste or
+          drop screenshots · **bold**, `code` and links work
         </p>
       </form>
     </section>

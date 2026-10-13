@@ -60,6 +60,11 @@ export default function NoteBlocks({
       case "divider":
         out.push(<hr key={block.line} />);
         break;
+      case "blank":
+        out.push(
+          <div key={block.line} className="ws-doc-blank" aria-hidden="true" />,
+        );
+        break;
       case "code":
         out.push(
           <pre key={block.line}>

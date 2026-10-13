@@ -2,9 +2,11 @@
 
 import { useState, useTransition } from "react";
 import { renameChannel } from "@/app/(workspace)/teams/actions";
-import { channelSlug, type Channel } from "@/lib/workspace/model";
+import { channelSlug, isAdmin, type Channel } from "@/lib/workspace/model";
+import { useTeam } from "./team-context";
 
 export default function ChannelHeader({ channel }: { channel: Channel }) {
+  const { me } = useTeam();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(channel.name);
   const [topic, setTopic] = useState(channel.topic);
@@ -19,18 +21,20 @@ export default function ChannelHeader({ channel }: { channel: Channel }) {
           {channel.name}
         </h1>
         {channel.topic && <p>{channel.topic}</p>}
-        <button
-          type="button"
-          className="ws-button ghost small ws-chat-edit"
-          onClick={() => {
-            setName(channel.name);
-            setTopic(channel.topic);
-            setError("");
-            setEditing(true);
-          }}
-        >
-          Edit channel
-        </button>
+        {isAdmin(me) && (
+          <button
+            type="button"
+            className="ws-button ghost small ws-chat-edit"
+            onClick={() => {
+              setName(channel.name);
+              setTopic(channel.topic);
+              setError("");
+              setEditing(true);
+            }}
+          >
+            Edit channel
+          </button>
+        )}
       </header>
     );
 

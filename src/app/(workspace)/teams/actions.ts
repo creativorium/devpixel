@@ -5,6 +5,10 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import {
   channelInput,
+  dependencyInput,
+  projectRenameInput,
+  importedNoteInput,
+  isAdmin,
   displayNameInput,
   taskDueInput,
   messageInput,
@@ -16,6 +20,7 @@ import {
   taskMoveInput,
   taskUpdateInput,
 } from "@/lib/workspace/model";
+import { BUCKET } from "@/lib/workspace/files";
 import { requireMember } from "@/lib/workspace/session";
 
 // Every action re-checks membership: Server Actions are reachable by direct POST.
@@ -57,9 +62,15 @@ export async function createTask(
   projectId: string,
   status: string,
   title: string,
+  parentId: string | null = null,
 ): Promise<ActionResult> {
   const { supabase } = await requireMember();
-  const input = taskCreateInput.safeParse({ projectId, status, title });
+  const input = taskCreateInput.safeParse({
+    projectId,
+    status,
+    title,
+    parentId,
+  });
   if (!input.success)
     return failed("Give the task a title (up to 200 characters).");
   const { data: last } = await supabase
@@ -75,6 +86,7 @@ export async function createTask(
     title: input.data.title,
     status: input.data.status,
     position: positionBetween(last?.position),
+    ...(input.data.parentId ? { parent_id: input.data.parentId } : {}),
   });
   if (error) return failed("Could not add the task.");
   revalidatePath("/teams", "layout");
@@ -88,16 +100,23 @@ export async function updateTask(formData: FormData): Promise<ActionResult> {
     title: formData.get("title") ?? "",
     details: formData.get("details") ?? "",
     priority: formData.get("priority"),
-    assignee: formData.get("assignee") ?? "",
+    assignees: formData.getAll("assignees").map(String).filter(Boolean),
+    labels: formData.getAll("labels").map(String),
     dueDate: formData.get("dueDate") ?? "",
   });
   if (!input.success) return failed("Check the title, priority and due date.");
-  const { id, dueDate, assignee, ...fields } = input.data;
-  if (assignee && !team.some((m) => m.email === assignee))
-    return failed("Assign the task to a team member.");
+  const { id, dueDate, assignees, ...fields } = input.data;
+  if (assignees.some((email) => !team.some((m) => m.email === email)))
+    return failed("Assign the task to team members.");
   const { data, error } = await supabase
     .from("tasks")
-    .update({ ...fields, assignee, due_date: dueDate })
+    // `assignee` keeps the first person for older views and reports.
+    .update({
+      ...fields,
+      assignees,
+      assignee: assignees[0] ?? null,
+      due_date: dueDate,
+    })
     .eq("id", id)
     .select("project_id")
     .single();
@@ -120,6 +139,10 @@ export async function moveTask(
     .eq("id", input.data.id)
     .select("project_id")
     .single();
+  if (error?.message.includes("Blocked by unfinished tasks"))
+    return failed(
+      "This task is blocked. Finish the tasks it waits for before moving it out of To do.",
+    );
   if (error || !data) return failed("Could not move the task.");
   revalidatePath("/teams", "layout");
   return { ok: true };
@@ -128,6 +151,7 @@ export async function moveTask(
 export async function deleteTask(id: string): Promise<ActionResult> {
   const { supabase } = await requireMember();
   if (!uuid.safeParse(id).success) return failed("Unknown task.");
+  await removeFiles(supabase, "task_id", id);
   const { data, error } = await supabase
     .from("tasks")
     .delete()
@@ -189,7 +213,8 @@ export async function deleteNote(id: string) {
 }
 
 export async function createChannel(formData: FormData) {
-  const { supabase } = await requireMember();
+  const { supabase, me } = await requireMember();
+  if (!isAdmin(me)) redirect("/teams?error=admin");
   const input = channelInput.safeParse({
     name: formData.get("name") ?? "",
     topic: formData.get("topic") ?? "",
@@ -217,11 +242,15 @@ export type SendResult =
 export async function sendMessage(
   channelId: string,
   body: string,
+  attachmentIds: string[] = [],
 ): Promise<SendResult> {
   const { supabase } = await requireMember();
-  const input = messageInput.safeParse({ channelId, body });
+  const input = messageInput.safeParse({ channelId, body, attachmentIds });
   if (!input.success)
-    return { ok: false, message: "Messages need 1–4,000 characters." };
+    return {
+      ok: false,
+      message: "Write a message (up to 4,000 characters) or attach a file.",
+    };
   // author defaults to the signed-in email; RLS rejects anything else.
   const { data, error } = await supabase
     .from("messages")
@@ -229,7 +258,72 @@ export async function sendMessage(
     .select("*")
     .single();
   if (error || !data) return { ok: false, message: "Could not send." };
-  return { ok: true, message: data as Message };
+  if (input.data.attachmentIds.length === 0)
+    return { ok: true, message: { ...(data as Message), attachments: [] } };
+
+  // Link the sender's own unsent uploads in this channel (RLS: uploader only).
+  await supabase
+    .from("attachments")
+    .update({ message_id: data.id })
+    .in("id", input.data.attachmentIds)
+    .eq("channel_id", input.data.channelId)
+    .is("message_id", null);
+  // Touch the message so other open chats re-fetch it with its files.
+  const { data: full } = await supabase
+    .from("messages")
+    .update({ body: input.data.body })
+    .eq("id", data.id)
+    .select("*, attachments(id, name, mime, size, uploaded_by, created_at)")
+    .single();
+  return { ok: true, message: (full ?? data) as Message };
+}
+
+/** Removes attachment rows and their stored files. */
+async function removeFiles(
+  supabase: Awaited<ReturnType<typeof requireMember>>["supabase"],
+  column: "id" | "task_id" | "message_id",
+  value: string,
+) {
+  const { data } = await supabase
+    .from("attachments")
+    .delete()
+    .eq(column, value)
+    .select("path");
+  const paths = (data ?? []).map((row) => row.path as string);
+  if (paths.length) await supabase.storage.from(BUCKET).remove(paths);
+  return paths.length;
+}
+
+export async function deleteAttachment(id: string): Promise<ActionResult> {
+  const { supabase } = await requireMember();
+  if (!uuid.safeParse(id).success) return failed("Unknown file.");
+  const removed = await removeFiles(supabase, "id", id);
+  if (!removed) return failed("Could not remove the file.");
+  revalidatePath("/teams", "layout");
+  return { ok: true };
+}
+
+export async function createNoteFromText(
+  projectId: string,
+  title: string,
+  body: string,
+): Promise<ActionResult & { id?: string }> {
+  const { supabase } = await requireMember();
+  const input = importedNoteInput.safeParse({ projectId, title, body });
+  if (!input.success)
+    return failed("Text files can hold up to 100,000 characters.");
+  const { data, error } = await supabase
+    .from("notes")
+    .insert({
+      project_id: input.data.projectId,
+      title: input.data.title,
+      body: input.data.body,
+    })
+    .select("id")
+    .single();
+  if (error || !data) return failed("Could not import the file.");
+  revalidatePath("/teams", "layout");
+  return { ok: true, id: data.id as string };
 }
 
 export async function deleteMessage(id: string): Promise<ActionResult> {
@@ -243,6 +337,7 @@ export async function deleteMessage(id: string): Promise<ActionResult> {
     .select("id")
     .maybeSingle();
   if (error || !data) return failed("You can only delete your own messages.");
+  await removeFiles(supabase, "message_id", id);
   return { ok: true };
 }
 
@@ -270,7 +365,8 @@ export async function renameChannel(
   name: string,
   topic: string,
 ): Promise<ActionResult> {
-  const { supabase } = await requireMember();
+  const { supabase, me } = await requireMember();
+  if (!isAdmin(me)) return failed("Only admins can rename channels.");
   const input = channelInput.safeParse({ name, topic });
   if (!uuid.safeParse(channelId).success || !input.success)
     return failed("Use letters, numbers and dashes (up to 40) for the name.");
@@ -302,6 +398,111 @@ export async function setTaskDue(
     .update({ due_date: input.data.dueDate })
     .eq("id", input.data.id);
   if (error) return failed("Could not change the due date.");
+  revalidatePath("/teams", "layout");
+  return { ok: true };
+}
+
+export async function addDependency(
+  taskId: string,
+  blockedBy: string,
+): Promise<ActionResult> {
+  const { supabase } = await requireMember();
+  const input = dependencyInput.safeParse({ taskId, blockedBy });
+  if (!input.success) return failed("Pick a different task.");
+  const { error } = await supabase
+    .from("task_dependencies")
+    .insert({ task_id: input.data.taskId, blocked_by: input.data.blockedBy });
+  if (error?.message.includes("block each other"))
+    return failed("These tasks would block each other.");
+  if (error && error.code !== "23505")
+    return failed("Could not link the tasks.");
+  revalidatePath("/teams", "layout");
+  return { ok: true };
+}
+
+export async function removeDependency(
+  taskId: string,
+  blockedBy: string,
+): Promise<ActionResult> {
+  const { supabase } = await requireMember();
+  const input = dependencyInput.safeParse({ taskId, blockedBy });
+  if (!input.success) return failed("Unknown link.");
+  const { error } = await supabase
+    .from("task_dependencies")
+    .delete()
+    .eq("task_id", input.data.taskId)
+    .eq("blocked_by", input.data.blockedBy);
+  if (error) return failed("Could not remove the link.");
+  revalidatePath("/teams", "layout");
+  return { ok: true };
+}
+
+export async function renameProject(
+  id: string,
+  name: string,
+): Promise<ActionResult> {
+  const { supabase } = await requireMember();
+  const input = projectRenameInput.safeParse({ id, name });
+  if (!input.success) return failed("Project names need 1–120 characters.");
+  const { error } = await supabase
+    .from("projects")
+    .update({ name: input.data.name })
+    .eq("id", input.data.id);
+  if (error) return failed("Could not rename the project.");
+  revalidatePath("/teams", "layout");
+  return { ok: true };
+}
+
+export async function renameNote(
+  id: string,
+  title: string,
+): Promise<ActionResult> {
+  const { supabase } = await requireMember();
+  const clean = title.trim();
+  if (!uuid.safeParse(id).success || !clean || clean.length > 200)
+    return failed("Page titles need 1–200 characters.");
+  const { error } = await supabase
+    .from("notes")
+    .update({ title: clean })
+    .eq("id", id);
+  if (error) return failed("Could not rename the page.");
+  revalidatePath("/teams", "layout");
+  return { ok: true };
+}
+
+/** Deletes a page without redirecting (used from the sidebar). */
+export async function removeNote(id: string): Promise<ActionResult> {
+  const { supabase } = await requireMember();
+  if (!uuid.safeParse(id).success) return failed("Unknown page.");
+  const { data, error } = await supabase
+    .from("notes")
+    .delete()
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
+  if (error || !data) return failed("Could not delete the page.");
+  revalidatePath("/teams", "layout");
+  return { ok: true };
+}
+
+export async function deleteChannel(id: string): Promise<ActionResult> {
+  const { supabase, me } = await requireMember();
+  if (!isAdmin(me)) return failed("Only admins can delete channels.");
+  if (!uuid.safeParse(id).success) return failed("Unknown channel.");
+  // Stored files first; the messages and file rows go with the channel.
+  const { data: files } = await supabase
+    .from("attachments")
+    .select("path")
+    .eq("channel_id", id);
+  const paths = (files ?? []).map((f) => f.path as string);
+  if (paths.length) await supabase.storage.from(BUCKET).remove(paths);
+  const { data, error } = await supabase
+    .from("channels")
+    .delete()
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
+  if (error || !data) return failed("Could not delete the channel.");
   revalidatePath("/teams", "layout");
   return { ok: true };
 }
