@@ -1,12 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import {
-  statuses,
-  type Member,
-  type Task,
-  type TaskStatus,
-} from "@/lib/workspace/model";
+import { useStatuses } from "./status-context";
+import { type Member, type Task, type TaskStatus } from "@/lib/workspace/model";
 import {
   AddTask,
   Assignees,
@@ -32,6 +28,7 @@ export default function TaskList({
   team: Member[];
 }) {
   const store = useTaskStore(projectId, serverTasks);
+  const statuses = useStatuses(projectId);
   const { open, dialog } = useTaskDialog(store, team);
   const [menu, setMenu] = useState<{
     id: string;
@@ -67,7 +64,7 @@ export default function TaskList({
                     {isOpen ? "▾" : "▸"}
                   </span>
                   <span className="ws-status-chip">
-                    <StatusDot status={status} />
+                    <StatusDot status={status} projectId={projectId} />
                     {label}
                   </span>
                   <span className="ws-meta">{items.length}</span>

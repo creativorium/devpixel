@@ -5,7 +5,8 @@ import { InlineText } from "@/components/workspace/team-context";
 import {
   addDays,
   memberName,
-  statuses,
+  projectStatuses,
+  statusDefinition,
   workspaceToday,
   type Project,
   type TaskStatus,
@@ -112,7 +113,12 @@ export default async function HomePage({
                 </h3>
                 <ul>
                   {group.tasks.map((task) => {
-                    const status = statuses.find((s) => s.id === task.status)!;
+                    const status = statusDefinition(
+                      task.status,
+                      projectStatuses(
+                        projects.find((p) => p.id === task.project_id),
+                      ),
+                    );
                     return (
                       <li key={task.id}>
                         <Link
@@ -263,6 +269,7 @@ export default async function HomePage({
 }
 
 function ProjectCard({ project }: { project: ProjectRow }) {
+  const statuses = projectStatuses(project);
   const total = project.tasks.length;
   const count = (status: TaskStatus) =>
     project.tasks.filter((t) => t.status === status).length;
@@ -299,7 +306,7 @@ function ProjectCard({ project }: { project: ProjectRow }) {
       <span className="ws-meta">
         {total === 0
           ? "No tasks yet"
-          : `${done}/${total} done · ${count("in_progress")} in progress · ${count("review")} in review`}
+          : `${done}/${total} complete · ${total - done} open`}
       </span>
     </Link>
   );

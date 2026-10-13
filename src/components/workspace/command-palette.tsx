@@ -3,7 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { SearchHit } from "@/app/(workspace)/teams/api/search/route";
-import { statuses, type Channel } from "@/lib/workspace/model";
+import {
+  projectStatuses,
+  statusDefinition,
+  type Channel,
+} from "@/lib/workspace/model";
 import type { SidebarProject } from "@/lib/workspace/queries";
 import Icon, { type IconName } from "./icons";
 
@@ -172,7 +176,12 @@ export default function CommandPalette({
                     hint: `Task in ${h.project}`,
                     icon: "check",
                     href: `/teams/p/${h.projectId}?task=${h.id}`,
-                    dot: statuses.find((s) => s.id === h.status)?.color,
+                    dot: statusDefinition(
+                      h.status,
+                      projectStatuses(
+                        projects.find((p) => p.id === h.projectId),
+                      ),
+                    ).color,
                   }
                 : {
                     key: `n-${h.id}`,
@@ -185,7 +194,7 @@ export default function CommandPalette({
             .filter((i) => !known.has(i.key))
         : [];
     return [...shown.slice(0, 30), ...remote];
-  }, [q, staticItems, hits]);
+  }, [q, staticItems, hits, projects]);
 
   function go(item: Item | undefined) {
     if (!item) return;

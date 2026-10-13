@@ -5,13 +5,13 @@ import type { DashboardStats } from "@/lib/workspace/insights";
 import {
   initials,
   memberName,
-  statuses,
   taskAssignees,
   workspaceToday,
 } from "@/lib/workspace/model";
 import { projectColor } from "@/lib/workspace/note-format";
 import LocalTime from "./local-time";
 import { useTeam } from "./team-context";
+import { useStatusLookup } from "./status-context";
 
 export type ProjectProgress = {
   id: string;
@@ -19,8 +19,6 @@ export type ProjectProgress = {
   total: number;
   done: number;
 };
-
-const openStatuses = statuses.filter((s) => s.id !== "done");
 
 // Dashboard: headline tiles, then thin stacked bars with a legend, hover titles
 // and a table view (colour is never the only way to read a value).
@@ -32,6 +30,9 @@ export default function Dashboard({
   projects?: ProjectProgress[];
 }) {
   const { team } = useTeam();
+  const statuses = stats.statuses;
+  const openStatuses = statuses.filter((s) => s.id !== "done");
+  const getStatus = useStatusLookup();
   const today = workspaceToday();
   const maxLoad = Math.max(1, ...stats.workload.map((w) => w.total));
   const maxPriority = Math.max(1, ...stats.byPriority.map((p) => p.count));
@@ -227,8 +228,7 @@ export default function Dashboard({
                   <span
                     className="ws-dot"
                     style={{
-                      background: statuses.find((s) => s.id === task.status)!
-                        .color,
+                      background: getStatus(task.status, task.project_id).color,
                     }}
                   />
                   <span className="ws-ellipsis">{task.title}</span>

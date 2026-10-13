@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Dashboard from "@/components/workspace/dashboard";
 import { dashboardStats } from "@/lib/workspace/insights";
-import { workspaceToday } from "@/lib/workspace/model";
+import { workspaceToday, projectStatuses } from "@/lib/workspace/model";
 import { getProject, getTasks } from "@/lib/workspace/queries";
 import { requireMember } from "@/lib/workspace/session";
 
@@ -22,5 +22,15 @@ export default async function ProjectOverviewPage({
   const { team } = await requireMember();
   const { projectId } = await params;
   const tasks = await getTasks(projectId);
-  return <Dashboard stats={dashboardStats(tasks, team, workspaceToday())} />;
+  const project = await getProject(projectId);
+  return (
+    <Dashboard
+      stats={dashboardStats(
+        tasks,
+        team,
+        workspaceToday(),
+        projectStatuses(project),
+      )}
+    />
+  );
 }

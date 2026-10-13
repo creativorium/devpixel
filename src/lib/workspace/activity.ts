@@ -3,17 +3,18 @@ import {
   memberName,
   statuses,
   type Member,
+  type StatusDefinition,
 } from "./model";
-
-const statusLabel = (id: unknown) =>
-  statuses.find((s) => s.id === id)?.label ?? String(id ?? "");
 
 /** One readable line per change, e.g. "moved this from To do to In progress". */
 export function describeActivity(
   type: string,
   detail: Record<string, unknown>,
   team: Member[],
+  options: readonly StatusDefinition[] = statuses,
 ): string {
+  const statusLabel = (id: unknown) =>
+    options.find((s) => s.id === id)?.label ?? "Other status";
   switch (type) {
     case "created":
       return "created this task";

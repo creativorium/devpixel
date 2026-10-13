@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { renameChannel } from "@/app/(workspace)/teams/actions";
 import { channelSlug, isAdmin, type Channel } from "@/lib/workspace/model";
 import { useTeam } from "./team-context";
+import ResourceVisibility from "./resource-visibility";
 
 export default function ChannelHeader({ channel }: { channel: Channel }) {
   const { me } = useTeam();
@@ -22,18 +23,21 @@ export default function ChannelHeader({ channel }: { channel: Channel }) {
         </h1>
         {channel.topic && <p>{channel.topic}</p>}
         {isAdmin(me) && (
-          <button
-            type="button"
-            className="ws-button ghost small ws-chat-edit"
-            onClick={() => {
-              setName(channel.name);
-              setTopic(channel.topic);
-              setError("");
-              setEditing(true);
-            }}
-          >
-            Edit channel
-          </button>
+          <div className="ws-resource-actions">
+            <ResourceVisibility kind="channel" id={channel.id} />
+            <button
+              type="button"
+              className="ws-button ghost small"
+              onClick={() => {
+                setName(channel.name);
+                setTopic(channel.topic);
+                setError("");
+                setEditing(true);
+              }}
+            >
+              Edit channel
+            </button>
+          </div>
         )}
       </header>
     );

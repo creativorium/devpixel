@@ -1,6 +1,8 @@
 import {
   addDays,
-  statuses,
+  statuses as defaultStatuses,
+  statusDefinition,
+  type StatusDefinition,
   taskAssignees,
   type Member,
   type Task,
@@ -50,7 +52,16 @@ export function monthGrid(month: string): string[][] {
 
 export type DashboardStats = ReturnType<typeof dashboardStats>;
 
-export function dashboardStats(tasks: Task[], team: Member[], today: string) {
+export function dashboardStats(
+  tasks: Task[],
+  team: Member[],
+  today: string,
+  configured: readonly StatusDefinition[] = defaultStatuses,
+) {
+  const statuses = [...configured];
+  for (const task of tasks)
+    if (!statuses.some((s) => s.id === task.status))
+      statuses.push(statusDefinition(task.status));
   const open = tasks.filter((t) => t.status !== "done");
   const week = addDays(today, 7);
   const weekAgo = addDays(today, -7);
@@ -87,6 +98,7 @@ export function dashboardStats(tasks: Task[], team: Member[], today: string) {
     })
     .filter((row) => row.total > 0 || row.email !== null);
   return {
+    statuses,
     total: tasks.length,
     open: open.length,
     overdue: open.filter((t) => t.due_date && t.due_date < today).length,

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Dashboard from "@/components/workspace/dashboard";
 import { dashboardStats } from "@/lib/workspace/insights";
-import { workspaceToday } from "@/lib/workspace/model";
+import { workspaceToday, allProjectStatuses } from "@/lib/workspace/model";
 import { getAllTasks, getSidebar } from "@/lib/workspace/queries";
 import { requireMember } from "@/lib/workspace/session";
 
@@ -30,7 +30,12 @@ export default async function WorkspaceDashboardPage() {
         </div>
       </header>
       <Dashboard
-        stats={dashboardStats(tasks, team, workspaceToday())}
+        stats={dashboardStats(
+          tasks,
+          team,
+          workspaceToday(),
+          allProjectStatuses(projects),
+        )}
         projects={progress}
       />
     </div>

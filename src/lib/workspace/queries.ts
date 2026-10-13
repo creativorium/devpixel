@@ -51,7 +51,10 @@ export type NoteSummary = Pick<
   Note,
   "id" | "project_id" | "title" | "updated_by" | "updated_at"
 >;
-export type SidebarProject = Pick<Project, "id" | "name" | "archived_at"> & {
+export type SidebarProject = Pick<
+  Project,
+  "id" | "name" | "archived_at" | "statuses"
+> & {
   notes: Pick<Note, "id" | "title">[];
 };
 
@@ -60,7 +63,7 @@ export const getSidebar = cache(async () => {
   const { supabase } = await requireMember();
   const { data } = await supabase
     .from("projects")
-    .select("id, name, archived_at, notes(id, title)")
+    .select("*, notes(id, title)")
     .order("created_at", { ascending: true })
     .order("title", { referencedTable: "notes" });
   return (data ?? []) as SidebarProject[];

@@ -71,13 +71,43 @@
 .ws-task-detail-activity .ws-feed {
   border-top: 0;
   padding-top: 0;
+  display: grid;
+  gap: 24px;
+}
+.ws-task-detail-activity .ws-feed-summary {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+  line-height: 1.6;
+}
+.ws-task-detail-activity .ws-feed-summary p {
+  margin: 0;
 }
 .ws-task-detail-activity .ws-feed-list {
   max-height: none;
   overflow: visible;
+  gap: 24px;
+}
+.ws-task-detail-activity .ws-feed-event {
+  line-height: 1.7;
+}
+.ws-task-detail-activity .ws-feed-bubble {
+  padding: 14px 16px;
+}
+.ws-task-detail-activity .ws-feed-meta {
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-bottom: 10px;
+}
+.ws-task-detail-activity .ws-msg-body {
+  line-height: 1.7;
 }
 .ws-task-detail-activity .ws-feed-composer {
   flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
 }
 .ws-task-detail-activity .ws-feed-composer textarea {
   flex-basis: 100%;

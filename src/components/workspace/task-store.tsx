@@ -28,7 +28,7 @@ import {
   openBlockers,
   positionBetween,
   priorities,
-  statuses,
+  statusDefinition,
   taskAssignees,
   workspaceToday,
   type Member,
@@ -40,6 +40,7 @@ import { projectColor } from "@/lib/workspace/note-format";
 import { AttachmentList, namePasted, uploadFile } from "./attachments";
 import Icon from "./icons";
 import TaskFeed from "./task-feed";
+import { useStatuses } from "./status-context";
 import LocalTime from "./local-time";
 import { useMentionPicker } from "./mention-picker";
 import { Mention } from "./team-context";
@@ -77,7 +78,7 @@ function apply(tasks: Task[], change: Change): Task[] {
 }
 
 export const BLOCKED_MESSAGE =
-  "This task is blocked. Finish the tasks it waits for before moving it out of To do.";
+  "This task is blocked. Finish the tasks it waits for before moving it out of the starting status.";
 
 export function useTaskStore(projectId: string, serverTasks: Task[]) {
   const [tasks, change] = useOptimistic(serverTasks, apply);
@@ -235,8 +236,14 @@ export const isOverdue = (task: Pick<Task, "due_date" | "status">) =>
     task.due_date && task.status !== "done" && task.due_date < workspaceToday(),
   );
 
-export function StatusDot({ status }: { status: TaskStatus }) {
-  const s = statuses.find((x) => x.id === status)!;
+export function StatusDot({
+  status,
+  projectId,
+}: {
+  status: TaskStatus;
+  projectId?: string;
+}) {
+  const s = statusDefinition(status, useStatuses(projectId));
   return (
     <span
       className="ws-dot"
@@ -456,7 +463,7 @@ function SubtaskTree({
                 title={blocked ? "Blocked by unfinished tasks" : undefined}
                 onChange={() => onToggle(child.id)}
               />
-              <StatusDot status={child.status} />
+              <StatusDot status={child.status} projectId={child.project_id} />
               <button
                 type="button"
                 className="ws-subtask-title"
@@ -506,6 +513,7 @@ export function TaskDialog({
   onDelete: () => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const statuses = useStatuses(task.project_id);
   const [copied, setCopied] = useState(false);
   const [duplicating, setDuplicating] = useState(false);
   const [details, setDetails] = useState(task.details);
@@ -629,7 +637,7 @@ export function TaskDialog({
               <p className="ws-notice warn" role="status">
                 🔒 Blocked: waiting on {waitingOn.length} unfinished{" "}
                 {waitingOn.length === 1 ? "task" : "tasks"}. It can only leave
-                To do once they are done.
+                the starting status once they are complete.
               </p>
             )}
             <div className="ws-dialog-row">
@@ -784,12 +792,12 @@ export function TaskDialog({
                 <ul className="ws-links">
                   {blockers.map((b) => (
                     <li key={b.id}>
-                      <StatusDot status={b.status} />
+                      <StatusDot status={b.status} projectId={b.project_id} />
                       <button type="button" onClick={() => onOpen(b.id)}>
                         {b.title}
                       </button>
                       <span className="ws-meta">
-                        {statuses.find((s) => s.id === b.status)!.label}
+                        {statusDefinition(b.status, statuses).label}
                       </span>
                       <button
                         type="button"
@@ -890,22 +898,29 @@ export function TaskDialog({
                 </p>
               )}
             </div>
-
-            <p className="ws-meta">
-              Added by {memberName(team, task.created_by)} ·{" "}
-              <LocalTime
-                iso={task.created_at}
-                options={{ dateStyle: "medium" }}
-              />{" "}
-              · updated <LocalTime iso={task.updated_at} />
-            </p>
           </div>
           {saved && (
             <aside
               className="ws-task-detail-activity"
               aria-label="Task discussion and history"
             >
-              <TaskFeed taskId={task.id} />
+              <TaskFeed
+                taskId={task.id}
+                historySummary={
+                  <>
+                    <p>
+                      Added by {memberName(team, task.created_by)} ·{" "}
+                      <LocalTime
+                        iso={task.created_at}
+                        options={{ dateStyle: "medium" }}
+                      />
+                    </p>
+                    <p>
+                      Last updated <LocalTime iso={task.updated_at} />
+                    </p>
+                  </>
+                }
+              />
             </aside>
           )}
         </div>
@@ -1030,6 +1045,7 @@ export function TaskMenu({
   onClose: () => void;
 }) {
   const box = useRef<HTMLDivElement>(null);
+  const statuses = useStatuses(task.project_id);
   const [copied, setCopied] = useState(false);
   const closeRef = useRef(onClose);
   useEffect(() => {

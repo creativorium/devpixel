@@ -1,6 +1,6 @@
 # Team workspace (/teams)
 
-A private workspace for up to five DevnPixel team members: projects with a kanban board (To do → In progress → Review → Done) and shared notes per project. Everyone on the team sees every project. It runs on the Supabase free tier; nothing here needs a paid plan.
+A private workspace for up to five DevnPixel team members: projects with customizable kanban boards and shared notes per project. Projects are visible to everyone by default; admins can restrict projects and chat channels to selected members. It runs on the Supabase free tier; nothing here needs a paid plan.
 
 The rest of the site is unaffected: `/teams` has its own layout with no site navigation or Analytics, is `noindex`, `no-store` and excluded from the sitemap. Until the two environment variables below are set, `/teams` shows a "not connected" message.
 
@@ -95,7 +95,7 @@ The site then exchanges Google's code itself and hands the verified ID token to 
 
 ## Chat channels
 
-Slack-style channels live under **Channels** in the sidebar (`#general` is created for you). Run `supabase/migrations/20261013000000_chat.sql` once in the SQL editor (after the workspace migration). Anyone on the team can create a channel; people can only post as themselves and delete their own messages (enforced by row level security). Open chats check for new messages every 3 seconds while the tab is visible, so the browser never connects to Supabase directly and the site's CSP is unchanged.
+Slack-style channels live under **Channels** in the sidebar (`#general` is created for you). Run `supabase/migrations/20261013000000_chat.sql` once in the SQL editor (after the workspace migration). With the roles migration, admins create and manage channels; people can only post as themselves and delete their own messages (enforced by row-level security). Chats use Supabase Realtime with polling every 5 seconds as a fallback while visible.
 
 ## Profiles, mentions, calendar and dashboard
 
@@ -108,9 +108,58 @@ Run `supabase/migrations/20261015000000_files_labels_subtasks.sql` once (after t
 - a **private** `workspace` storage bucket and `attachments` table: screenshots/files on tasks and in chat (paste, drop or attach; 4 MB each; images shown inline, everything else downloads; served only through `/teams/api/files/…` after the team check);
 - task `labels` (Bug, Blocker, Feature, Improvement, Design, Content, Client request), `assignees` (up to 5, existing single assignees are copied over) and `parent_id` for nested subtasks;
 - `task_dependencies`: "blocked by" links. A blocked task cannot leave To do until every task it waits for is Done, enforced by a database trigger; loops are refused;
-- `members.role` (`admin` / `member`). Admins create, rename and delete channels; everyone else can do everything else. The script makes the workspace owner an admin. To change someone: `update public.members set role = 'admin' where email = '…';`
+- `members.role` (`admin` / `member`). Admins manage channels and, with the visibility migration, control resource access and project archiving. Members work on projects they can access. The script makes the workspace owner an admin. To change someone: `update public.members set role = 'admin' where email = '…';`
 
 Notes also gained a formatting toolbar (Ctrl/Cmd+B, I, E, K), list continuation on Enter, kept blank lines, and **Import .txt / .md** (read in the browser; no storage).
 
+## Custom project statuses
+
+Before using **Manage statuses** above the Kanban board, run
+`supabase/migrations/20261017000000_project_statuses.sql` in Supabase SQL Editor
+after the existing migrations. The migration preserves all existing tasks and
+adds per-project column names/colors. Team members can rename the four original
+columns and add up to 16 extra open stages (20 columns total). Additional stages
+appear before the completion column. Existing starting (`todo`) and completion
+(`done`) IDs retain their behavior even after renaming, including dependency
+checks, checkboxes and completion timestamps. No statuses are deleted by this UI.
+
+Names and colors are shared through the board, list, task editor, calendar,
+activity and project overview. The all-project dashboard uses standard names
+for the four shared states and includes each project's additional stages.
+Writes are member-only, validate status ownership in the database, and lock the
+project row to avoid lost concurrent edits. Without the migration, current
+boards retain their default statuses and editing reports a setup error.
+
+## Admin-controlled visibility
+
+After the existing migrations (including `20261017000000_project_statuses.sql`),
+run `supabase/migrations/20261018000000_resource_visibility.sql` in the Supabase
+SQL editor. This migration has been tested locally; it is not automatically
+applied by deploying the site.
+
+Admins have a **Visibility** button beside the project heading and in each chat
+channel header. Choose **Everyone** or **Selected members**; selecting nobody
+means admins only. Admins always retain access. Project and channel access are
+configured independently. Members can create projects, which are visible to
+everyone by default, but cannot change visibility, archive, restore, or delete
+projects. Channel creation and management remain admin-only.
+
+Row-level security protects projects, tasks, notes, comments, activity, chat,
+notifications, and private file storage, including direct API access. The same
+filters apply to sidebar listings, search, dashboards, and realtime messages.
+Open project/channel pages check access every 15 seconds and on focus, returning
+to Teams if access is revoked. Previously downloaded content cannot be retracted.
+The new controls report a setup error until the migration is applied; no existing
+project or channel is restricted automatically.
+
+The isolated Postgres integration test applies all migrations and tests admin,
+allowed-member, excluded-member and outsider access without using a live database:
+
+```powershell
+npm install --prefix output/status-db-check --no-save --package-lock=false @electric-sql/pglite
+node tests/resource-visibility.mjs ./output/status-db-check/node_modules/@electric-sql/pglite/dist/index.js
+```
+
 ## Comments, activity, notifications and live updates
+
 Run `supabase/migrations/20261016000000_comments_activity_notifications.sql` once. It adds task comments, a change history written by database triggers (status, title, due date, priority, labels, assignees), and notifications for @mentions, assignments and comments on your tasks (the bell, top right). It also enables Supabase Realtime for chat messages and notifications; the site's CSP allows the browser to connect to the project in `SUPABASE_URL` only. Until the script runs, these features stay quiet and everything else works as before.

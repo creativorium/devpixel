@@ -1,0 +1,95 @@
+.ws-visibility {
+  width: min(480px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+  padding: 28px;
+  border: 1px solid #dbe0e8;
+  border-radius: 20px;
+  color: #17202a;
+  background: #fff;
+  box-shadow: 0 24px 80px #10182830;
+}
+.ws-visibility::backdrop {
+  background: #10182870;
+  backdrop-filter: blur(4px);
+}
+.ws-visibility h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+.ws-visibility fieldset {
+  border: 0;
+  padding: 0;
+  margin: 24px 0;
+  min-width: 0;
+}
+.ws-visibility legend {
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.ws-visibility-option {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  column-gap: 8px;
+  padding: 14px 0;
+  cursor: pointer;
+}
+.ws-visibility-option input {
+  align-self: center;
+}
+.ws-visibility-option span {
+  grid-column: 2;
+  font-size: 12px;
+  color: #596574;
+  margin-top: 4px;
+}
+.ws-visibility-members {
+  border-top: 1px solid #e2e7ef;
+  margin-top: 12px;
+  padding-top: 12px;
+}
+.ws-visibility-members label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  cursor: pointer;
+  text-align: left;
+}
+.ws-visibility-members input {
+  flex: 0 0 auto;
+}
+.ws-visibility-members span {
+  min-width: 0;
+}
+.ws-visibility-members small {
+  display: block;
+  font-size: 11px;
+  color: #596574;
+  overflow-wrap: anywhere;
+}
+.ws-visibility-actions,
+.ws-resource-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.ws-visibility-actions {
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+.ws-chat-head .ws-resource-actions {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+@media (max-width: 640px) {
+  .ws-chat-head {
+    flex-wrap: wrap;
+  }
+  .ws-chat-head .ws-resource-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+}

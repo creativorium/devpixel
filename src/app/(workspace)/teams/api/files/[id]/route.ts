@@ -33,7 +33,7 @@ export async function GET(
       "Content-Type": isImage(row.mime) ? row.mime : "application/octet-stream",
       "Content-Length": String(blob.size),
       "Content-Disposition": disposition(row.name, row.mime),
-      "Cache-Control": "private, max-age=3600",
+      "Cache-Control": "private, no-store",
       "Content-Security-Policy": "default-src 'none'; sandbox",
       "X-Content-Type-Options": "nosniff",
     },

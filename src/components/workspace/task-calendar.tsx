@@ -4,15 +4,11 @@ import Link from "next/link";
 import { useOptimistic, useState, useTransition } from "react";
 import { setTaskDue } from "@/app/(workspace)/teams/actions";
 import { monthGrid, monthLabel, shiftMonth } from "@/lib/workspace/insights";
-import {
-  dayLabel,
-  statuses,
-  workspaceToday,
-  type Task,
-} from "@/lib/workspace/model";
+import { dayLabel, workspaceToday, type Task } from "@/lib/workspace/model";
 import { projectColor } from "@/lib/workspace/note-format";
 import { Assignees } from "./task-store";
 import { useTeam } from "./team-context";
+import { useStatusLookup } from "./status-context";
 
 export type CalendarTask = Task & { projectName?: string };
 
@@ -33,6 +29,7 @@ export default function TaskCalendar({
   showProject?: boolean;
 }) {
   const { team } = useTeam();
+  const getStatus = useStatusLookup();
   const [tasks, setDue] = useOptimistic(
     serverTasks,
     (current, change: { id: string; due: string | null }) =>
@@ -89,7 +86,7 @@ export default function TaskCalendar({
   });
 
   const chip = (task: CalendarTask) => {
-    const status = statuses.find((s) => s.id === task.status)!;
+    const status = getStatus(task.status, task.project_id);
     return (
       <Link
         key={task.id}
@@ -231,8 +228,7 @@ export default function TaskCalendar({
                 <span
                   className="ws-dot"
                   style={{
-                    background: statuses.find((s) => s.id === task.status)!
-                      .color,
+                    background: getStatus(task.status, task.project_id).color,
                   }}
                 />
                 <span className="ws-ellipsis">{task.title}</span>

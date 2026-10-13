@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ArchiveButton from "@/components/workspace/archive-button";
+import ResourceVisibility from "@/components/workspace/resource-visibility";
+import { requireMember } from "@/lib/workspace/session";
+import { isAdmin } from "@/lib/workspace/model";
 import ProjectTabs from "@/components/workspace/project-tabs";
 import { projectColor } from "@/lib/workspace/note-format";
 import { getProject } from "@/lib/workspace/queries";
@@ -13,6 +16,7 @@ export default async function ProjectLayout({
   params: Promise<{ projectId: string }>;
 }) {
   const { projectId } = await params;
+  const { me } = await requireMember();
   const project = await getProject(projectId);
   if (!project) notFound();
 
@@ -34,10 +38,15 @@ export default async function ProjectLayout({
               />
               {project.name}
             </h1>
-            <ArchiveButton
-              projectId={project.id}
-              archived={Boolean(project.archived_at)}
-            />
+            {isAdmin(me) && (
+              <div className="ws-resource-actions">
+                <ResourceVisibility kind="project" id={project.id} />
+                <ArchiveButton
+                  projectId={project.id}
+                  archived={Boolean(project.archived_at)}
+                />
+              </div>
+            )}
           </div>
           {project.archived_at ? (
             <p className="ws-meta">Archived project</p>

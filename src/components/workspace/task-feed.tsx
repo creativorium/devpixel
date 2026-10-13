@@ -1,18 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { addComment, deleteComment } from "@/app/(workspace)/teams/actions";
 import type { FeedItem } from "@/app/(workspace)/teams/api/tasks/[taskId]/feed/route";
 import { describeActivity } from "@/lib/workspace/activity";
 import { initials, memberName } from "@/lib/workspace/model";
 import { projectColor } from "@/lib/workspace/note-format";
 import LocalTime from "./local-time";
+import { useStatuses } from "./status-context";
 import { useMentionPicker } from "./mention-picker";
 import { RichText, useTeam } from "./team-context";
 
 // ClickUp/Plane-style activity: history and comments in one timeline.
-export default function TaskFeed({ taskId }: { taskId: string }) {
+export default function TaskFeed({
+  taskId,
+  historySummary,
+}: {
+  taskId: string;
+  historySummary?: ReactNode;
+}) {
   const { team, me } = useTeam();
+  const statuses = useStatuses();
   const [items, setItems] = useState<FeedItem[] | null>(null);
   const [unavailable, setUnavailable] = useState(false);
   const [draft, setDraft] = useState("");
@@ -89,6 +97,9 @@ export default function TaskFeed({ taskId }: { taskId: string }) {
           Show history
         </label>
       </div>
+      {showHistory && historySummary && (
+        <div className="ws-feed-summary ws-meta">{historySummary}</div>
+      )}
       {unavailable && (
         <p className="ws-meta">
           Comments need the latest database update (WORKSPACE.md).
@@ -106,7 +117,7 @@ export default function TaskFeed({ taskId }: { taskId: string }) {
                   <span className="ws-feed-dot" aria-hidden="true" />
                   <span>
                     <strong>{name}</strong>{" "}
-                    {describeActivity(item.type, item.detail, team)}
+                    {describeActivity(item.type, item.detail, team, statuses)}
                     <span className="ws-meta">
                       {" · "}
                       <LocalTime

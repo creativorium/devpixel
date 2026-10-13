@@ -47,7 +47,8 @@ export async function createProject(formData: FormData) {
 }
 
 export async function setProjectArchived(projectId: string, archived: boolean) {
-  const { supabase } = await requireMember();
+  const { supabase, me } = await requireMember();
+  if (!isAdmin(me)) return failed("Only admins can archive or restore projects.");
   if (!uuid.safeParse(projectId).success) return failed("Unknown project.");
   const { error } = await supabase
     .from("projects")

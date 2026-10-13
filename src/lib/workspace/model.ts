@@ -7,7 +7,59 @@ export const statuses = [
   { id: "review", label: "Review", color: "#eda100" },
   { id: "done", label: "Done", color: "#1baf7a" },
 ] as const;
-export type TaskStatus = (typeof statuses)[number]["id"];
+export type TaskStatus = string;
+export type StatusDefinition = { id: string; label: string; color: string };
+export const statusIdInput = z
+  .string()
+  .regex(
+    /^(todo|in_progress|review|done|custom_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/,
+  );
+export const statusDefinitionInput = z.object({
+  id: statusIdInput,
+  label: z.string().trim().min(1).max(40),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+});
+export function projectStatuses(
+  project?: { statuses?: unknown } | null,
+): StatusDefinition[] {
+  const parsed = z
+    .array(statusDefinitionInput)
+    .min(4)
+    .max(20)
+    .safeParse(project?.statuses);
+  if (!parsed.success) return [...statuses];
+  const ids = parsed.data.map((s) => s.id);
+  const names = parsed.data.map((s) => s.label.toLowerCase());
+  if (
+    new Set(ids).size !== ids.length ||
+    new Set(names).size !== names.length ||
+    !statuses.every((s) => ids.includes(s.id))
+  )
+    return [...statuses];
+  return parsed.data;
+}
+export function statusDefinition(
+  id: string,
+  options: readonly StatusDefinition[] = statuses,
+): StatusDefinition {
+  return (
+    options.find((s) => s.id === id) ?? {
+      id,
+      label: "Other status",
+      color: "#64748b",
+    }
+  );
+}
+export function allProjectStatuses(
+  projects: { statuses?: unknown }[],
+): StatusDefinition[] {
+  return [
+    ...statuses,
+    ...projects.flatMap((p) =>
+      projectStatuses(p).filter((s) => s.id.startsWith("custom_")),
+    ),
+  ];
+}
 export const statusIds = statuses.map((s) => s.id) as [
   TaskStatus,
   ...TaskStatus[],
@@ -80,6 +132,7 @@ export type Member = {
 export const isAdmin = (member: Member | null | undefined) =>
   member?.role === "admin";
 export type Project = {
+  statuses?: StatusDefinition[];
   id: string;
   name: string;
   description: string;
@@ -136,7 +189,7 @@ export const projectInput = z.object({
 export const taskCreateInput = z.object({
   projectId: id,
   title: requiredText(200),
-  status: z.enum(statusIds).default("todo"),
+  status: statusIdInput.default("todo"),
   parentId: id.nullable().default(null),
 });
 
@@ -162,7 +215,7 @@ export const taskUpdateInput = z.object({
 
 export const taskMoveInput = z.object({
   id,
-  status: z.enum(statusIds),
+  status: statusIdInput,
   position: z.number().finite(),
 });
 

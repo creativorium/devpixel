@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
   labels as labelOptions,
-  statuses,
   taskAssignees,
   type Member,
   type Task,
@@ -26,6 +25,8 @@ import {
 import { fileUrl } from "./attachments";
 import { isImage } from "@/lib/workspace/files";
 import Icon from "./icons";
+import { useStatuses } from "./status-context";
+import StatusSettings from "./status-settings";
 
 /** Only show the card footer when it has something to say. */
 const hasFoot = (task: Task, all: Task[]) =>
@@ -51,6 +52,7 @@ export default function KanbanBoard({
   openTaskId?: string | null;
 }) {
   const store = useTaskStore(projectId, serverTasks);
+  const statuses = useStatuses(projectId);
   const { open, dialog } = useTaskDialog(store, team, openTaskId);
   const [dragId, setDragId] = useState<string | null>(null);
   const [filter, setFilter] = useState<TaskLabel | null>(null);
@@ -99,6 +101,7 @@ export default function KanbanBoard({
   return (
     <>
       <StoreError message={store.error} />
+      <StatusSettings projectId={projectId} />
       <div className="ws-filter" role="group" aria-label="Filter by label">
         <span className="ws-meta">Label:</span>
         <button
@@ -157,7 +160,7 @@ export default function KanbanBoard({
             >
               <h2 className="ws-column-head">
                 <span className="ws-status-chip">
-                  <StatusDot status={status} />
+                  <StatusDot status={status} projectId={projectId} />
                   {label}
                   <span className="ws-count">{items.length}</span>
                 </span>
