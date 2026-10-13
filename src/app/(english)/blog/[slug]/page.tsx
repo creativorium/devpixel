@@ -4,7 +4,9 @@ import { posts } from "@/lib/posts";
 import { site } from "@/lib/site";
 import { pageMetadata } from "@/lib/seo";
 import { StructuredData } from "@/components/structured-data";
-export const dynamicParams = false;
+// Keep runtime fallback available for Netlify; unknown slugs are rejected
+// by the post lookup below. Known articles are still generated at build time.
+export const dynamicParams = true;
 export function generateStaticParams() {
   return posts.map(({ slug }) => ({ slug }));
 }

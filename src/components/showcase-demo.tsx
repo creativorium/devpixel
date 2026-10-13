@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { villaDirections } from "@/lib/villa-directions";
 import { ShowcaseVariant } from "./showcase-variants";
 import { showcases, showcaseContact, type Showcase } from "@/lib/showcase";
 import {
@@ -33,7 +34,7 @@ export function ShowcaseDemo({
               : HotelExperience;
   return (
     <div
-      className={`demo-site experience-site demo-${s.slug} ${s.serif ? "demo-serif" : "demo-sans"}`}
+      className={`demo-site experience-site demo-${s.slug} ${s.serif ? "demo-serif" : "demo-sans"} ${s.category === "Villa" ? `villa-direction villa-direction-${villaDirections[s.slug].direction}` : ""}`}
       style={
         {
           "--paper": s.palette[0],

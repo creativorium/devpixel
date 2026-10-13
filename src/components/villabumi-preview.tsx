@@ -11,6 +11,7 @@ import {
   type PointerEvent,
 } from "react";
 import { villaBumi as villa } from "@/lib/villabumi";
+import { VillaBumiBooking } from "./villabumi-booking";
 
 /** Auto-slide timing: each slider changes every 6s with a 1.2s crossfade (see CSS). */
 const SLIDE_INTERVAL = 6000;
@@ -294,6 +295,7 @@ export function VillaBumiPreview() {
     () => false,
   );
   const [notice, setNotice] = useState("");
+  const [stay, setStay] = useState({ arrival: "", departure: "" });
   const gallery = useRef<HTMLDialogElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -717,17 +719,23 @@ export function VillaBumiPreview() {
               <h2 id="bumi-rates-heading">Rates & availability</h2>
             </div>
             <span className="bumi-rate-badge">
-              THE WHOLE VILLA / MONTHLY STAYS
+              THE WHOLE VILLA / THREE BEDROOMS
             </span>
           </div>
           <p>
-            Make Villa Bumi your home for a while. Monthly rental rates vary
-            with the season.
+            A few nights above the coast, or a month to call it home. Find your
+            dates and explore the rates for your stay.
           </p>
+          <VillaBumiBooking
+            onDates={(arrival, departure) => setStay({ arrival, departure })}
+          />
+          <div className="bumi-monthly-heading">
+            <p className="bumi-eyebrow">MAKE YOURSELF AT HOME</p>
+            <h3>Monthly stays.</h3>
+          </div>
           <table>
             <caption className="bumi-visually-hidden">
-              Indicative monthly rates from the supplied design brief, in US
-              dollars
+              Published monthly rates from Villa Bumi, in US dollars
             </caption>
             <thead>
               <tr>
@@ -755,9 +763,9 @@ export function VillaBumiPreview() {
                 1,000 security deposit is due at check-in for monthly stays.
               </p>
               <p className="bumi-fine">
-                Indicative rates for design review, based on the supplied brief.
-                Please confirm current prices, inclusions and availability
-                directly with the villa.
+                Published monthly rates from Villa Bumi’s website. Please
+                confirm current prices, inclusions and availability directly
+                with the villa.
               </p>
             </div>
             <a className="bumi-button" href="#contact">
@@ -839,11 +847,32 @@ export function VillaBumiPreview() {
             <div className="bumi-form-row">
               <label>
                 Arrival <span className="bumi-optional">(optional)</span>
-                <input name="arrival" type="date" />
+                <input
+                  name="arrival"
+                  type="date"
+                  value={stay.arrival}
+                  onChange={(event) =>
+                    setStay((value) => ({
+                      ...value,
+                      arrival: event.target.value,
+                    }))
+                  }
+                />
               </label>
               <label>
                 Departure <span className="bumi-optional">(optional)</span>
-                <input name="departure" type="date" />
+                <input
+                  name="departure"
+                  type="date"
+                  value={stay.departure}
+                  min={stay.arrival || undefined}
+                  onChange={(event) =>
+                    setStay((value) => ({
+                      ...value,
+                      departure: event.target.value,
+                    }))
+                  }
+                />
               </label>
             </div>
             <label>
@@ -875,6 +904,49 @@ export function VillaBumiPreview() {
               @villabumibali <Arrow diagonal />
             </a>
           </div>
+        </section>
+        <section
+          id="instagram"
+          className="bumi-section bumi-instagram"
+          aria-labelledby="bumi-instagram-heading"
+        >
+          <div className="bumi-section-heading">
+            <div>
+              <p className="bumi-eyebrow">POSTCARDS FROM PECATU</p>
+              <h2 id="bumi-instagram-heading">A little Bumi, every day.</h2>
+            </div>
+            <a
+              className="bumi-text-link"
+              href={villa.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Follow @villabumibali <Arrow diagonal />
+            </a>
+          </div>
+          <p>
+            Slow mornings, sunlit corners, and a view that never gets old.
+            Follow our days at the villa on Instagram.
+          </p>
+          <div className="bumi-instagram-grid">
+            {["pool", "living", "bedroomDetail", "garden"].map((id) => (
+              <a
+                key={id}
+                href={villa.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${photoTitle(id)} — visit @villabumibali on Instagram (new tab)`}
+              >
+                <VillaPhoto id={id} />
+                <span aria-hidden="true">
+                  <Arrow diagonal />
+                </span>
+              </a>
+            ))}
+          </div>
+          <p className="bumi-fine">
+            Photographs from Villa Bumi. Visit Instagram for the latest posts.
+          </p>
         </section>
       </main>
       <footer className="bumi-footer">

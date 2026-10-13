@@ -54,9 +54,9 @@ export const services = [
   {
     slug: "web-design",
     name: "Web design",
-    headline: "A website with a point of view.",
+    headline: "Web design for businesses in Bali.",
     intro:
-      "Your website should make people understand you, trust you, and know what to do next. We bring structure, clarity, and a distinctive visual language to every screen.",
+      "Website design for Bali businesses, from company profiles and villa websites to online stores. We organise your content and design responsive pages that help customers understand your offer and contact you.",
     description:
       "Thoughtful website design, user journeys, and responsive interfaces shaped around your brand and your visitors.",
     shape: "frame",
@@ -106,9 +106,9 @@ export const services = [
   {
     slug: "development",
     name: "Development",
-    headline: "Built to work. Made to last.",
+    headline: "Web development for businesses in Bali.",
     intro:
-      "We turn designs into responsive websites that feel good to use and are straightforward to maintain. The craft continues long after the first screen looks right.",
+      "Looking for a web developer for your Bali business? We build responsive websites from an agreed design, connect the forms, content tools, and integrations you need, and prepare the site for launch and maintenance.",
     description:
       "Responsive website development with attention to performance, accessibility, technical SEO, and maintainable code.",
     shape: "steps",

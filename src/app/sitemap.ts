@@ -1,17 +1,11 @@
 import type { MetadataRoute } from "next";
 import { site } from "@/lib/site";
-import { showcases } from "@/lib/showcase";
 import { publicPaths } from "@/lib/language-routes";
 import { locales, localizedPath } from "@/lib/i18n";
 export default function sitemap(): MetadataRoute.Sitemap {
+  // Index the studio pages and case studies. Standalone design demos are
+  // excluded until their production routes have been verified.
   return [
-    ...showcases
-      .filter((s) => s.category === "Rental")
-      .map((s) => ({
-        url: `${site.url}/showcase/${s.slug}/rentals`,
-        changeFrequency: "monthly" as const,
-        priority: 0.6,
-      })),
     ...publicPaths.flatMap((path) =>
       locales.map((locale) => ({
         url: site.url + localizedPath(path, locale),
@@ -27,10 +21,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: path === "/" ? 1 : 0.7,
       })),
     ),
-    ...showcases.map((s) => ({
-      url: `${site.url}/showcase/${s.slug}`,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    })),
   ];
 }

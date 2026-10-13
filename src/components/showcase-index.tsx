@@ -67,7 +67,7 @@ export function ShowcaseIndex({ locale = "en" }: { locale?: Locale }) {
                 </div>
                 <Image
                   className="showcase-live-preview"
-                  src={`/showcase/previews/${s.slug}.jpg`}
+                  src={`/showcase/previews/${s.category === "Villa" ? "villa-directions/" : ""}${s.slug}.jpg`}
                   alt={`${s.name}: preview of the ${s.category.toLowerCase()} website`}
                   width={1440}
                   height={1100}
