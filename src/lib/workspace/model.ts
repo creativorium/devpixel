@@ -150,3 +150,72 @@ export function initials(name: string) {
       .join("") || "?"
   );
 }
+
+export type Channel = {
+  id: string;
+  name: string;
+  topic: string;
+  created_by: string;
+  created_at: string;
+};
+export type Message = {
+  id: string;
+  channel_id: string;
+  author: string;
+  body: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+};
+
+/** "Client Feedback!" → "client-feedback" (Slack-style channel names). */
+export function channelSlug(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40)
+    .replace(/-+$/, "");
+}
+
+export const channelInput = z.object({
+  name: z
+    .string()
+    .transform(channelSlug)
+    .pipe(z.string().regex(/^[a-z0-9][a-z0-9-]{0,39}$/)),
+  topic: optionalText(200).default(""),
+});
+
+export const messageInput = z.object({
+  channelId: id,
+  body: z.string().trim().min(1).max(4000),
+});
+
+/** Day key and label in the team's time zone, identical on server and browser. */
+export function workspaceDay(iso: string) {
+  return workspaceToday(new Date(iso));
+}
+export function dayLabel(day: string, today = workspaceToday()) {
+  if (day === today) return "Today";
+  if (day === addDays(today, -1)) return "Yesterday";
+  return new Date(`${day}T00:00:00Z`).toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  });
+}
+
+/** Slack-style grouping: same author within five minutes shares one header. */
+export function startsGroup(previous: Message | undefined, message: Message) {
+  if (!previous) return true;
+  if (previous.author !== message.author) return true;
+  if (workspaceDay(previous.created_at) !== workspaceDay(message.created_at))
+    return true;
+  return (
+    new Date(message.created_at).getTime() -
+      new Date(previous.created_at).getTime() >
+    5 * 60 * 1000
+  );
+}

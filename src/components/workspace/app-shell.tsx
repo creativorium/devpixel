@@ -3,10 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { createNote, createProject } from "@/app/(workspace)/teams/actions";
+import {
+  createChannel,
+  createNote,
+  createProject,
+} from "@/app/(workspace)/teams/actions";
 import { signOut } from "@/app/(workspace)/teams/login/actions";
 import { initials, type Member } from "@/lib/workspace/model";
 import { projectColor } from "@/lib/workspace/note-format";
+import type { Channel } from "@/lib/workspace/model";
 import type { SidebarProject } from "@/lib/workspace/queries";
 import Icon from "./icons";
 
@@ -14,10 +19,12 @@ import Icon from "./icons";
 export default function AppShell({
   me,
   projects,
+  channels,
   children,
 }: {
   me: Member;
   projects: SidebarProject[];
+  channels: Channel[];
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -79,7 +86,12 @@ export default function AppShell({
 
           <div className="ws-side-section">
             <span>Projects</span>
-            <NewProject />
+            <InlineCreate
+              label="New project"
+              placeholder="Project name, then Enter"
+              maxLength={120}
+              action={createProject}
+            />
           </div>
           {active.length === 0 && (
             <p className="ws-side-empty">Create a project with +</p>
@@ -93,6 +105,35 @@ export default function AppShell({
                 onNavigate={close}
               />
             ))}
+          </ul>
+
+          <div className="ws-side-section">
+            <span>Channels</span>
+            <InlineCreate
+              label="New channel"
+              placeholder="channel-name, then Enter"
+              maxLength={40}
+              action={createChannel}
+            />
+          </div>
+          <ul className="ws-tree">
+            {channels.map((channel) => {
+              const href = `/teams/c/${channel.id}`;
+              return (
+                <li key={channel.id}>
+                  <SideLink
+                    href={href}
+                    current={pathname === href}
+                    onNavigate={close}
+                  >
+                    <span className="ws-hash" aria-hidden="true">
+                      #
+                    </span>
+                    {channel.name}
+                  </SideLink>
+                </li>
+              );
+            })}
           </ul>
 
           {archived.length > 0 && (
@@ -279,15 +320,25 @@ function ProjectNode({
   );
 }
 
-function NewProject() {
+function InlineCreate({
+  label,
+  placeholder,
+  maxLength,
+  action,
+}: {
+  label: string;
+  placeholder: string;
+  maxLength: number;
+  action: (formData: FormData) => Promise<void>;
+}) {
   const [open, setOpen] = useState(false);
   if (!open)
     return (
       <button
         type="button"
         className="ws-icon-button small"
-        aria-label="New project"
-        title="New project"
+        aria-label={label}
+        title={label}
         onClick={() => setOpen(true)}
       >
         <Icon name="plus" size={14} />
@@ -298,15 +349,15 @@ function NewProject() {
       className="ws-side-new"
       action={async (formData) => {
         setOpen(false);
-        await createProject(formData);
+        await action(formData);
       }}
     >
       <input
         className="ws-input"
         name="name"
-        aria-label="Project name"
-        placeholder="Project name, then Enter"
-        maxLength={120}
+        aria-label={label}
+        placeholder={placeholder}
+        maxLength={maxLength}
         required
         autoFocus
         onKeyDown={(event) => event.key === "Escape" && setOpen(false)}

@@ -4,7 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import {
+  channelInput,
+  messageInput,
   noteInput,
+  type Message,
   positionBetween,
   projectInput,
   taskCreateInput,
@@ -181,4 +184,62 @@ export async function deleteNote(id: string) {
   if (!data) redirect("/teams");
   revalidatePath("/teams", "layout");
   redirect(`/teams/p/${data.project_id}/notes`);
+}
+
+export async function createChannel(formData: FormData) {
+  const { supabase } = await requireMember();
+  const input = channelInput.safeParse({
+    name: formData.get("name") ?? "",
+    topic: formData.get("topic") ?? "",
+  });
+  if (!input.success) redirect("/teams?error=channel");
+  const { data: existing } = await supabase
+    .from("channels")
+    .select("id")
+    .eq("name", input.data.name)
+    .maybeSingle();
+  if (existing) redirect(`/teams/c/${existing.id}`);
+  const { data, error } = await supabase
+    .from("channels")
+    .insert(input.data)
+    .select("id")
+    .single();
+  if (error || !data) redirect("/teams?error=channel");
+  revalidatePath("/teams", "layout");
+  redirect(`/teams/c/${data.id}`);
+}
+
+export type SendResult =
+  { ok: true; message: Message } | { ok: false; message: string };
+
+export async function sendMessage(
+  channelId: string,
+  body: string,
+): Promise<SendResult> {
+  const { supabase } = await requireMember();
+  const input = messageInput.safeParse({ channelId, body });
+  if (!input.success)
+    return { ok: false, message: "Messages need 1–4,000 characters." };
+  // author defaults to the signed-in email; RLS rejects anything else.
+  const { data, error } = await supabase
+    .from("messages")
+    .insert({ channel_id: input.data.channelId, body: input.data.body })
+    .select("*")
+    .single();
+  if (error || !data) return { ok: false, message: "Could not send." };
+  return { ok: true, message: data as Message };
+}
+
+export async function deleteMessage(id: string): Promise<ActionResult> {
+  const { supabase } = await requireMember();
+  if (!uuid.safeParse(id).success) return failed("Unknown message.");
+  // Soft delete so other open chats see the removal on their next poll.
+  const { data, error } = await supabase
+    .from("messages")
+    .update({ body: "", deleted_at: new Date().toISOString() })
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
+  if (error || !data) return failed("You can only delete your own messages.");
+  return { ok: true };
 }

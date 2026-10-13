@@ -1,5 +1,5 @@
 import AppShell from "@/components/workspace/app-shell";
-import { getSidebar } from "@/lib/workspace/queries";
+import { getChannels, getSidebar } from "@/lib/workspace/queries";
 import { requireMember } from "@/lib/workspace/session";
 
 export default async function WorkspaceAppLayout({
@@ -8,9 +8,9 @@ export default async function WorkspaceAppLayout({
   children: React.ReactNode;
 }) {
   const { me } = await requireMember();
-  const projects = await getSidebar();
+  const [projects, channels] = await Promise.all([getSidebar(), getChannels()]);
   return (
-    <AppShell me={me} projects={projects}>
+    <AppShell me={me} projects={projects} channels={channels}>
       {children}
     </AppShell>
   );

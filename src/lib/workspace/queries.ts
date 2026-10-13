@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { z } from "zod";
-import type { Note, Project, Task } from "./model";
+import type { Channel, Message, Note, Project, Task } from "./model";
 import { requireMember } from "./session";
 
 const uuid = z.uuid();
@@ -93,4 +93,52 @@ export async function getNote(projectId: string, noteId: string) {
     .eq("project_id", projectId)
     .maybeSingle();
   return data as Note | null;
+}
+
+export const getChannels = cache(async () => {
+  const { supabase } = await requireMember();
+  const { data } = await supabase
+    .from("channels")
+    .select("id, name, topic, created_by, created_at")
+    .order("name");
+  return (data ?? []) as Channel[];
+});
+
+export const getChannel = cache(async (id: string) => {
+  if (!uuid.safeParse(id).success) return null;
+  const { supabase } = await requireMember();
+  const { data } = await supabase
+    .from("channels")
+    .select("id, name, topic, created_by, created_at")
+    .eq("id", id)
+    .maybeSingle();
+  return data as Channel | null;
+});
+
+export const MESSAGE_PAGE = 200;
+
+/** The latest messages in a channel, oldest first. */
+export async function getMessages(channelId: string) {
+  const { supabase } = await requireMember();
+  const { data } = await supabase
+    .from("messages")
+    .select("*")
+    .eq("channel_id", channelId)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false })
+    .limit(MESSAGE_PAGE);
+  return ((data ?? []) as Message[]).reverse();
+}
+
+/** Messages created, edited or deleted after a cursor (for polling). */
+export async function getMessageChanges(channelId: string, since: string) {
+  const { supabase } = await requireMember();
+  const { data } = await supabase
+    .from("messages")
+    .select("*")
+    .eq("channel_id", channelId)
+    .gt("updated_at", since)
+    .order("updated_at")
+    .limit(MESSAGE_PAGE);
+  return (data ?? []) as Message[];
 }
