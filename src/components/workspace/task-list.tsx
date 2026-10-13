@@ -9,7 +9,9 @@ import {
 } from "@/lib/workspace/model";
 import {
   AddTask,
-  Assignee,
+  Assignees,
+  LabelChips,
+  SubtaskProgress,
   DueLabel,
   PriorityPill,
   StatusDot,
@@ -116,6 +118,10 @@ export default function TaskList({
                             disabled={pending}
                             onClick={() => open(task.id)}
                           >
+                            {store.isBlocked(task) &&
+                              task.status !== "done" && (
+                                <span aria-label="Blocked">🔒 </span>
+                              )}
                             {task.title}
                             {task.details && (
                               <span
@@ -126,10 +132,23 @@ export default function TaskList({
                                 ≡
                               </span>
                             )}
+                            {(task.attachments?.length ?? 0) > 0 && (
+                              <span
+                                className="ws-meta"
+                                aria-label={`${task.attachments!.length} attachments`}
+                              >
+                                {" "}
+                                📎 {task.attachments!.length}
+                              </span>
+                            )}
                           </button>
+                          <LabelChips task={task} />
+                          <span className="ws-meta">
+                            <SubtaskProgress task={task} tasks={store.tasks} />
+                          </span>
                         </span>
                         <span role="cell" data-label="Assignee">
-                          <Assignee team={team} email={task.assignee} />
+                          <Assignees team={team} task={task} />
                         </span>
                         <span role="cell" data-label="Due">
                           <DueLabel task={task} />

@@ -14,6 +14,14 @@ const paths = {
   chart: "M4 20V10M10 20V4M16 20v-7M22 20H2",
   calendar: "M4 6h16v14H4zM4 10h16M8 3v4M16 3v4",
   overview: "M4 4h7v7H4zM13 4h7v4h-7zM13 10h7v10h-7zM4 13h7v7H4z",
+  clip: "m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7",
+  upload: "M12 16V4M7 9l5-5 5 5M4 20h16",
+  bold: "M7 4h6a4 4 0 0 1 0 8H7zM7 12h7a4 4 0 0 1 0 8H7z",
+  italic: "M14 4h-4M14 20h-4M15 4 9 20",
+  heading: "M6 4v16M18 4v16M6 12h12",
+  link: "M10 14a4 4 0 0 0 6 0l3-3a4 4 0 0 0-6-6l-1 1M14 10a4 4 0 0 0-6 0l-3 3a4 4 0 0 0 6 6l1-1",
+  code: "m8 8-5 4 5 4M16 8l5 4-5 4",
+  todo: "M4 5h6v6H4zM14 8h6M4 15l2 2 4-4M14 16h6",
   user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0",
 } as const;
 

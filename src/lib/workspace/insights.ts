@@ -1,6 +1,7 @@
 import {
   addDays,
   statuses,
+  taskAssignees,
   type Member,
   type Task,
   type TaskPriority,
@@ -64,11 +65,15 @@ export function dashboardStats(tasks: Task[], team: Member[], today: string) {
   }));
   const people = [
     ...team.map((m) => m.email),
-    ...(open.some((t) => !t.assignee) ? [null] : []),
+    ...(open.some((t) => taskAssignees(t).length === 0) ? [null] : []),
   ];
   const workload = people
     .map((email) => {
-      const mine = open.filter((t) => t.assignee === email);
+      const mine = open.filter((t) =>
+        email
+          ? taskAssignees(t).includes(email)
+          : taskAssignees(t).length === 0,
+      );
       return {
         email,
         total: mine.length,

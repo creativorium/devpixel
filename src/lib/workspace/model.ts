@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { Attachment } from "./files";
 
 export const statuses = [
   { id: "todo", label: "To do", color: "#e87ba4" },
@@ -13,9 +14,71 @@ export const statusIds = statuses.map((s) => s.id) as [
 ];
 
 export const priorities = ["low", "medium", "high", "urgent"] as const;
+
+/** Task categories, ClickUp-style. Text always accompanies the colour. */
+export const labels = [
+  { id: "bug", label: "Bug", color: "#c2410c" },
+  { id: "blocker", label: "Blocker", color: "#b42318" },
+  { id: "feature", label: "Feature", color: "#2a78d6" },
+  { id: "improvement", label: "Improvement", color: "#0f8a5f" },
+  { id: "design", label: "Design", color: "#7a3fd1" },
+  { id: "content", label: "Content", color: "#8a6100" },
+  { id: "client", label: "Client request", color: "#be3a7a" },
+] as const;
+export type TaskLabel = (typeof labels)[number]["id"];
+export const labelIds = labels.map((l) => l.id) as [TaskLabel, ...TaskLabel[]];
+
+/** Everyone on a task (new list, falling back to the original single assignee). */
+export function taskAssignees(task: {
+  assignees?: string[];
+  assignee: string | null;
+}) {
+  if (task.assignees && task.assignees.length) return task.assignees;
+  return task.assignee ? [task.assignee] : [];
+}
+
+/** Ids of unfinished tasks this task waits for. */
+export function openBlockers(
+  task: { blockers?: { blocked_by: string }[] },
+  all: { id: string; status: string }[],
+) {
+  const ids = new Set((task.blockers ?? []).map((b) => b.blocked_by));
+  return all.filter((t) => ids.has(t.id) && t.status !== "done");
+}
+
+/** All descendants of a task (subtasks, their subtasks, ...). */
+export function descendants<
+  T extends { id: string; parent_id?: string | null },
+>(id: string, all: T[]): T[] {
+  const out: T[] = [];
+  const queue = [id];
+  while (queue.length) {
+    const current = queue.shift()!;
+    for (const t of all)
+      if (t.parent_id === current && !out.includes(t)) {
+        out.push(t);
+        queue.push(t.id);
+      }
+  }
+  return out;
+}
+
+export const dependencyInput = z
+  .object({ taskId: z.uuid(), blockedBy: z.uuid() })
+  .refine((d) => d.taskId !== d.blockedBy);
+export const projectRenameInput = z.object({
+  id: z.uuid(),
+  name: z.string().trim().min(1).max(120),
+});
 export type TaskPriority = (typeof priorities)[number];
 
-export type Member = { email: string; display_name: string };
+export type Member = {
+  email: string;
+  display_name: string;
+  role?: "admin" | "member";
+};
+export const isAdmin = (member: Member | null | undefined) =>
+  member?.role === "admin";
 export type Project = {
   id: string;
   name: string;
@@ -32,12 +95,17 @@ export type Task = {
   status: TaskStatus;
   priority: TaskPriority;
   assignee: string | null;
+  assignees?: string[];
+  labels?: TaskLabel[];
+  parent_id?: string | null;
+  blockers?: { blocked_by: string }[];
   due_date: string | null;
   position: number;
   created_by: string;
   created_at: string;
   updated_at: string;
   completed_at?: string | null;
+  attachments?: Attachment[];
 };
 export type Note = {
   id: string;
@@ -69,6 +137,7 @@ export const taskCreateInput = z.object({
   projectId: id,
   title: requiredText(200),
   status: z.enum(statusIds).default("todo"),
+  parentId: id.nullable().default(null),
 });
 
 export const taskUpdateInput = z.object({
@@ -76,12 +145,14 @@ export const taskUpdateInput = z.object({
   title: requiredText(200),
   details: optionalText(10000).default(""),
   priority: z.enum(priorities),
-  assignee: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .transform((v) => v || null)
-    .pipe(z.email().nullable()),
+  assignees: z
+    .array(z.string().trim().toLowerCase().pipe(z.email()))
+    .max(5)
+    .transform((list) => [...new Set(list)]),
+  labels: z
+    .array(z.enum(labelIds))
+    .max(labelIds.length)
+    .transform((list) => [...new Set(list)]),
   dueDate: z
     .string()
     .trim()
@@ -167,6 +238,7 @@ export type Message = {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+  attachments?: Attachment[];
 };
 
 /** "Client Feedback!" → "client-feedback" (Slack-style channel names). */
@@ -188,9 +260,18 @@ export const channelInput = z.object({
   topic: optionalText(200).default(""),
 });
 
-export const messageInput = z.object({
-  channelId: id,
-  body: z.string().trim().min(1).max(4000),
+export const messageInput = z
+  .object({
+    channelId: id,
+    body: z.string().trim().max(4000),
+    attachmentIds: z.array(id).max(10).default([]),
+  })
+  .refine((m) => m.body.length > 0 || m.attachmentIds.length > 0);
+
+export const importedNoteInput = z.object({
+  projectId: id,
+  title: z.string().trim().min(1).max(200),
+  body: z.string().max(100000),
 });
 
 /** Day key and label in the team's time zone, identical on server and browser. */

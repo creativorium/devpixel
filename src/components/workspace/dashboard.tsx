@@ -6,6 +6,7 @@ import {
   initials,
   memberName,
   statuses,
+  taskAssignees,
   workspaceToday,
 } from "@/lib/workspace/model";
 import { projectColor } from "@/lib/workspace/note-format";
@@ -232,7 +233,9 @@ export default function Dashboard({
                   />
                   <span className="ws-ellipsis">{task.title}</span>
                   <span className="ws-meta">
-                    {memberName(team, task.assignee)}
+                    {taskAssignees(task)
+                      .map((e) => memberName(team, e))
+                      .join(", ") || "Unassigned"}
                   </span>
                   <span
                     className={`ws-due${task.due_date! < today ? " overdue" : ""}`}

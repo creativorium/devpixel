@@ -6,13 +6,66 @@ import { memberName, type Member, type Note } from "@/lib/workspace/model";
 import {
   parseBlocks,
   todoProgress,
+  continueList,
+  insertLink,
+  togglePrefix,
   toggleTodo,
+  toggleWrap,
+  type Edit,
 } from "@/lib/workspace/note-format";
+import Icon, { type IconName } from "./icons";
 import LocalTime from "./local-time";
 import { useMentionPicker } from "./mention-picker";
 import NoteBlocks from "./note-blocks";
 
 const AUTOSAVE_MS = 1200;
+
+type Tool = {
+  label: string;
+  icon: IconName;
+  key?: string;
+  keys?: string;
+  apply: (text: string, start: number, end: number) => Edit;
+};
+const tools: Tool[] = [
+  {
+    label: "Bold",
+    icon: "bold",
+    key: "b",
+    keys: "Ctrl+B",
+    apply: (t, s, e) => toggleWrap(t, s, e, "**", "bold text"),
+  },
+  {
+    label: "Italic",
+    icon: "italic",
+    key: "i",
+    keys: "Ctrl+I",
+    apply: (t, s, e) => toggleWrap(t, s, e, "_", "italic text"),
+  },
+  {
+    label: "Heading",
+    icon: "heading",
+    apply: (t, s, e) => togglePrefix(t, s, e, "## "),
+  },
+  {
+    label: "Bulleted list",
+    icon: "list",
+    apply: (t, s, e) => togglePrefix(t, s, e, "- "),
+  },
+  {
+    label: "To-do",
+    icon: "todo",
+    apply: (t, s, e) => togglePrefix(t, s, e, "[ ] "),
+  },
+  {
+    label: "Code",
+    icon: "code",
+    key: "e",
+    keys: "Ctrl+E",
+    apply: (t, s, e) => toggleWrap(t, s, e, "`", "code"),
+  },
+  { label: "Link", icon: "link", key: "k", keys: "Ctrl+K", apply: insertLink },
+];
 
 // Notion-style page: reads as a formatted document, edits as light Markdown with autosave.
 export default function NoteEditor({
@@ -35,6 +88,21 @@ export default function NoteEditor({
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const latest = useRef({ title, body });
   const mentions = useMentionPicker(body, (next) => edit({ body: next }));
+  const area = useRef<HTMLTextAreaElement>(null);
+
+  function applyEdit(next: Edit) {
+    edit({ body: next.text });
+    requestAnimationFrame(() => {
+      area.current?.focus();
+      area.current?.setSelectionRange(next.start, next.end);
+    });
+  }
+
+  function format(apply: (text: string, start: number, end: number) => Edit) {
+    const el = area.current;
+    if (!el) return;
+    applyEdit(apply(el.value, el.selectionStart, el.selectionEnd));
+  }
 
   // While reading, follow the server copy (a teammate may have edited the page).
   const [syncedAt, setSyncedAt] = useState(note.updated_at);
@@ -158,7 +226,27 @@ export default function NoteEditor({
             placeholder="Untitled"
             onChange={(event) => edit({ title: event.target.value })}
           />
+          <div
+            className="ws-toolbar"
+            role="toolbar"
+            aria-label="Formatting"
+            onMouseDown={(event) => event.preventDefault()}
+          >
+            {tools.map((tool) => (
+              <button
+                key={tool.label}
+                type="button"
+                className="ws-tool"
+                title={tool.label + (tool.keys ? ` (${tool.keys})` : "")}
+                aria-label={tool.label}
+                onClick={() => format(tool.apply)}
+              >
+                <Icon name={tool.icon} size={16} />
+              </button>
+            ))}
+          </div>
           <textarea
+            ref={area}
             className="ws-doc-source"
             aria-label="Page content"
             aria-describedby="ws-format-hint"
@@ -169,7 +257,27 @@ export default function NoteEditor({
             {...mentions.fieldProps}
             onChange={(event) => edit({ body: event.target.value })}
             onKeyDown={(event) => {
-              mentions.onKeyDown(event);
+              if (mentions.onKeyDown(event)) return;
+              const mod = event.ctrlKey || event.metaKey;
+              const tool = mod
+                ? tools.find((t) => t.key === event.key.toLowerCase())
+                : undefined;
+              if (tool) {
+                event.preventDefault();
+                format(tool.apply);
+              } else if (
+                event.key === "Enter" &&
+                !event.shiftKey &&
+                !mod &&
+                !event.nativeEvent.isComposing
+              ) {
+                const el = event.currentTarget;
+                if (el.selectionStart !== el.selectionEnd) return;
+                const next = continueList(el.value, el.selectionStart);
+                if (!next) return;
+                event.preventDefault();
+                applyEdit(next);
+              }
             }}
             onBlur={() => {
               mentions.fieldProps.onBlur();

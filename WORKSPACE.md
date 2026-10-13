@@ -98,4 +98,16 @@ The site then exchanges Google's code itself and hands the verified ID token to 
 Slack-style channels live under **Channels** in the sidebar (`#general` is created for you). Run `supabase/migrations/20261013000000_chat.sql` once in the SQL editor (after the workspace migration). Anyone on the team can create a channel; people can only post as themselves and delete their own messages (enforced by row level security). Open chats check for new messages every 3 seconds while the tab is visible, so the browser never connects to Supabase directly and the site's CSP is unchanged.
 
 ## Profiles, mentions, calendar and dashboard
+
 Run `supabase/migrations/20261014000000_profiles_and_completion.sql` once (after the earlier two). It lets each member change **only their own display name** (Profile page, from the name at the bottom of the sidebar) and records when a task is completed for the dashboard. Type `@` in chat, task descriptions or pages to tag a teammate; tags are stored as `@[Name](email)` and always show the current name. Home lists recent mentions of you.
+
+## Files, labels, subtasks, linked tasks, several assignees and roles
+
+Run `supabase/migrations/20261015000000_files_labels_subtasks.sql` once (after the earlier three), **before** deploying the code that uses it. It adds:
+
+- a **private** `workspace` storage bucket and `attachments` table: screenshots/files on tasks and in chat (paste, drop or attach; 4 MB each; images shown inline, everything else downloads; served only through `/teams/api/files/…` after the team check);
+- task `labels` (Bug, Blocker, Feature, Improvement, Design, Content, Client request), `assignees` (up to 5, existing single assignees are copied over) and `parent_id` for nested subtasks;
+- `task_dependencies`: "blocked by" links. A blocked task cannot leave To do until every task it waits for is Done, enforced by a database trigger; loops are refused;
+- `members.role` (`admin` / `member`). Admins create, rename and delete channels; everyone else can do everything else. The script makes the workspace owner an admin. To change someone: `update public.members set role = 'admin' where email = '…';`
+
+Notes also gained a formatting toolbar (Ctrl/Cmd+B, I, E, K), list continuation on Enter, kept blank lines, and **Import .txt / .md** (read in the browser; no storage).

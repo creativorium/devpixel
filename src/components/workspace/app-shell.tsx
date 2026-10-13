@@ -1,22 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState, useTransition } from "react";
 import {
   createChannel,
   createNote,
   createProject,
+  deleteChannel,
+  removeNote,
+  renameChannel,
+  renameNote,
+  renameProject,
+  setProjectArchived,
 } from "@/app/(workspace)/teams/actions";
 import { signOut } from "@/app/(workspace)/teams/login/actions";
-import { initials, type Member } from "@/lib/workspace/model";
+import {
+  initials,
+  isAdmin,
+  type Channel,
+  type Member,
+} from "@/lib/workspace/model";
 import { projectColor } from "@/lib/workspace/note-format";
-import type { Channel } from "@/lib/workspace/model";
 import type { SidebarProject } from "@/lib/workspace/queries";
-import Icon from "./icons";
+import Icon, { type IconName } from "./icons";
 import { TeamProvider } from "./team-context";
 
-// ClickUp-style workspace sidebar with Notion-style page tree under each project.
+type Result = { ok: boolean; message?: string };
+
+// ClickUp-style workspace sidebar with a Notion-style page tree under each project.
+// Every item can be renamed in place (double-click or ⋯ → Rename) and removed from ⋯.
 export default function AppShell({
   me,
   projects,
@@ -31,11 +44,70 @@ export default function AppShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [drawer, setDrawer] = useState(false);
+  const [error, setError] = useState("");
+  const [, start] = useTransition();
+  // Optimistic names/removals so the sidebar reacts instantly.
+  const [names, setNames] = useState<Record<string, string>>({});
+  const [hidden, setHidden] = useState<Set<string>>(new Set());
   const close = () => setDrawer(false);
-  const active = projects.filter((p) => !p.archived_at);
+  const admin = isAdmin(me);
+  const active = projects.filter((p) => !p.archived_at && !hidden.has(p.id));
   const archived = projects.filter((p) => p.archived_at);
-  const name = me.display_name || me.email;
+  const label = (id: string, fallback: string) => names[id] ?? fallback;
+
+  function act(
+    work: () => Promise<Result>,
+    undo: () => void,
+    after?: () => void,
+  ) {
+    setError("");
+    start(async () => {
+      const result = await work();
+      if (!result.ok) {
+        undo();
+        setError(result.message ?? "Something went wrong.");
+      } else after?.();
+    });
+  }
+
+  function rename(
+    id: string,
+    value: string,
+    save: (v: string) => Promise<Result>,
+  ) {
+    const previous = names[id];
+    setNames((n) => ({ ...n, [id]: value }));
+    act(
+      () => save(value),
+      () =>
+        setNames((n) => {
+          const next = { ...n };
+          if (previous === undefined) delete next[id];
+          else next[id] = previous;
+          return next;
+        }),
+    );
+  }
+
+  function hide(id: string, work: () => Promise<Result>, leaveTo?: string) {
+    setHidden((h) => new Set(h).add(id));
+    act(
+      work,
+      () =>
+        setHidden((h) => {
+          const next = new Set(h);
+          next.delete(id);
+          return next;
+        }),
+      () => {
+        if (leaveTo && pathname.includes(id)) router.push(leaveTo);
+      },
+    );
+  }
+
+  const profile = <ProfileMenu me={me} onNavigate={close} />;
 
   return (
     <div className="ws-app" data-drawer={drawer ? "open" : undefined}>
@@ -53,6 +125,7 @@ export default function AppShell({
         <Link href="/teams" className="ws-brand">
           DevnPixel <span>Teams</span>
         </Link>
+        <span className="ws-push">{profile}</span>
       </header>
       <div className="ws-scrim" onClick={close} aria-hidden="true" />
 
@@ -103,6 +176,12 @@ export default function AppShell({
             Calendar
           </SideLink>
 
+          {error && (
+            <p className="ws-side-error" role="alert">
+              {error}
+            </p>
+          )}
+
           <div className="ws-side-section">
             <span>Projects</span>
             <InlineCreate
@@ -122,37 +201,92 @@ export default function AppShell({
                 project={project}
                 pathname={pathname}
                 onNavigate={close}
+                label={label}
+                hidden={hidden}
+                onRenameProject={(v) =>
+                  rename(project.id, v, (n) => renameProject(project.id, n))
+                }
+                onArchiveProject={() =>
+                  confirm(
+                    `Archive "${label(project.id, project.name)}"? You can restore it from Archived.`,
+                  ) &&
+                  hide(
+                    project.id,
+                    () => setProjectArchived(project.id, true),
+                    "/teams",
+                  )
+                }
+                onRenameNote={(id, v) =>
+                  rename(id, v, (n) => renameNote(id, n))
+                }
+                onDeleteNote={(id, title) =>
+                  confirm(`Delete the page "${title}" for everyone?`) &&
+                  hide(id, () => removeNote(id), `/teams/p/${project.id}/notes`)
+                }
               />
             ))}
           </ul>
 
           <div className="ws-side-section">
             <span>Channels</span>
-            <InlineCreate
-              label="New channel"
-              placeholder="channel-name, then Enter"
-              maxLength={40}
-              action={createChannel}
-            />
+            {admin && (
+              <InlineCreate
+                label="New channel"
+                placeholder="channel-name, then Enter"
+                maxLength={40}
+                action={createChannel}
+              />
+            )}
           </div>
           <ul className="ws-tree">
-            {channels.map((channel) => {
-              const href = `/teams/c/${channel.id}`;
-              return (
-                <li key={channel.id}>
-                  <SideLink
-                    href={href}
-                    current={pathname === href}
-                    onNavigate={close}
-                  >
-                    <span className="ws-hash" aria-hidden="true">
-                      #
-                    </span>
-                    {channel.name}
-                  </SideLink>
-                </li>
-              );
-            })}
+            {channels
+              .filter((c) => !hidden.has(c.id))
+              .map((channel) => {
+                const href = `/teams/c/${channel.id}`;
+                const name = label(channel.id, channel.name);
+                return (
+                  <li key={channel.id}>
+                    <SideItem
+                      href={href}
+                      current={pathname === href}
+                      onNavigate={close}
+                      name={name}
+                      prefix={
+                        <span className="ws-hash" aria-hidden="true">
+                          #
+                        </span>
+                      }
+                      onRename={
+                        admin
+                          ? (v) =>
+                              rename(channel.id, v, (n) =>
+                                renameChannel(channel.id, n, channel.topic),
+                              )
+                          : undefined
+                      }
+                      menu={
+                        admin
+                          ? [
+                              {
+                                label: "Delete channel",
+                                danger: true,
+                                onSelect: () =>
+                                  confirm(
+                                    `Delete #${name} and all its messages and files for everyone?`,
+                                  ) &&
+                                  hide(
+                                    channel.id,
+                                    () => deleteChannel(channel.id),
+                                    "/teams",
+                                  ),
+                              },
+                            ]
+                          : []
+                      }
+                    />
+                  </li>
+                );
+              })}
           </ul>
 
           {archived.length > 0 && (
@@ -163,52 +297,117 @@ export default function AppShell({
               <ul className="ws-tree">
                 {archived.map((p) => (
                   <li key={p.id}>
-                    <SideLink
+                    <SideItem
                       href={`/teams/p/${p.id}`}
                       current={pathname.startsWith(`/teams/p/${p.id}`)}
                       onNavigate={close}
-                    >
-                      {p.name}
-                    </SideLink>
+                      name={label(p.id, p.name)}
+                      menu={[
+                        {
+                          label: "Restore",
+                          onSelect: () =>
+                            act(
+                              () => setProjectArchived(p.id, false),
+                              () => {},
+                            ),
+                        },
+                      ]}
+                    />
                   </li>
                 ))}
               </ul>
             </details>
           )}
         </nav>
-
-        <div className="ws-side-foot">
-          <Link
-            href="/teams/settings"
-            className="ws-side-profile"
-            aria-current={pathname === "/teams/settings" ? "page" : undefined}
-            onClick={close}
-            title="Your profile"
-          >
-            <span
-              className="ws-avatar"
-              style={{ background: projectColor(me.email) }}
-              aria-hidden="true"
-            >
-              {initials(name)}
-            </span>
-            <span className="ws-side-me">{name}</span>
-          </Link>
-          <form action={signOut}>
-            <button type="submit" className="ws-button ghost small">
-              Sign out
-            </button>
-          </form>
-        </div>
       </aside>
 
       <div className="ws-content">
+        <header className="ws-topbar">{profile}</header>
         <TeamProvider team={team} me={me}>
           {children}
         </TeamProvider>
       </div>
     </div>
   );
+}
+
+function ProfileMenu({
+  me,
+  onNavigate,
+}: {
+  me: Member;
+  onNavigate: () => void;
+}) {
+  const name = me.display_name || me.email;
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  useOutsideClose(box, open, () => setOpen(false));
+  return (
+    <div className="ws-profile" ref={box}>
+      <button
+        type="button"
+        className="ws-profile-button"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen(!open)}
+      >
+        <span
+          className="ws-avatar"
+          style={{ background: projectColor(me.email) }}
+          aria-hidden="true"
+        >
+          {initials(name)}
+        </span>
+        <span className="ws-profile-name">{name}</span>
+      </button>
+      {open && (
+        <div className="ws-menu right" role="menu">
+          <div className="ws-menu-head">
+            <strong>{name}</strong>
+            <span className="ws-meta">
+              {me.email} · {isAdmin(me) ? "Admin" : "Member"}
+            </span>
+          </div>
+          <Link
+            href="/teams/settings"
+            role="menuitem"
+            className="ws-menu-item"
+            onClick={() => {
+              setOpen(false);
+              onNavigate();
+            }}
+          >
+            <Icon name="user" /> Your profile
+          </Link>
+          <form action={signOut}>
+            <button type="submit" role="menuitem" className="ws-menu-item">
+              <Icon name="close" /> Sign out
+            </button>
+          </form>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function useOutsideClose(
+  ref: React.RefObject<HTMLElement | null>,
+  open: boolean,
+  close: () => void,
+) {
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (event: MouseEvent) => {
+      if (!ref.current?.contains(event.target as Node)) close();
+    };
+    const onKey = (event: KeyboardEvent) => event.key === "Escape" && close();
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [ref, open, close]);
 }
 
 function SideLink({
@@ -220,7 +419,7 @@ function SideLink({
   depth = 0,
 }: {
   href: string;
-  icon?: Parameters<typeof Icon>[0]["name"];
+  icon?: IconName;
   current: boolean;
   onNavigate: () => void;
   children: React.ReactNode;
@@ -240,14 +439,141 @@ function SideLink({
   );
 }
 
+type MenuItem = { label: string; danger?: boolean; onSelect: () => void };
+
+/** A sidebar row with in-place rename and an optional ⋯ menu. */
+function SideItem({
+  href,
+  current,
+  onNavigate,
+  name,
+  prefix,
+  icon,
+  depth = 0,
+  onRename,
+  menu = [],
+  className = "",
+}: {
+  href: string;
+  current: boolean;
+  onNavigate: () => void;
+  name: string;
+  prefix?: React.ReactNode;
+  icon?: IconName;
+  depth?: number;
+  onRename?: (value: string) => void;
+  menu?: MenuItem[];
+  className?: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  useOutsideClose(box, open, () => setOpen(false));
+  const items: MenuItem[] = [
+    ...(onRename
+      ? [{ label: "Rename", onSelect: () => setEditing(true) }]
+      : []),
+    ...menu,
+  ];
+
+  if (editing && onRename)
+    return (
+      <div className="ws-side-row" style={{ paddingLeft: 6 + depth * 16 }}>
+        <input
+          className="ws-input ws-rename-input"
+          defaultValue={name}
+          aria-label={`Rename ${name}`}
+          maxLength={200}
+          autoFocus
+          onFocus={(event) => event.currentTarget.select()}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") setEditing(false);
+            if (event.key === "Enter") event.currentTarget.blur();
+          }}
+          onBlur={(event) => {
+            const value = event.currentTarget.value.trim();
+            setEditing(false);
+            if (value && value !== name) onRename(value);
+          }}
+        />
+      </div>
+    );
+
+  return (
+    <div className={`ws-side-row${open ? " menu-open" : ""}`} ref={box}>
+      <Link
+        href={href}
+        className={`ws-side-link ${className}`}
+        aria-current={current ? "page" : undefined}
+        onClick={onNavigate}
+        onDoubleClick={(event) => {
+          if (!onRename) return;
+          event.preventDefault();
+          setEditing(true);
+        }}
+        title={onRename ? `${name} — double-click to rename` : name}
+        style={{ paddingLeft: 10 + depth * 16 }}
+      >
+        {icon && <Icon name={icon} />}
+        {prefix}
+        <span className="ws-ellipsis">{name}</span>
+      </Link>
+      {items.length > 0 && (
+        <>
+          <button
+            type="button"
+            className="ws-row-menu"
+            aria-label={`More actions for ${name}`}
+            aria-haspopup="menu"
+            aria-expanded={open}
+            onClick={() => setOpen(!open)}
+          >
+            ⋯
+          </button>
+          {open && (
+            <div className="ws-menu" role="menu">
+              {items.map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  role="menuitem"
+                  className={`ws-menu-item${item.danger ? " danger" : ""}`}
+                  onClick={() => {
+                    setOpen(false);
+                    item.onSelect();
+                  }}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 function ProjectNode({
   project,
   pathname,
   onNavigate,
+  label,
+  hidden,
+  onRenameProject,
+  onArchiveProject,
+  onRenameNote,
+  onDeleteNote,
 }: {
   project: SidebarProject;
   pathname: string;
   onNavigate: () => void;
+  label: (id: string, fallback: string) => string;
+  hidden: Set<string>;
+  onRenameProject: (value: string) => void;
+  onArchiveProject: () => void;
+  onRenameNote: (id: string, value: string) => void;
+  onDeleteNote: (id: string, title: string) => void;
 }) {
   const base = `/teams/p/${project.id}`;
   const inside = pathname === base || pathname.startsWith(`${base}/`);
@@ -258,6 +584,14 @@ function ProjectNode({
     setWasInside(inside);
     if (inside) setOpen(true);
   }
+  const name = label(project.id, project.name);
+  const views: { path: string; label: string; icon: IconName }[] = [
+    { path: "/overview", label: "Overview", icon: "overview" },
+    { path: "", label: "Board", icon: "board" },
+    { path: "/list", label: "List", icon: "list" },
+    { path: "/calendar", label: "Calendar", icon: "calendar" },
+    { path: "/notes", label: "Notes", icon: "notes" },
+  ];
 
   return (
     <li>
@@ -265,7 +599,7 @@ function ProjectNode({
         <button
           type="button"
           className="ws-caret-button"
-          aria-label={`${open ? "Collapse" : "Expand"} ${project.name}`}
+          aria-label={`${open ? "Collapse" : "Expand"} ${name}`}
           aria-expanded={open}
           onClick={() => setOpen(!open)}
         >
@@ -273,93 +607,64 @@ function ProjectNode({
             <Icon name="chevron" size={14} />
           </span>
         </button>
-        <Link
+        <SideItem
           href={base}
-          className="ws-side-link ws-project-link"
-          aria-current={pathname === base ? "page" : undefined}
-          onClick={onNavigate}
-        >
-          <span
-            className="ws-project-dot"
-            style={{ background: projectColor(project.id) }}
-            aria-hidden="true"
-          />
-          <span className="ws-ellipsis">{project.name}</span>
-        </Link>
+          current={pathname === base}
+          onNavigate={onNavigate}
+          name={name}
+          className="ws-project-link"
+          prefix={
+            <span
+              className="ws-project-dot"
+              style={{ background: projectColor(project.id) }}
+              aria-hidden="true"
+            />
+          }
+          onRename={onRenameProject}
+          menu={[{ label: "Archive project", onSelect: onArchiveProject }]}
+        />
       </div>
       {open && (
         <ul className="ws-tree">
-          <li>
-            <SideLink
-              href={`${base}/overview`}
-              icon="overview"
-              depth={1}
-              current={pathname === `${base}/overview`}
-              onNavigate={onNavigate}
-            >
-              Overview
-            </SideLink>
-          </li>
-          <li>
-            <SideLink
-              href={base}
-              icon="board"
-              depth={1}
-              current={pathname === base}
-              onNavigate={onNavigate}
-            >
-              Board
-            </SideLink>
-          </li>
-          <li>
-            <SideLink
-              href={`${base}/list`}
-              icon="list"
-              depth={1}
-              current={pathname === `${base}/list`}
-              onNavigate={onNavigate}
-            >
-              List
-            </SideLink>
-          </li>
-          <li>
-            <SideLink
-              href={`${base}/calendar`}
-              icon="calendar"
-              depth={1}
-              current={pathname === `${base}/calendar`}
-              onNavigate={onNavigate}
-            >
-              Calendar
-            </SideLink>
-          </li>
-          <li>
-            <SideLink
-              href={`${base}/notes`}
-              icon="notes"
-              depth={1}
-              current={pathname === `${base}/notes`}
-              onNavigate={onNavigate}
-            >
-              Notes
-            </SideLink>
-          </li>
-          {project.notes.map((note) => {
-            const href = `${base}/notes/${note.id}`;
-            return (
-              <li key={note.id}>
-                <SideLink
-                  href={href}
-                  icon="doc"
-                  depth={2}
-                  current={pathname === href}
-                  onNavigate={onNavigate}
-                >
-                  {note.title}
-                </SideLink>
-              </li>
-            );
-          })}
+          {views.map((v) => (
+            <li key={v.label}>
+              <SideLink
+                href={base + v.path}
+                icon={v.icon}
+                depth={1}
+                current={pathname === base + v.path}
+                onNavigate={onNavigate}
+              >
+                {v.label}
+              </SideLink>
+            </li>
+          ))}
+          {project.notes
+            .filter((n) => !hidden.has(n.id))
+            .map((note) => {
+              const href = `${base}/notes/${note.id}`;
+              const title = label(note.id, note.title);
+              return (
+                <li key={note.id}>
+                  <SideItem
+                    href={href}
+                    icon="doc"
+                    depth={2}
+                    current={pathname === href}
+                    onNavigate={onNavigate}
+                    name={title}
+                    onRename={(v) => onRenameNote(note.id, v)}
+                    menu={[
+                      {
+                        label: "Delete page",
+                        danger: true,
+                        onSelect: () => onDeleteNote(note.id, title),
+                      },
+                    ]}
+                  />
+                </li>
+              );
+            })}
           <li>
             <form action={createNote.bind(null, project.id)}>
               <button

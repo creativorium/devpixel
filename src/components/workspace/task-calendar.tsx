@@ -11,7 +11,7 @@ import {
   type Task,
 } from "@/lib/workspace/model";
 import { projectColor } from "@/lib/workspace/note-format";
-import { Assignee } from "./task-store";
+import { Assignees } from "./task-store";
 import { useTeam } from "./team-context";
 
 export type CalendarTask = Task & { projectName?: string };
@@ -239,7 +239,7 @@ export default function TaskCalendar({
                 {task.projectName && (
                   <span className="ws-mytask-project">{task.projectName}</span>
                 )}
-                <Assignee team={team} email={task.assignee} />
+                <Assignees team={team} task={task} />
               </Link>
             ))}
           </li>

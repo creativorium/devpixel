@@ -2,21 +2,30 @@
 
 import { useState } from "react";
 import {
+  labels as labelOptions,
   statuses,
   type Member,
   type Task,
+  type TaskLabel,
   type TaskStatus,
 } from "@/lib/workspace/model";
 import {
   AddTask,
-  Assignee,
+  Assignees,
   DueLabel,
+  LabelChips,
+  SubtaskProgress,
   PriorityPill,
   StatusDot,
   StoreError,
   useTaskDialog,
   useTaskStore,
 } from "./task-store";
+import { fileUrl } from "./attachments";
+import { isImage } from "@/lib/workspace/files";
+
+const cover = (task: Task) =>
+  task.attachments?.find((a) => isImage(a.mime)) ?? null;
 
 export default function KanbanBoard({
   projectId,
@@ -32,6 +41,8 @@ export default function KanbanBoard({
   const store = useTaskStore(projectId, serverTasks);
   const { open, dialog } = useTaskDialog(store, team, openTaskId);
   const [dragId, setDragId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<TaskLabel | null>(null);
+  const visible = (task: Task) => !filter || !!task.labels?.includes(filter);
   const [over, setOver] = useState<{
     status: TaskStatus;
     index: number;
@@ -51,9 +62,36 @@ export default function KanbanBoard({
   return (
     <>
       <StoreError message={store.error} />
+      <div className="ws-filter" role="group" aria-label="Filter by label">
+        <span className="ws-meta">Label:</span>
+        <button
+          type="button"
+          className="ws-filter-chip"
+          aria-pressed={filter === null}
+          onClick={() => setFilter(null)}
+        >
+          All
+        </button>
+        {labelOptions.map((l) => (
+          <button
+            key={l.id}
+            type="button"
+            className="ws-filter-chip"
+            aria-pressed={filter === l.id}
+            onClick={() => setFilter(filter === l.id ? null : l.id)}
+          >
+            <span
+              className="ws-swatch"
+              style={{ background: l.color }}
+              aria-hidden="true"
+            />
+            {l.label}
+          </button>
+        ))}
+      </div>
       <div className="ws-board">
         {statuses.map(({ id: status, label }) => {
-          const items = store.column(status);
+          const items = store.column(status).filter(visible);
           return (
             <section
               key={status}
@@ -108,14 +146,43 @@ export default function KanbanBoard({
                       setOver(null);
                     }}
                   >
-                    <span className="ws-task-title">{task.title}</span>
+                    {cover(task) && (
+                      // eslint-disable-next-line @next/next/no-img-element -- private, auth-checked file
+                      <img
+                        className="ws-task-cover"
+                        src={fileUrl(cover(task)!.id)}
+                        alt=""
+                        loading="lazy"
+                        draggable={false}
+                      />
+                    )}
+                    <LabelChips task={task} />
+                    <span className="ws-task-title">
+                      {store.isBlocked(task) && task.status !== "done" && (
+                        <span
+                          title="Blocked by unfinished tasks"
+                          aria-label="Blocked"
+                        >
+                          🔒{" "}
+                        </span>
+                      )}
+                      {task.title}
+                    </span>
                     <span className="ws-task-foot">
                       <PriorityPill priority={task.priority} />
                       <DueLabel task={task} />
                       {task.details && (
                         <span aria-label="Has description">≡</span>
                       )}
-                      <Assignee team={team} email={task.assignee} />
+                      {(task.attachments?.length ?? 0) > 0 && (
+                        <span
+                          aria-label={`${task.attachments!.length} attachments`}
+                        >
+                          📎 {task.attachments!.length}
+                        </span>
+                      )}
+                      <SubtaskProgress task={task} tasks={store.tasks} />
+                      <Assignees team={team} task={task} />
                     </span>
                   </button>
                 );

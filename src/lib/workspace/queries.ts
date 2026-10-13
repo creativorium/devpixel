@@ -4,6 +4,8 @@ import type { Channel, Message, Note, Project, Task } from "./model";
 import { requireMember } from "./session";
 
 const uuid = z.uuid();
+const WITH_FILES =
+  "*, attachments(id, name, mime, size, uploaded_by, created_at)";
 
 export const getProject = cache(async (id: string) => {
   if (!uuid.safeParse(id).success) return null;
@@ -18,12 +20,18 @@ export const getProject = cache(async (id: string) => {
 
 export async function getTasks(projectId: string) {
   const { supabase } = await requireMember();
-  const { data } = await supabase
-    .from("tasks")
-    .select("*")
-    .eq("project_id", projectId)
-    .order("position");
-  return (data ?? []) as Task[];
+  const query = (columns: string) =>
+    supabase
+      .from("tasks")
+      .select(columns)
+      .eq("project_id", projectId)
+      .order("position");
+  const { data, error } = await query(
+    `${WITH_FILES}, blockers:task_dependencies!task_dependencies_task_fk(blocked_by)`,
+  );
+  // Before the attachments migration runs, load tasks without files.
+  if (error) return ((await query("*")).data ?? []) as unknown as Task[];
+  return (data ?? []) as unknown as Task[];
 }
 
 export const getNotes = cache(async (projectId: string) => {
@@ -63,13 +71,18 @@ export type TaskWithProject = Task & { projects: { name: string } | null };
 /** Open tasks assigned to the signed-in member, across active projects. */
 export async function getMyTasks(email: string) {
   const { supabase } = await requireMember();
-  const { data } = await supabase
-    .from("tasks")
-    .select("*, projects!inner(name, archived_at)")
-    .eq("assignee", email)
-    .neq("status", "done")
-    .is("projects.archived_at", null)
-    .order("due_date", { ascending: true, nullsFirst: false });
+  const base = () =>
+    supabase
+      .from("tasks")
+      .select("*, projects!inner(name, archived_at)")
+      .neq("status", "done")
+      .is("projects.archived_at", null)
+      .order("due_date", { ascending: true, nullsFirst: false });
+  const result = await base().contains("assignees", [email]);
+  // Before the assignees migration runs, fall back to the single assignee column.
+  const data = result.error
+    ? (await base().eq("assignee", email)).data
+    : result.data;
   return (data ?? []) as TaskWithProject[];
 }
 
@@ -120,27 +133,33 @@ export const MESSAGE_PAGE = 200;
 /** The latest messages in a channel, oldest first. */
 export async function getMessages(channelId: string) {
   const { supabase } = await requireMember();
-  const { data } = await supabase
-    .from("messages")
-    .select("*")
-    .eq("channel_id", channelId)
-    .is("deleted_at", null)
-    .order("created_at", { ascending: false })
-    .limit(MESSAGE_PAGE);
-  return ((data ?? []) as Message[]).reverse();
+  const query = (columns: string) =>
+    supabase
+      .from("messages")
+      .select(columns)
+      .eq("channel_id", channelId)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false })
+      .limit(MESSAGE_PAGE);
+  const result = await query(WITH_FILES);
+  const data = result.error ? (await query("*")).data : result.data;
+  return ((data ?? []) as unknown as Message[]).reverse();
 }
 
 /** Messages created, edited or deleted after a cursor (for polling). */
 export async function getMessageChanges(channelId: string, since: string) {
   const { supabase } = await requireMember();
-  const { data } = await supabase
-    .from("messages")
-    .select("*")
-    .eq("channel_id", channelId)
-    .gt("updated_at", since)
-    .order("updated_at")
-    .limit(MESSAGE_PAGE);
-  return (data ?? []) as Message[];
+  const query = (columns: string) =>
+    supabase
+      .from("messages")
+      .select(columns)
+      .eq("channel_id", channelId)
+      .gt("updated_at", since)
+      .order("updated_at")
+      .limit(MESSAGE_PAGE);
+  const result = await query(WITH_FILES);
+  const data = result.error ? (await query("*")).data : result.data;
+  return (data ?? []) as unknown as Message[];
 }
 
 export type TaskInProject = Task & { projects: { name: string } };

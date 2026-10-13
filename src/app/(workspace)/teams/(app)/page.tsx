@@ -85,9 +85,11 @@ export default async function HomePage({
       )}
       {error && (
         <p className="ws-notice error" role="alert">
-          {error === "channel"
-            ? "Could not create the channel. Use letters, numbers and dashes (up to 40)."
-            : "Could not create the project. Names need 1–120 characters."}
+          {error === "admin"
+            ? "Only admins can create channels."
+            : error === "channel"
+              ? "Could not create the channel. Use letters, numbers and dashes (up to 40)."
+              : "Could not create the project. Names need 1–120 characters."}
         </p>
       )}
 
