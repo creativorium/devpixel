@@ -111,3 +111,6 @@ Run `supabase/migrations/20261015000000_files_labels_subtasks.sql` once (after t
 - `members.role` (`admin` / `member`). Admins create, rename and delete channels; everyone else can do everything else. The script makes the workspace owner an admin. To change someone: `update public.members set role = 'admin' where email = '…';`
 
 Notes also gained a formatting toolbar (Ctrl/Cmd+B, I, E, K), list continuation on Enter, kept blank lines, and **Import .txt / .md** (read in the browser; no storage).
+
+## Comments, activity, notifications and live updates
+Run `supabase/migrations/20261016000000_comments_activity_notifications.sql` once. It adds task comments, a change history written by database triggers (status, title, due date, priority, labels, assignees), and notifications for @mentions, assignments and comments on your tasks (the bell, top right). It also enables Supabase Realtime for chat messages and notifications; the site's CSP allows the browser to connect to the project in `SUPABASE_URL` only. Until the script runs, these features stay quiet and everything else works as before.

@@ -39,6 +39,7 @@ import {
 import { projectColor } from "@/lib/workspace/note-format";
 import { AttachmentList, namePasted, uploadFile } from "./attachments";
 import Icon from "./icons";
+import TaskFeed from "./task-feed";
 import LocalTime from "./local-time";
 import { useMentionPicker } from "./mention-picker";
 import { Mention } from "./team-context";
@@ -874,6 +875,8 @@ export function TaskDialog({
             </p>
           )}
         </div>
+
+        {saved && <TaskFeed taskId={task.id} />}
 
         <p className="ws-meta">
           Added by {memberName(team, task.created_by)} ·{" "}
