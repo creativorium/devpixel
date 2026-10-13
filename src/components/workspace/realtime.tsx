@@ -3,6 +3,7 @@
 import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { subscribeToChanges } from "@/lib/workspace/realtime";
 
 // Supabase Realtime in the browser: pushes new chat messages and notifications
 // instantly. Row level security still applies, so people only receive rows they
@@ -41,16 +42,6 @@ export function useRealtime(
   });
   useEffect(() => {
     if (!client || !filter) return;
-    const channel = client
-      .channel(`ws-${table}-${filter}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table, filter },
-        () => handler.current(),
-      )
-      .subscribe();
-    return () => {
-      void client.removeChannel(channel);
-    };
+    return subscribeToChanges(client, table, filter, () => handler.current());
   }, [client, table, filter]);
 }
