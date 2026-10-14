@@ -39,6 +39,7 @@ import {
 import { projectColor } from "@/lib/workspace/note-format";
 import { AttachmentList, namePasted, uploadFile } from "./attachments";
 import Icon from "./icons";
+import SubtaskTitle from "./subtask-title";
 import TaskFeed from "./task-feed";
 import TaskTimeLogs from "./task-time-logs";
 import { durationLabel } from "@/lib/workspace/time-logs";
@@ -471,15 +472,8 @@ function SubtaskTree({
                 onChange={() => onToggle(child.id)}
               />
               <StatusDot status={child.status} projectId={child.project_id} />
-              <button
-                type="button"
-                className="ws-subtask-title"
-                disabled={pending}
-                onClick={() => onOpen(child.id)}
-              >
-                {blocked && <span aria-label="Blocked">🔒 </span>}
-                {child.title}
-              </button>
+              <SubtaskTitle id={child.id} title={child.title} disabled={pending} />
+              <button type="button" className="ws-button ghost small" disabled={pending} onClick={() => onOpen(child.id)} aria-label={`Open ${child.title} details`}>Details</button>
               <SubtaskProgress task={child} tasks={tasks} />
               <DueLabel task={child} />
               <Assignees team={team} task={child} />

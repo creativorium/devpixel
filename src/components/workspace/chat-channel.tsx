@@ -1,4 +1,5 @@
 "use client";
+import { PresenceBadge } from "./presence";
 
 import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { deleteMessage, sendMessage } from "@/app/(workspace)/teams/actions";
@@ -204,6 +205,7 @@ export default function ChatChannel({
   return (
     <section className="ws-chat" aria-label={`${chatName}`}>
       <ChannelHeader channel={channel} />
+      {channel.direct_members && <div className="ws-chat-presence">{channel.direct_members.filter(email => email !== me.email).map(email => <span key={email}>{memberName(team, email)} <PresenceBadge email={email} /></span>)}</div>}
 
       <div
         ref={scroller}

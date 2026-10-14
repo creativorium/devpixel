@@ -31,6 +31,7 @@ import { RealtimeProvider } from "./realtime";
 import { useReadMarks } from "./read-marks";
 import { TeamProvider } from "./team-context";
 import { StatusProvider } from "./status-context";
+import { PresenceProvider } from "./presence";
 import AccessMonitor from "./access-monitor";
 import { useProjectOrder } from "./project-order";
 import { moveProject, orderedProjects } from "@/lib/workspace/project-order";
@@ -178,7 +179,7 @@ export default function AppShell({
 
   return (
     <RealtimeProvider config={realtime}>
-      <StatusProvider projects={projects}>
+      <StatusProvider projects={projects}><PresenceProvider>
         <AccessMonitor />
         <div className="ws-app" data-drawer={drawer ? "open" : undefined}>
           <header className="ws-mobilebar" inert={drawer}>
@@ -263,6 +264,7 @@ export default function AppShell({
               >
                 Calendar
               </SideLink>
+              <SideLink href="/teams/people" icon="user" current={pathname === "/teams/people"} onNavigate={close}>Team</SideLink>
 
               {error && (
                 <p className="ws-side-error" role="alert">
@@ -468,7 +470,7 @@ export default function AppShell({
             onOpenChange={setPalette}
           />
         </div>
-      </StatusProvider>
+      </PresenceProvider></StatusProvider>
     </RealtimeProvider>
   );
 }

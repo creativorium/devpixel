@@ -29,6 +29,16 @@ export type ActionResult = { ok: true } | { ok: false; message: string };
 const failed = (message: string): ActionResult => ({ ok: false, message });
 const uuid = z.uuid();
 
+export async function renameTaskTitle(id: string, title: string): Promise<ActionResult> {
+  const { supabase } = await requireMember();
+  const parsed = z.string().trim().min(1).max(200).safeParse(title);
+  if (!uuid.safeParse(id).success || !parsed.success) return failed("Enter a title between 1 and 200 characters.");
+  const { data, error } = await supabase.from("tasks").update({ title: parsed.data }).eq("id", id).select("id").single();
+  if (error || !data) return failed("Could not rename this task. Check your access and try again.");
+  revalidatePath("/teams", "layout");
+  return { ok: true };
+}
+
 export async function createProject(formData: FormData) {
   const { supabase } = await requireMember();
   const input = projectInput.safeParse({

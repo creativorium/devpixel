@@ -11,7 +11,7 @@ import { useStatuses } from "./status-context";
 import { useMentionPicker } from "./mention-picker";
 import { RichText, useTeam } from "./team-context";
 
-// ClickUp/Plane-style activity: history and comments in one timeline.
+// Keep the conversation first, with the task audit trail below it.
 export default function TaskFeed({
   taskId,
   historySummary,
@@ -89,26 +89,14 @@ export default function TaskFeed({
     }
   }
 
-  const visible = (items ?? []).filter(
-    (i) => showHistory || i.kind === "comment",
-  );
+  const comments = (items ?? []).filter((i) => i.kind === "comment");
+  const history = (items ?? []).filter((i) => i.kind === "activity");
 
   return (
-    <section className="ws-task-section ws-feed" aria-label="Activity">
+    <section className="ws-task-section ws-feed" aria-label="Comments and history">
       <div className="ws-task-files-head">
-        <span className="ws-field">Activity</span>
-        <label className="ws-check">
-          <input
-            type="checkbox"
-            checked={showHistory}
-            onChange={(event) => setShowHistory(event.target.checked)}
-          />
-          Show history
-        </label>
+        <span className="ws-field">Comments</span>
       </div>
-      {showHistory && historySummary && (
-        <div className="ws-feed-summary ws-meta">{historySummary}</div>
-      )}
       {unavailable && (
         <p className="ws-meta">
           Comments need the latest database update (WORKSPACE.md).
@@ -118,30 +106,8 @@ export default function TaskFeed({
         <p className="ws-meta">Loading…</p>
       ) : (
         <ol className="ws-feed-list">
-          {visible.map((item) => {
+          {comments.map((item) => {
             const name = memberName(team, item.author);
-            if (item.kind === "activity")
-              return (
-                <li key={`a-${item.id}`} className="ws-feed-event">
-                  <span className="ws-feed-dot" aria-hidden="true" />
-                  <span>
-                    <strong>{name}</strong>{" "}
-                    {describeActivity(item.type, item.detail, team, statuses)}
-                    <span className="ws-meta">
-                      {" · "}
-                      <LocalTime
-                        iso={item.at}
-                        options={{
-                          day: "numeric",
-                          month: "short",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        }}
-                      />
-                    </span>
-                  </span>
-                </li>
-              );
             return (
               <li key={`c-${item.id}`} className="ws-feed-comment">
                 <span
@@ -182,7 +148,7 @@ export default function TaskFeed({
               </li>
             );
           })}
-          {visible.length === 0 && (
+          {comments.length === 0 && (
             <li className="ws-meta">No comments yet.</li>
           )}
         </ol>
@@ -220,6 +186,29 @@ export default function TaskFeed({
           {error}
         </p>
       )}
+      <section className="ws-feed-history" aria-label="Task history">
+        <div className="ws-task-files-head">
+          <span className="ws-field">Activity</span>
+          <label className="ws-check">
+            <input type="checkbox" checked={showHistory} onChange={event => setShowHistory(event.target.checked)} />
+            Show history
+          </label>
+        </div>
+        {showHistory && <>
+          {historySummary && <div className="ws-feed-summary ws-meta">{historySummary}</div>}
+          {items === null ? <p className="ws-meta">Loading history…</p> : <ol className="ws-feed-list">
+            {history.map(item => <li key={`a-${item.id}`} className="ws-feed-event">
+              <span className="ws-feed-dot" aria-hidden="true" />
+              <span>
+                <strong>{memberName(team, item.author)}</strong>{" "}
+                {describeActivity(item.type, item.detail, team, statuses)}
+                <span className="ws-meta">{" · "}<LocalTime iso={item.at} options={{ day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }} /></span>
+              </span>
+            </li>)}
+            {history.length === 0 && <li className="ws-meta">No history yet.</li>}
+          </ol>}
+        </>}
+      </section>
     </section>
   );
 }

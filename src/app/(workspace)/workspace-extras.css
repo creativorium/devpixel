@@ -1096,6 +1096,11 @@ kbd {
 .ws-feed-composer textarea {
   flex: 1;
 }
+.ws-feed-history {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
 
 /* ---------- Error screen ---------- */
 .ws-error-panel {
@@ -1112,4 +1117,35 @@ kbd {
   font-size: 12px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+.ws-presence { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #626a76; white-space: nowrap; }
+.ws-presence i { width: 8px; height: 8px; border-radius: 50%; background: #a6adb7; }
+.ws-presence i.online { background: #159965; box-shadow: 0 0 0 3px #15996518; }
+.ws-team-directory { max-width: 760px; }
+.ws-team-directory-head { display: flex; align-items: center; gap: 12px; }
+.ws-team-directory-head h1 { margin: 0; font-size: 26px; line-height: 1.3; letter-spacing: -.6px; }
+.ws-team-directory .ws-team-directory-hint { margin: 8px 0 20px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.ws-people-list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.ws-person { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid var(--line); background: var(--ws-panel); border-radius: 12px; }
+.ws-person > .ws-avatar { flex-shrink: 0; }
+.ws-person-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.ws-person-info strong { font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
+.ws-person-you { font-weight: 400; color: var(--muted); }
+.ws-person-email { font-size: 12px; line-height: 1.4; color: var(--muted); overflow-wrap: anywhere; }
+.ws-person > .ws-presence { flex-shrink: 0; }
+@media (max-width: 480px) {
+  .ws-person { flex-wrap: wrap; gap: 8px; padding: 12px; }
+  .ws-person-info { flex-basis: calc(100% - 44px); }
+  .ws-person > .ws-presence { margin-left: 36px; }
+}
+.ws-chat-presence { display: flex; flex-wrap: wrap; gap: 16px; padding: 10px 22px; border-bottom: 1px solid #dce2eb; font-size: 12px; }
+.ws-chat-presence > span { display: inline-flex; gap: 8px; align-items: center; }
+.ws-inline-subtask { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.ws-inline-subtask .ws-input { flex: 1; width: auto; min-width: 120px; min-height: 30px; padding: 6px 10px; font-size: 13px; }
+.ws-inline-subtask [role=alert] { width: 100%; color: #b42318; font-size: 12px; }
+@media (max-width: 480px) {
+  .ws-subtask { flex-wrap: wrap; }
+  .ws-inline-subtask:has(.ws-input) { flex-basis: calc(100% - 32px); }
+  .ws-inline-subtask .ws-input { flex-basis: 100%; }
 }

@@ -275,3 +275,11 @@ required. Project/channel headings now show Everyone, Selected members or
 Admins only; wide boards also show project progress, upcoming tasks and tips.
 
 Run `supabase/migrations/20261016000000_comments_activity_notifications.sql` once. It adds task comments, a change history written by database triggers (status, title, due date, priority, labels, assignees), and notifications for @mentions, assignments and comments on your tasks (the bell, top right). It also enables Supabase Realtime for chat messages and notifications; the site's CSP allows the browser to connect to the project in `SUPABASE_URL` only. Until the script runs, these features stay quiet and everything else works as before.
+
+## Local database scripts and presence
+
+SQL migrations are maintained locally in `supabase/migrations/` and ignored by Git. Keep a separate private backup: fresh clones do not include these scripts. Existing Git history still contains previously committed migrations. The isolated database integration test requires the local migration folder.
+
+Apply `20261026000000_member_presence.sql` in Supabase after the existing migrations to enable the Team page and private-chat presence. Online means a signed-in teammate had Teams visible within the last 90 seconds, with heartbeats every 30 seconds. Connection/setup failures show Status unavailable. Presence does not indicate whether someone is working, and does not track their location. Heartbeats derive identity from authentication and use database timestamps.
+
+Subtask titles can be clicked to rename inline. Enter or Save saves the title, Escape or Cancel discards the edit, and Details opens the full task.

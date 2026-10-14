@@ -13,3 +13,6 @@ output/
 
 # Local secrets and setup notes (never commit)
 .supabasenote/
+
+# Database migrations are maintained locally.
+supabase/migrations/

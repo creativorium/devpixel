@@ -499,6 +499,14 @@ assert.equal((await first("select display_name from members where email=$1",['ne
 await assert.rejects(()=>db.query("select admin_save_member($1,'Admin','member',false)",[admin]),/own admin role/);
 await login('new@example.test');
 assert.equal((await first("select is_member() as member")).member,true);
+await db.query("select touch_member_presence()");
+assert.equal((await first("select email from member_presence where email='new@example.test'")).email,'new@example.test');
+await assert.rejects(() => db.query("insert into member_presence(email) values ($1)",[allowed]), /permission denied/);
+await login(allowed);
+assert.equal(await count("member_presence"),1);
+await login('outsider@example.test');
+assert.equal(await count("member_presence"),0);
+await assert.rejects(() => db.query("select touch_member_presence()"), /Membership required/);
 await db.close();
 console.log(
   "PASS: full migrations and rerun; public defaults; admin-only controls; project/chat/content/file isolation; forged paths; notifications; custom statuses; revocation and restoration; outsider denial.",
