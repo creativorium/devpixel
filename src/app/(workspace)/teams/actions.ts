@@ -162,7 +162,7 @@ export async function deleteTask(id: string): Promise<ActionResult> {
     .eq("id", id)
     .select("project_id")
     .single();
-  if (error || !data) return failed("Could not delete the task.");
+  if (error || !data) return failed(error?.code === "42501" ? "Task deletion was denied. Check your project access." : `Could not delete the task${error?.code ? ` (${error.code})` : ""}. Refresh and try again.`);
   revalidatePath("/teams", "layout");
   return { ok: true };
 }
@@ -493,6 +493,8 @@ export async function deleteChannel(id: string): Promise<ActionResult> {
   const { supabase, me } = await requireMember();
   if (!isAdmin(me)) return failed("Only admins can delete channels.");
   if (!uuid.safeParse(id).success) return failed("Unknown channel.");
+  const { data: channel } = await supabase.from("channels").select("*").eq("id", id).maybeSingle();
+  if (!channel || channel.direct_members) return failed("Private conversations cannot be deleted as channels.");
   // Stored files first; the messages and file rows go with the channel.
   const { data: files } = await supabase
     .from("attachments")

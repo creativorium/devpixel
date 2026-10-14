@@ -26,11 +26,14 @@ import type { SidebarProject } from "@/lib/workspace/queries";
 import Icon, { type IconName } from "./icons";
 import CommandPalette from "./command-palette";
 import NotificationBell from "./notification-bell";
+import DirectMessages from "./direct-messages";
 import { RealtimeProvider } from "./realtime";
 import { useReadMarks } from "./read-marks";
 import { TeamProvider } from "./team-context";
 import { StatusProvider } from "./status-context";
 import AccessMonitor from "./access-monitor";
+import { useProjectOrder } from "./project-order";
+import { moveProject, orderedProjects } from "@/lib/workspace/project-order";
 
 type Result = { ok: boolean; message?: string };
 
@@ -97,7 +100,22 @@ export default function AppShell({
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const close = () => setDrawer(false);
   const admin = isAdmin(me);
-  const active = projects.filter((p) => !p.archived_at && !hidden.has(p.id));
+  const projectOrder = useProjectOrder(me.email);
+  const active = orderedProjects(
+    projects.filter((p) => !p.archived_at && !hidden.has(p.id)),
+    projectOrder.order,
+  );
+  const [dragProject, setDragProject] = useState<string | null>(null);
+  function reorderProject(id: string, target: string, after = false) {
+    setError("");
+    const ids = active.map((project) => project.id);
+    if (!projectOrder.save(moveProject(ids, id, target, after))) {
+      setError(
+        "Could not save project order. Allow browser storage and try again.",
+      );
+    }
+    setDragProject(null);
+  }
   const archived = projects.filter((p) => p.archived_at);
   const label = (id: string, fallback: string) => names[id] ?? fallback;
 
@@ -265,7 +283,7 @@ export default function AppShell({
                 <p className="ws-side-empty">Create a project with +</p>
               )}
               <ul className="ws-tree">
-                {active.map((project) => (
+                {active.map((project, index) => (
                   <ProjectNode
                     key={project.id}
                     project={project}
@@ -273,6 +291,30 @@ export default function AppShell({
                     onNavigate={close}
                     label={label}
                     hidden={hidden}
+                    onMoveUp={
+                      index > 0
+                        ? () => reorderProject(project.id, active[index - 1].id)
+                        : undefined
+                    }
+                    onMoveDown={
+                      index < active.length - 1
+                        ? () =>
+                            reorderProject(
+                              project.id,
+                              active[index + 1].id,
+                              true,
+                            )
+                        : undefined
+                    }
+                    onDragStart={() => setDragProject(project.id)}
+                    onDragEnd={() => setDragProject(null)}
+                    dragging={dragProject === project.id}
+                    onDropProject={
+                      dragProject
+                        ? (after) =>
+                            reorderProject(dragProject, project.id, after)
+                        : undefined
+                    }
                     onRenameProject={(v) =>
                       rename(project.id, v, (n) => renameProject(project.id, n))
                     }
@@ -317,7 +359,7 @@ export default function AppShell({
               </div>
               <ul className="ws-tree">
                 {channels
-                  .filter((c) => !hidden.has(c.id))
+                  .filter((c) => !c.direct_members && !hidden.has(c.id))
                   .map((channel) => {
                     const href = `/teams/c/${channel.id}`;
                     const name = label(channel.id, channel.name);
@@ -374,6 +416,8 @@ export default function AppShell({
                     );
                   })}
               </ul>
+
+              <DirectMessages channels={channels} team={team} me={me} pathname={pathname} unread={unread} close={close} />
 
               {archived.length > 0 && (
                 <details className="ws-side-archived">
@@ -663,6 +707,12 @@ function ProjectNode({
   hidden,
   onRenameProject,
   onArchiveProject,
+  onMoveUp,
+  onMoveDown,
+  onDragStart,
+  onDragEnd,
+  dragging,
+  onDropProject,
   onRenameNote,
   onDeleteNote,
 }: {
@@ -673,6 +723,12 @@ function ProjectNode({
   hidden: Set<string>;
   onRenameProject: (value: string) => void;
   onArchiveProject?: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  onDragStart: () => void;
+  onDragEnd: () => void;
+  dragging: boolean;
+  onDropProject?: (after: boolean) => void;
   onRenameNote: (id: string, value: string) => void;
   onDeleteNote: (id: string, title: string) => void;
 }) {
@@ -696,7 +752,36 @@ function ProjectNode({
 
   return (
     <li>
-      <div className="ws-project-row">
+      <div
+        className={`ws-project-row${dragging ? " is-dragging" : ""}`}
+        onDragOver={(event) => {
+          if (onDropProject) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = "move";
+          }
+        }}
+        onDrop={(event) => {
+          if (!onDropProject) return;
+          event.preventDefault();
+          const bounds = event.currentTarget.getBoundingClientRect();
+          onDropProject(event.clientY > bounds.top + bounds.height / 2);
+        }}
+      >
+        <button
+          type="button"
+          draggable
+          className="ws-project-grip"
+          aria-label={`Drag to reorder ${name}; use project menu to move up or down`}
+          title="Drag to reorder. Or use Move up / Move down in the project menu."
+          onDragStart={(event) => {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", project.id);
+            onDragStart();
+          }}
+          onDragEnd={onDragEnd}
+        >
+          ⠿
+        </button>
         <button
           type="button"
           className="ws-caret-button"
@@ -722,11 +807,15 @@ function ProjectNode({
             />
           }
           onRename={onRenameProject}
-          menu={
-            onArchiveProject
+          menu={[
+            ...(onMoveUp ? [{ label: "Move up", onSelect: onMoveUp }] : []),
+            ...(onMoveDown
+              ? [{ label: "Move down", onSelect: onMoveDown }]
+              : []),
+            ...(onArchiveProject
               ? [{ label: "Archive project", onSelect: onArchiveProject }]
-              : undefined
-          }
+              : []),
+          ]}
         />
       </div>
       {open && (

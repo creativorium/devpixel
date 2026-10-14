@@ -85,6 +85,7 @@ test("dashboard counts open, overdue, due soon and done this week", () => {
   });
   const a = stats.workload.find((w) => w.email === "a@x.co")!;
   assert.equal(a.total, 2);
+  assert.equal(stats.workload.some(row => row.email === "b@x.co"), false);
   assert.equal(a.overdue, 1);
   assert.equal(stats.workload.find((w) => w.email === null)!.total, 1);
   assert.equal(stats.byPriority.find((p) => p.priority === "urgent")!.count, 1);

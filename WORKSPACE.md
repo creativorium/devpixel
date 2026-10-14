@@ -132,6 +132,21 @@ boards retain their default statuses and editing reports a setup error.
 
 ## Admin-controlled visibility
 
+### Personal sidebar ordering
+
+Drag a project's grip in the left sidebar to place it above or below another
+project, or use its menu's **Move up** / **Move down** actions (also available on
+mobile). The order is stored per account in the current browser; it does not
+reorder another member's sidebar or change access. New projects appear after
+previously ordered projects. No database migration is needed.
+
+**Blocked by** requires another saved task in the project. Open the task that
+must wait and choose its prerequisite under **Blocked by**. Once the prerequisite
+is completed, the waiting task can move out of the starting status. Use the remove
+button beside a linked task to unlink it. Circular dependencies are rejected.
+
+### Visibility setup
+
 After the existing migrations (including `20261017000000_project_statuses.sql`),
 run `supabase/migrations/20261018000000_resource_visibility.sql` in the Supabase
 SQL editor. This migration has been tested locally; it is not automatically
@@ -161,5 +176,90 @@ node tests/resource-visibility.mjs ./output/status-db-check/node_modules/@electr
 ```
 
 ## Comments, activity, notifications and live updates
+
+The bell receives assignments, task-description/comment/chat mentions (select a
+person from the `@` suggestions), and comments on assigned tasks. Self-actions
+do not notify the actor. Realtime updates have a 60-second polling fallback;
+opening the bell or focusing the window also refreshes it. Loading failures show
+a retry message. These are in-app notifications, not email or device push alerts.
+
+## Direct messages and optional time logs (local preview)
+
+Migration `20261024000000_chat_management.sql` supersedes the separate-conversation
+behavior below: Add people now extends the current conversation, preserving its
+ID and giving new participants access to existing messages and attachments. Any
+current participant can add teammates up to five total or confirm Delete chat
+for everyone. Unrelated admins cannot manage it. Header and sidebar controls use
+the same dialogs. Old browser-hidden chats are shown again; removal is now chat
+deletion rather than a sidebar preference. Time reports offer Date range with
+Start date and End date calendar inputs.
+
+Apply `20261023000000_private_groups.sql` after migration 22 to enable private
+groups (up to five participants including you). Use + to select teammates, or a
+conversation's options → Add people. A changed participant set opens a separate
+conversation, preserving the previous private history. The same participant set
+reopens its existing conversation. Options also provide Move up/down and Remove
+from sidebar. Ordering and hidden chats are personal to this browser/account;
+Removed chats restores them without deleting anyone's messages. Notifications
+continue for hidden conversations.
+
+After migration 19, run `20261020000000_direct_messages.sql`, then
+`20261021000000_task_time_logs.sql` in the Supabase SQL editor. Both are safe to
+rerun. Keep migration order when recreating the database.
+
+**Direct messages** appears below Channels. Use + and choose a teammate; an
+existing conversation between that pair reopens. Every new private message
+notifies its recipient. The conversation, messages and uploaded files are
+limited by database policies to the two participants, including against other
+workspace admins. The normal chat UI supports replies and attachments. Private
+conversations cannot be renamed, expanded into groups or deleted as channels.
+The sidebar discovers new conversations on focus or within a minute; the bell
+also links directly to new messages. Database/project owners retain operational
+access; these messages are not end-to-end encrypted.
+
+**Time logs** defaults to Off on every project. Admins toggle it in the project
+header. Enabled tasks allow manual dated hours/minutes and a required work note;
+logs save separately from task details. Members edit/delete their own entries;
+admins can manage entries in accessible projects. Logs are limited to 24 hours
+per entry. Disabling logging blocks writes without deleting history.
+
+Apply `20261022000000_time_log_activity.sql` after migration 21 for card totals
+and activity history. Existing logs are backfilled once. Tasks show a compact
+total with **Log time** and **Manage logs** buttons opening a popup. Saving,
+editing and deleting entries creates Activity events. Card totals count only
+the task's own logs, not subtask logs. Both the main Dashboard and project
+Overview show reports; Overview is restricted to that project.
+
+Dashboard → Time logged supports day, Monday–Sunday week, month and custom date
+ranges up to one year, plus teammate/project filters. Totals include all matching
+entries; notes link back to their task. Historical entries remain in reports for
+accessible projects even when logging is off. No automatic timer or invoice
+charging is added. Test locally at `http://localhost:3000/teams` after applying
+the migrations. These changes have not been deployed.
+
+Supabase quota is shown at https://supabase.com/dashboard/org/_/usage. Select the
+correct organization and review Database Size, Storage Size and Egress.
+
+## Task-based invoice setup
+
+Run `supabase/migrations/20261019000000_project_invoices.sql` after migration 18.
+Use the latest complete file; it is safe to rerun. Admins can open a project and
+choose **Create invoice**, select tasks and optionally group subtasks into line
+descriptions, then edit the invoice. Rates begin at zero for review. Billing
+defaults and the task/invoice register are admin-only. Removed invoice lines
+are excluded from the saved task links; repeat billing requires acknowledgement.
+
+Drafts stay in this browser, scoped by account and project. Resume a draft to
+continue editing. Saving a short link writes to the configured Google Sheet and
+records the linked tasks in Supabase. PDF exports and snapshot links do not mark
+tasks invoiced. A timed-out save must be checked against the Sheet before retrying;
+the reserved invoice ID prevents automatically appending a duplicate.
+
+Test at `http://localhost:3000/teams` with `npm run dev -- --port 3000` and the
+existing local authentication and Sheets environment configuration. Previewing
+and editing drafts does not write to Sheets, but **saving a short link locally
+writes to the configured Sheet**, just as production does. No new secret is
+required. Project/channel headings now show Everyone, Selected members or
+Admins only; wide boards also show project progress, upcoming tasks and tips.
 
 Run `supabase/migrations/20261016000000_comments_activity_notifications.sql` once. It adds task comments, a change history written by database triggers (status, title, due date, priority, labels, assignees), and notifications for @mentions, assignments and comments on your tasks (the bell, top right). It also enables Supabase Realtime for chat messages and notifications; the site's CSP allows the browser to connect to the project in `SUPABASE_URL` only. Until the script runs, these features stay quiet and everything else works as before.

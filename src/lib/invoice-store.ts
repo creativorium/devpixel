@@ -151,8 +151,10 @@ export function validateStoredInvoice(value: unknown): Invoice {
 export async function saveInvoice(
   value: unknown,
   request: SheetRequest = sheetRequest,
+  reservedId?: string,
 ) {
   const data = validateStoredInvoice(value);
+  if (reservedId && !invoiceIdPattern.test(reservedId)) throw new Error("Invalid invoice identifier");
   const headers = (await request("Invoices!A1:I1")).values?.[0];
   if (
     !headers ||
@@ -164,7 +166,7 @@ export async function saveInvoice(
     )
   )
     throw new Error("Invoice sheet headers missing");
-  const id = randomBytes(18).toString("base64url");
+  const id = reservedId ?? randomBytes(18).toString("base64url");
   const url = `${site.url}/i/${id}`;
   // RAW is essential: user-supplied values must never become spreadsheet formulas.
   const result = await request("Invoices!A:I", [

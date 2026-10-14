@@ -1,0 +1,103 @@
+.ws-billing-controls {
+  margin: 24px 0;
+}
+.ws-billing-controls h2 {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+.ws-billing-controls h3 {
+  margin: 28px 0 12px;
+  font-size: 17px;
+}
+.ws-billing-controls p {
+  margin: 12px 0;
+}
+.ws-billing-defaults {
+  padding: 20px;
+  border: 1px solid #dce2eb;
+  border-radius: 16px;
+  background: #fff;
+}
+.ws-billing-defaults summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.ws-billing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.ws-billing-defaults > label {
+  margin: 16px 0;
+}
+.ws-billing-check {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  cursor: pointer;
+}
+.ws-billing-check input {
+  flex-shrink: 0;
+}
+.ws-billing-check small {
+  display: block;
+  color: #92611b;
+  margin-top: 5px;
+}
+.ws-billing-tasks {
+  max-height: 440px;
+  overflow: auto;
+  border-block: 1px solid #dce2eb;
+  margin: 14px 0;
+}
+.ws-billing-tasks label {
+  border-bottom: 1px solid #e8ecf3;
+}
+.ws-billing-history {
+  list-style: none;
+  padding: 0;
+}
+.ws-billing-history li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid #dce2eb;
+}
+.ws-linked-invoice {
+  padding: 0;
+  max-width: none;
+}
+@media (max-width: 800px) {
+  .ws-billing-grid {
+    grid-template-columns: 1fr;
+  }
+  .ws-linked-invoice .invoice-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+@media print {
+  .ws-body:has(.ws-linked-invoice) .ws-side,
+  .ws-body:has(.ws-linked-invoice) .ws-mobilebar,
+  .ws-body:has(.ws-linked-invoice) .ws-topbar,
+  .ws-body:has(.ws-linked-invoice) .ws-page-head,
+  .ws-body:has(.ws-linked-invoice) .ws-views,
+  .ws-body:has(.ws-linked-invoice) .ws-billing-controls {
+    display: none !important;
+  }
+  .ws-body:has(.ws-linked-invoice),
+  .ws-body:has(.ws-linked-invoice) .ws-app,
+  .ws-body:has(.ws-linked-invoice) .ws-content,
+  .ws-body:has(.ws-linked-invoice) .ws-main,
+  .ws-body:has(.ws-linked-invoice) .ws-page {
+    display: block;
+    height: auto;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+  }
+}

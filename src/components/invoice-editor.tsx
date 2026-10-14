@@ -9,7 +9,17 @@ import {
 import { InvoicePaper } from "./invoice-paper";
 import { createInvoiceSnapshot } from "@/lib/invoice-share";
 const storageKey = "devnpixel.invoice.v1";
-export function InvoiceEditor() {
+export function InvoiceEditor({
+  initialInvoice,
+  draftStorageKey = storageKey,
+  onSaveShortLink,
+}: {
+  initialInvoice?: Invoice;
+  draftStorageKey?: string;
+  onSaveShortLink?: (
+    invoice: Invoice,
+  ) => Promise<{ url: string; warning?: string }>;
+} = {}) {
   const [data, setData] = useState<Invoice | null>(null);
   const [status, setStatus] = useState(
     "Drafts stay in this browser. Export a backup to keep a copy.",
@@ -21,9 +31,9 @@ export function InvoiceEditor() {
   const [reset, setReset] = useState(false);
   const file = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    let initial = newInvoice();
+    let initial = initialInvoice ?? newInvoice();
     try {
-      const saved = localStorage.getItem(storageKey);
+      const saved = !initialInvoice && localStorage.getItem(draftStorageKey);
       if (saved) {
         const parsed = invoiceSchema.safeParse(JSON.parse(saved));
         if (parsed.success) initial = parsed.data;
@@ -38,15 +48,15 @@ export function InvoiceEditor() {
       );
     }
     setData(initial);
-  }, []);
+  }, [initialInvoice, draftStorageKey]);
   useEffect(() => {
     if (!data) return;
     try {
-      localStorage.setItem(storageKey, JSON.stringify(data));
+      localStorage.setItem(draftStorageKey, JSON.stringify(data));
     } catch {
       setStatus("Draft could not be saved. Please export a JSON backup.");
     }
-  }, [data]);
+  }, [data, draftStorageKey]);
   if (!data)
     return (
       <div className="invoice-loading" role="status">
@@ -87,15 +97,19 @@ export function InvoiceEditor() {
           <i /> LOCAL WORKSPACE
         </span>
         <div>
-          <button className="button small" onClick={() => setReset(true)}>
-            New invoice +
-          </button>
-          <button
-            className="button small"
-            onClick={() => file.current?.click()}
-          >
-            Import JSON ↑
-          </button>
+          {!onSaveShortLink && (
+            <button className="button small" onClick={() => setReset(true)}>
+              New invoice +
+            </button>
+          )}
+          {!onSaveShortLink && (
+            <button
+              className="button small"
+              onClick={() => file.current?.click()}
+            >
+              Import JSON ↑
+            </button>
+          )}
           <button
             className="button small"
             onClick={() => {
@@ -223,39 +237,55 @@ export function InvoiceEditor() {
           Save a fixed copy to your private invoice register. Anyone with the
           link can view this invoice.
         </p>
-        <label>
-          Owner password
-          <input
-            type="password"
-            autoComplete="off"
-            maxLength={256}
-            value={ownerPassword}
-            onChange={(e) => setOwnerPassword(e.target.value)}
-          />
-        </label>
+        {onSaveShortLink && (
+          <p>
+            Saving also records the linked tasks in Teams. Draft previews and
+            PDF exports do not mark tasks as invoiced.
+          </p>
+        )}
+        {!onSaveShortLink && (
+          <label>
+            Owner password
+            <input
+              type="password"
+              autoComplete="off"
+              maxLength={256}
+              value={ownerPassword}
+              onChange={(e) => setOwnerPassword(e.target.value)}
+            />
+          </label>
+        )}
         <button
           className="button small"
-          disabled={sharing || !valid || ownerPassword.length < 32}
+          disabled={
+            sharing || !valid || (!onSaveShortLink && ownerPassword.length < 32)
+          }
           onClick={async () => {
             setShortStatus("Saving invoice to Google Sheets...");
             setSharing(true);
             try {
-              const response = await fetch("/api/invoices", {
-                method: "POST",
-                signal: AbortSignal.timeout(35_000),
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: "Bearer " + ownerPassword,
-                },
-                body: JSON.stringify(data),
-              });
-              const result = await response.json().catch(() => {
-                throw new Error(
-                  "The server did not return an invoice response. Check the Netlify function logs and your Sheet before retrying.",
-                );
-              });
-              if (!response.ok)
-                throw new Error(result.message || "Could not save invoice.");
+              const saveStandalone = async () => {
+                const response = await fetch("/api/invoices", {
+                  method: "POST",
+                  signal: AbortSignal.timeout(35_000),
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + ownerPassword,
+                  },
+                  body: JSON.stringify(data),
+                });
+                const result = await response.json().catch(() => {
+                  throw new Error(
+                    "The server did not return an invoice response. Check the Netlify function logs and your Sheet before retrying.",
+                  );
+                });
+                if (!response.ok)
+                  throw new Error(result.message || "Could not save invoice.");
+                return result as { url: string; warning?: string };
+              };
+              const result = onSaveShortLink
+                ? await onSaveShortLink(data)
+                : await saveStandalone();
               setShareUrl(result.url);
               try {
                 await navigator.clipboard.writeText(result.url);
@@ -267,6 +297,7 @@ export function InvoiceEditor() {
                   "Short link saved. Copy it from the field below.",
                 );
               }
+              if (result.warning) setShortStatus(result.warning);
             } catch (error) {
               setShortStatus(
                 error instanceof Error
@@ -289,7 +320,7 @@ export function InvoiceEditor() {
             are valid.
           </p>
         )}
-        {ownerPassword.length < 32 && (
+        {!onSaveShortLink && ownerPassword.length < 32 && (
           <p>
             Enter your complete owner password (at least 32 characters) to
             enable saving.

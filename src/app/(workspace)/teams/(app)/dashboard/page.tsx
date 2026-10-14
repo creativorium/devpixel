@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Dashboard from "@/components/workspace/dashboard";
+import TimeReport from "@/components/workspace/time-report";
 import { dashboardStats } from "@/lib/workspace/insights";
 import { workspaceToday, allProjectStatuses } from "@/lib/workspace/model";
 import { getAllTasks, getSidebar } from "@/lib/workspace/queries";
@@ -38,6 +39,7 @@ export default async function WorkspaceDashboardPage() {
         )}
         projects={progress}
       />
+      <TimeReport />
     </div>
   );
 }

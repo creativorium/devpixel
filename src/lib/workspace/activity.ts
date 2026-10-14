@@ -16,6 +16,19 @@ export function describeActivity(
   const statusLabel = (id: unknown) =>
     options.find((s) => s.id === id)?.label ?? "Other status";
   switch (type) {
+    case "time_logged":
+    case "time_updated":
+    case "time_deleted": {
+      const minutes = Number(detail.minutes) || 0;
+      const duration = `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
+      const verb =
+        type === "time_logged"
+          ? "logged"
+          : type === "time_updated"
+            ? "updated a time log to"
+            : "removed a time log of";
+      return `${verb} ${duration} for ${String(detail.work_date ?? "")}: ${String(detail.note ?? "")}`;
+    }
     case "created":
       return "created this task";
     case "status":

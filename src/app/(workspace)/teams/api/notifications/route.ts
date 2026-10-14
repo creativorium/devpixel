@@ -8,7 +8,7 @@ const headers = { "Cache-Control": "private, no-store" };
 export type Notification = {
   id: number;
   actor: string;
-  kind: "mention" | "assigned" | "comment";
+  kind: "mention" | "assigned" | "comment" | "direct";
   project_id: string | null;
   task_id: string | null;
   channel_id: string | null;
@@ -33,6 +33,12 @@ export async function GET() {
       .select("id", { count: "exact", head: true })
       .is("read_at", null),
   ]);
+  if (list.error || unread.error) {
+    return NextResponse.json(
+      { error: "Could not load notifications. Please try again." },
+      { status: 503, headers },
+    );
+  }
   return NextResponse.json(
     { items: (list.data ?? []) as Notification[], unread: unread.count ?? 0 },
     { headers },

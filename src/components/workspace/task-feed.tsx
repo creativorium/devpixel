@@ -27,6 +27,15 @@ export default function TaskFeed({
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState("");
   const [showHistory, setShowHistory] = useState(true);
+  const [revision, setRevision] = useState(0);
+  useEffect(() => {
+    const refresh = (event: Event) => {
+      if ((event as CustomEvent).detail === taskId)
+        setRevision((value) => value + 1);
+    };
+    window.addEventListener("workspace:time-logged", refresh);
+    return () => window.removeEventListener("workspace:time-logged", refresh);
+  }, [taskId]);
   const mentions = useMentionPicker(draft, setDraft);
 
   useEffect(() => {
@@ -42,7 +51,7 @@ export default function TaskFeed({
     return () => {
       alive = false;
     };
-  }, [taskId]);
+  }, [taskId, revision]);
 
   async function post() {
     const body = draft.trim();

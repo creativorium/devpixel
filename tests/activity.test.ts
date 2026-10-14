@@ -8,6 +8,7 @@ const team = [
 ];
 
 test("activity lines read naturally", () => {
+  assert.equal(describeActivity("time_logged", { minutes: 240, work_date: "2026-10-14", note: "Deploy to production" }, team), "logged 4h 0m for 2026-10-14: Deploy to production");
   assert.equal(describeActivity("created", {}, team), "created this task");
   assert.equal(
     describeActivity("status", { from: "todo", to: "in_progress" }, team),

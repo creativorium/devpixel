@@ -96,7 +96,7 @@ export function dashboardStats(
         ) as Record<Exclude<TaskStatus, "done">, number>,
       };
     })
-    .filter((row) => row.total > 0 || row.email !== null);
+    .filter((row) => row.total > 0);
   return {
     statuses,
     total: tasks.length,

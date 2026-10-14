@@ -40,6 +40,8 @@ import { projectColor } from "@/lib/workspace/note-format";
 import { AttachmentList, namePasted, uploadFile } from "./attachments";
 import Icon from "./icons";
 import TaskFeed from "./task-feed";
+import TaskTimeLogs from "./task-time-logs";
+import { durationLabel } from "@/lib/workspace/time-logs";
 import { useStatuses } from "./status-context";
 import LocalTime from "./local-time";
 import { useMentionPicker } from "./mention-picker";
@@ -98,8 +100,12 @@ export function useTaskStore(projectId: string, serverTasks: Task[]) {
     setError("");
     startTransition(async () => {
       change(optimistic);
-      const result = await action();
-      if (!result.ok) setError(result.message ?? "Something went wrong.");
+      try {
+        const result = await action();
+        if (!result.ok) setError(result.message ?? "Something went wrong.");
+      } catch {
+        setError("The request could not finish. Refresh to check the task, then try again.");
+      }
     });
   }
 
@@ -337,11 +343,11 @@ export function Assignees({
 }
 
 export function LabelChips({ task }: { task: Task }) {
-  if (!task.labels?.length) return null;
+  if (!task.labels?.length && !task.logged_minutes) return null;
   return (
     <span className="ws-labels">
       {labelOptions
-        .filter((l) => task.labels!.includes(l.id))
+        .filter((l) => task.labels?.includes(l.id))
         .map((l) => (
           <span
             key={l.id}
@@ -351,6 +357,7 @@ export function LabelChips({ task }: { task: Task }) {
             {l.label}
           </span>
         ))}
+      {!!task.logged_minutes && <span className="ws-label" title="Total time logged on this task">{durationLabel(task.logged_minutes)}</span>}
     </span>
   );
 }
@@ -516,6 +523,7 @@ export function TaskDialog({
   const statuses = useStatuses(task.project_id);
   const [copied, setCopied] = useState(false);
   const [duplicating, setDuplicating] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [details, setDetails] = useState(task.details);
   const mentions = useMentionPicker(details, setDetails);
   const tagged = [...new Set(mentionedEmails(details))];
@@ -730,6 +738,7 @@ export function TaskDialog({
               ))}
             </fieldset>
 
+            <TaskTimeLogs key={task.id} taskId={task.id} />
             <label className="ws-field ws-mention-host">
               Description
               {mentions.popup}
@@ -788,6 +797,18 @@ export function TaskDialog({
 
             <section className="ws-task-section" aria-label="Linked tasks">
               <span className="ws-field">Blocked by (must be done first)</span>
+              <p className="ws-meta">
+                {!saved
+                  ? "Wait for this task to finish saving before linking another task."
+                  : linkable.length === 0 && blockers.length === 0
+                    ? "Create another task in this project first, then select it here as a prerequisite."
+                    : "Select a task that must finish first. Complete that task before moving this one out of the starting status."}
+              </p>
+              {store.error && (
+                <p className="ws-notice error" role="alert">
+                  {store.error}
+                </p>
+              )}
               {blockers.length > 0 && (
                 <ul className="ws-links">
                   {blockers.map((b) => (
@@ -956,16 +977,15 @@ export function TaskDialog({
           <button
             type="button"
             className="ws-button danger small"
-            onClick={() =>
-              confirm(
-                descendants(task.id, all).length
-                  ? "Delete this task and all its subtasks?"
-                  : "Delete this task?",
-              ) && onDelete()
-            }
+            onClick={() => setConfirmDelete(true)}
           >
             Delete
           </button>
+          {confirmDelete && <div className="ws-delete-confirm" role="alert">
+            <p>Delete this task{descendants(task.id, all).length ? " and its subtasks" : ""}? Comments, attachments and time logs will also be removed.</p>
+            <button type="button" className="ws-button danger small" onClick={onDelete}>Delete task</button>
+            <button type="button" className="ws-button ghost small" onClick={() => setConfirmDelete(false)}>Keep task</button>
+          </div>}
           <button
             type="button"
             className="ws-button ghost"
@@ -1045,6 +1065,7 @@ export function TaskMenu({
   onClose: () => void;
 }) {
   const box = useRef<HTMLDivElement>(null);
+  const [deleteReady, setDeleteReady] = useState(false);
   const statuses = useStatuses(task.project_id);
   const [copied, setCopied] = useState(false);
   const closeRef = useRef(onClose);
@@ -1121,20 +1142,15 @@ export function TaskMenu({
         )}
       <div className="ws-menu-sep" />
       {item(
-        "Delete",
+        deleteReady ? "Confirm delete task" : "Delete",
         () => {
+          if (!deleteReady) { setDeleteReady(true); return; }
           onClose();
-          if (
-            confirm(
-              descendants(task.id, store.tasks).length
-                ? "Delete this task and all its subtasks?"
-                : "Delete this task?",
-            )
-          )
-            store.remove(task.id);
+          store.remove(task.id);
         },
         true,
       )}
+      {deleteReady && <><p className="ws-meta">Includes subtasks, comments, files and time logs.</p>{item("Keep task", () => setDeleteReady(false))}</>}
     </div>
   );
 }

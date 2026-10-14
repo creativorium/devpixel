@@ -1,7 +1,9 @@
 import Link from "next/link";
+import TimeTrackingToggle from "@/components/workspace/time-tracking-toggle";
 import { notFound } from "next/navigation";
 import ArchiveButton from "@/components/workspace/archive-button";
 import ResourceVisibility from "@/components/workspace/resource-visibility";
+import VisibilityBadge from "@/components/workspace/visibility-badge";
 import { requireMember } from "@/lib/workspace/session";
 import { isAdmin } from "@/lib/workspace/model";
 import ProjectTabs from "@/components/workspace/project-tabs";
@@ -38,9 +40,12 @@ export default async function ProjectLayout({
               />
               {project.name}
             </h1>
+            <VisibilityBadge visibleTo={project.visible_to} />
             {isAdmin(me) && (
               <div className="ws-resource-actions">
+                <Link className="ws-button small" href={`/teams/p/${project.id}/invoices`}>Create invoice</Link>
                 <ResourceVisibility kind="project" id={project.id} />
+                <TimeTrackingToggle projectId={project.id} enabled={Boolean(project.time_tracking_enabled)} />
                 <ArchiveButton
                   projectId={project.id}
                   archived={Boolean(project.archived_at)}

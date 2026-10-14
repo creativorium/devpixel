@@ -33,7 +33,7 @@ export default function ProjectTabs({ projectId }: { projectId: string }) {
           href={tab.href}
           aria-current={tab.on ? "page" : undefined}
         >
-          <Icon name={tab.icon} /> {tab.label}
+          <Icon name={tab.icon} size={19} /> {tab.label}
         </Link>
       ))}
     </nav>

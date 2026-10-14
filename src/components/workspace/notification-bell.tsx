@@ -14,6 +14,7 @@ import { InlineText } from "./team-context";
 const POLL_MS = 60_000;
 
 const verb: Record<Notification["kind"], string> = {
+  direct: "sent you a private message",
   mention: "mentioned you",
   assigned: "assigned you",
   comment: "commented on your task",
@@ -31,6 +32,8 @@ export default function NotificationBell({
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<Notification[]>([]);
   const [unread, setUnread] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const box = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
@@ -38,24 +41,31 @@ export default function NotificationBell({
       const res = await fetch("/teams/api/notifications", {
         cache: "no-store",
       });
-      if (!res.ok || !res.headers.get("content-type")?.includes("json")) return;
+      if (!res.ok || !res.headers.get("content-type")?.includes("json")) {
+        throw new Error("Notifications unavailable");
+      }
       const data = (await res.json()) as {
         items: Notification[];
         unread: number;
       };
       setItems(data.items);
       setUnread(data.unread);
+      setLoaded(true);
+      setLoadError(false);
     } catch {
-      // offline; try again later
+      setLoadError(true);
     }
   }, []);
 
   useEffect(() => {
     const first = setTimeout(() => void load(), 0);
     const timer = setInterval(() => !document.hidden && void load(), POLL_MS);
+    const onFocus = () => void load();
+    window.addEventListener("focus", onFocus);
     return () => {
       clearTimeout(first);
       clearInterval(timer);
+      window.removeEventListener("focus", onFocus);
     };
   }, [load]);
   useRealtime("notifications", `recipient=eq.${me.email}`, () => void load());
@@ -117,7 +127,10 @@ export default function NotificationBell({
         }
         aria-haspopup="dialog"
         aria-expanded={open}
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          if (!open) void load();
+          setOpen(!open);
+        }}
       >
         <Icon name="bell" size={18} />
         {unread > 0 && (
@@ -142,7 +155,16 @@ export default function NotificationBell({
               </button>
             )}
           </div>
-          {items.length === 0 ? (
+          {loadError && (
+            <p className="ws-inbox-empty" role="status">
+              Could not refresh notifications.{' '}
+              <button type="button" className="ws-inline-link" onClick={() => void load()}>
+                Try again
+              </button>
+            </p>
+          )}
+          {!loaded && !loadError && <p className="ws-inbox-empty">Loading notifications…</p>}
+          {loaded && !loadError && items.length === 0 ? (
             <p className="ws-inbox-empty">
               You&apos;re all caught up. Mentions, assignments and comments on
               your tasks show up here.

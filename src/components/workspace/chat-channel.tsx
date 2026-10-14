@@ -6,6 +6,7 @@ import {
   dayLabel,
   initials,
   memberName,
+  privateChatName,
   startsGroup,
   workspaceDay,
   type Channel,
@@ -52,6 +53,7 @@ export default function ChatChannel({
   team: Member[];
   me: Member;
 }) {
+  const chatName = channel.direct_members ? privateChatName(channel, team, me.email) : "#" + channel.name;
   const [messages, setMessages] = useState<Shown[]>(initial);
   const [error, setError] = useState("");
   const [draft, setDraft] = useState("");
@@ -200,7 +202,7 @@ export default function ChatChannel({
   const today = workspaceDay(new Date().toISOString());
 
   return (
-    <section className="ws-chat" aria-label={`#${channel.name}`}>
+    <section className="ws-chat" aria-label={`${chatName}`}>
       <ChannelHeader channel={channel} />
 
       <div
@@ -216,8 +218,8 @@ export default function ChatChannel({
       >
         {messages.length === 0 ? (
           <div className="ws-chat-empty">
-            <strong>Welcome to #{channel.name}</strong>
-            <p>This is the start of the channel. Say hello to the team.</p>
+            <strong>{channel.direct_members ? `Start your conversation with ${chatName}` : `Welcome to ${chatName}`}</strong>
+            <p>{channel.direct_members ? "Messages and attachments here are shared only with this conversation’s participants." : "This is the start of the channel. Say hello to the team."}</p>
           </div>
         ) : (
           messages.map((message, i) => {
@@ -376,8 +378,8 @@ export default function ChatChannel({
             value={draft}
             rows={1}
             maxLength={4000}
-            aria-label={`Message #${channel.name}`}
-            placeholder={`Message #${channel.name}`}
+            aria-label={`Message ${chatName}`}
+            placeholder={`Message ${chatName}`}
             {...mentions.fieldProps}
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={(event) => {

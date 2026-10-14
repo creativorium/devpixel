@@ -9,6 +9,7 @@ import "./task-detail.css";
 import "./mobile-navigation.css";
 import "./statuses.css";
 import "./visibility.css";
+import "./billing.css";
 import { site } from "@/lib/site";
 
 const sans = localFont({

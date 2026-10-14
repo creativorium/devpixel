@@ -21,6 +21,31 @@ test("owner authentication rejects missing, short and incorrect passwords", () =
   assert.equal(ownerAuthorized("Bearer short", "short"), false);
 });
 
+test("a Teams invoice uses its reserved identifier and rejects invalid identifiers before writing", async () => {
+  const data = { ...newInvoice(), client: "Example" };
+  const id = "T".repeat(24);
+  let saved: unknown;
+  const request: SheetRequest = async (_range, values) => {
+    if (values) {
+      saved = values[0][0];
+      return { updates: { updatedRows: 1 } };
+    }
+    return { values: [invoiceHeaders] };
+  };
+  assert.equal((await saveInvoice(data, request, id)).id, id);
+  assert.equal(saved, id);
+  await assert.rejects(
+    saveInvoice(
+      data,
+      async () => {
+        throw new Error("Must not access Google");
+      },
+      "invalid",
+    ),
+    /Invalid invoice identifier/,
+  );
+});
+
 test("short links store independent invoices, find only the requested row and respect revocation", async () => {
   const rows: (string | number)[][] = [];
   const request: SheetRequest = async (range, values) => {

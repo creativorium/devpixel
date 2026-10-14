@@ -2,17 +2,25 @@
 
 import { useState, useTransition } from "react";
 import { renameChannel } from "@/app/(workspace)/teams/actions";
-import { channelSlug, isAdmin, type Channel } from "@/lib/workspace/model";
+import { channelSlug, isAdmin, privateChatName, type Channel } from "@/lib/workspace/model";
 import { useTeam } from "./team-context";
 import ResourceVisibility from "./resource-visibility";
+import VisibilityBadge from "./visibility-badge";
+import PrivateChatControls from "./private-chat-controls";
 
 export default function ChannelHeader({ channel }: { channel: Channel }) {
-  const { me } = useTeam();
+  const { me, team } = useTeam();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(channel.name);
   const [topic, setTopic] = useState(channel.topic);
   const [error, setError] = useState("");
   const [pending, start] = useTransition();
+
+  if (channel.direct_members) return <header className="ws-chat-head">
+    <h1>{privateChatName(channel, team, me?.email ?? "")}</h1>
+    <span className="ws-meta">Private · {channel.direct_members.length === 2 ? "Only you two" : `${channel.direct_members.length} participants`}</span>
+    <div className="ws-resource-actions"><PrivateChatControls channel={channel}/></div>
+  </header>;
 
   if (!editing)
     return (
@@ -21,6 +29,7 @@ export default function ChannelHeader({ channel }: { channel: Channel }) {
           <span aria-hidden="true">#</span>
           {channel.name}
         </h1>
+        <VisibilityBadge visibleTo={channel.visible_to} />
         {channel.topic && <p>{channel.topic}</p>}
         {isAdmin(me) && (
           <div className="ws-resource-actions">

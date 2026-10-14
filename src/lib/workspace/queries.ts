@@ -31,7 +31,19 @@ export async function getTasks(projectId: string) {
   );
   // Before the attachments migration runs, load tasks without files.
   if (error) return ((await query("*")).data ?? []) as unknown as Task[];
-  return (data ?? []) as unknown as Task[];
+  const { data: totals } = await supabase.rpc("project_time_totals", {
+    project: projectId,
+  });
+  const minutes = new Map(
+    (totals ?? []).map((row: { task_id: string; minutes: number }) => [
+      row.task_id,
+      Number(row.minutes),
+    ]),
+  );
+  return ((data ?? []) as unknown as Task[]).map((task) => ({
+    ...task,
+    logged_minutes: Number(minutes.get(task.id) ?? 0),
+  }));
 }
 
 export const getNotes = cache(async (projectId: string) => {
@@ -113,7 +125,7 @@ export async function getNote(projectId: string, noteId: string) {
 
 export const getChannels = cache(async () => {
   const { supabase } = await requireMember();
-  const columns = "id, name, topic, created_by, created_at";
+  const columns = "*";
   // The newest message per channel powers the sidebar's unread dots.
   const withLatest = await supabase
     .from("channels")
@@ -135,7 +147,7 @@ export const getChannel = cache(async (id: string) => {
   const { supabase } = await requireMember();
   const { data } = await supabase
     .from("channels")
-    .select("id, name, topic, created_by, created_at")
+    .select("*")
     .eq("id", id)
     .maybeSingle();
   return data as Channel | null;

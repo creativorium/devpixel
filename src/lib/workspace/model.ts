@@ -132,6 +132,8 @@ export type Member = {
 export const isAdmin = (member: Member | null | undefined) =>
   member?.role === "admin";
 export type Project = {
+  time_tracking_enabled?: boolean;
+  visible_to?: string[] | null;
   statuses?: StatusDefinition[];
   id: string;
   name: string;
@@ -141,6 +143,7 @@ export type Project = {
   archived_at: string | null;
 };
 export type Task = {
+  logged_minutes?: number;
   id: string;
   project_id: string;
   title: string;
@@ -277,12 +280,17 @@ export function initials(name: string) {
 }
 
 export type Channel = {
+  direct_members?: string[] | null;
+  visible_to?: string[] | null;
   id: string;
   name: string;
   topic: string;
   created_by: string;
   created_at: string;
 };
+export function privateChatName(channel: Channel, team: Member[], email: string) {
+  return (channel.direct_members ?? []).filter(member => member !== email).map(member => memberName(team, member)).join(", ");
+}
 export type Message = {
   id: string;
   channel_id: string;

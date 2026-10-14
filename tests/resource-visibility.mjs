@@ -34,6 +34,8 @@ await db.exec(
     "utf8",
   ),
 );
+await db.exec(await fs.readFile("supabase/migrations/20261020000000_direct_messages.sql", "utf8"));
+await db.exec(await fs.readFile("supabase/migrations/20261024000000_chat_management.sql", "utf8"));
 const admin = "admin@example.test",
   allowed = "allowed@example.test",
   excluded = "excluded@example.test";
@@ -338,6 +340,154 @@ await assert.rejects(
   () => db.query("select can_access_project($1)", [p]),
   /permission denied/,
 );
+await db.exec("reset role");
+await db.exec(
+  await fs.readFile(
+    "supabase/migrations/20261019000000_project_invoices.sql",
+    "utf8",
+  ),
+);
+await login(admin);
+await db.query(
+  "insert into project_billing(project_id,details) values ($1,$2)",
+  [p, JSON.stringify({ client: "Private client" })],
+);
+const reservationId = "00000000-0000-4000-8000-000000000111";
+await db.query(
+  "insert into project_invoices(id,project_id,share_id,invoice_number,fingerprint,task_ids) values ($1,$2,$3,'TEST','hash',$4)",
+  [reservationId, p, "A".repeat(24), [t]],
+);
+await assert.rejects(
+  () =>
+    db.query(
+      "insert into project_invoices(id,project_id,share_id,invoice_number,fingerprint,task_ids) values (gen_random_uuid(),$1,$2,'TEST','hash',$3)",
+      [p, "B".repeat(24), [t]],
+    ),
+  /already included/,
+);
+await assert.rejects(
+  () =>
+    db.query(
+      "insert into project_invoices(id,project_id,share_id,invoice_number,fingerprint,task_ids) values (gen_random_uuid(),$1,$2,'TEST','hash',$3)",
+      [p, "B".repeat(24), [t2]],
+    ),
+  /must belong/,
+);
+await db.query("update project_invoices set state='saved' where id=$1", [
+  reservationId,
+]);
+await login(allowed);
+assert.equal(await count("project_billing"), 0);
+assert.equal(await count("project_invoices"), 0);
+await assert.rejects(
+  () => db.query("insert into project_billing(project_id) values ($1)", [p2]),
+  /row-level security/,
+);
+await assert.rejects(
+  () =>
+    db.query(
+      "insert into project_invoices(id,project_id,share_id,invoice_number,fingerprint,task_ids) values (gen_random_uuid(),$1,$2,'TEST','hash',$3)",
+      [p, "C".repeat(24), [t]],
+    ),
+  /Only admins/,
+);
+// Exercise assignment, mention and comment delivery as separate signed-in users.
+await login(admin);
+const notificationTask = (await first(
+  "insert into tasks(project_id,title,assignees) values ($1,'Notification checks',$2) returning id",
+  [p2, [allowed, admin]],
+)).id;
+await login(allowed);
+assert.equal(await count("notifications", "where task_id=$1 and kind='assigned'", [notificationTask]), 1);
+await login(admin);
+assert.equal(await count("notifications", "where task_id=$1", [notificationTask]), 0);
+await db.query("update tasks set title='Updated title' where id=$1", [notificationTask]);
+await db.query("update tasks set details=$2 where id=$1", [notificationTask, `Please check @[Allowed](${allowed})`]);
+await db.query("insert into task_comments(task_id,body) values ($1,$2)", [notificationTask, `Hi @[Allowed](${allowed})`]);
+await db.query("insert into task_comments(task_id,body) values ($1,'A follow-up')", [notificationTask]);
+await login(allowed);
+assert.equal(await count("notifications", "where task_id=$1 and kind='assigned'", [notificationTask]), 1);
+assert.equal(await count("notifications", "where task_id=$1 and kind='mention'", [notificationTask]), 2);
+assert.equal(await count("notifications", "where task_id=$1 and kind='comment'", [notificationTask]), 1);
+await db.query("update notifications set read_at=now() where task_id=$1", [notificationTask]);
+assert.equal(await count("notifications", "where task_id=$1 and read_at is null", [notificationTask]), 0);
+// A member can start a DM; the same pair reuses it in either direction.
+await login(allowed);
+const dm = (await first("select start_direct_message($1) as id", [excluded])).id;
+await assert.rejects(() => db.query("select start_direct_message($1)", [allowed]), /Choose another/);
+await assert.rejects(() => db.query("select start_direct_message($1)", ["nobody@example.test"]), /Choose another/);
+await assert.rejects(() => db.query("insert into channels(name,direct_members) values ('forged',$1)", [[allowed, admin]]), /Use the private conversation functions/);
+const dmMessage = (await first("insert into messages(channel_id,body) values ($1,'Private hello') returning id", [dm])).id;
+await db.query("insert into storage.objects(bucket_id,name) values ('workspace',$1)", [`channels/${dm}/dm.txt`]);
+await login(excluded);
+assert.equal((await first("select start_direct_message($1) as id", [allowed])).id, dm);
+assert.equal(await count("messages", "where id=$1", [dmMessage]), 1);
+assert.equal(await count("notifications", "where channel_id=$1 and kind='direct'", [dm]), 1);
+assert.equal((await db.query("update channels set direct_members=null where id=$1 returning id", [dm])).rows.length, 0);
+await login(admin);
+assert.equal(await count("channels", "where id=$1", [dm]), 0);
+assert.equal(await count("messages", "where id=$1", [dmMessage]), 0);
+assert.equal(await count("storage.objects", "where name=$1", [`channels/${dm}/dm.txt`]), 0);
+assert.equal((await first("select can_access_channel($1) as allowed", [dm])).allowed, false);
+await assert.rejects(() => db.query("insert into messages(channel_id,body) values ($1,'Intrusion')", [dm]), /row-level security/);
+// Time tracking is an admin-controlled project feature, with own-log editing.
+await login(allowed);
+await assert.rejects(()=>db.query("update projects set time_tracking_enabled=true where id=$1",[p2]),/Only admins/);
+await assert.rejects(()=>db.query("insert into task_time_logs(task_id,work_date,minutes,note) values ($1,'2026-10-13',90,'Work')",[t2]),/row-level security/);
+await login(admin);
+await db.query("update projects set time_tracking_enabled=true where id=$1",[p2]);
+await login(allowed);
+const logId=(await first("insert into task_time_logs(task_id,work_date,minutes,note) values ($1,'2026-10-13',90,'Work') returning id",[t2])).id;
+await db.query("update task_time_logs set minutes=120 where id=$1",[logId]);
+assert.equal(await count("task_activity", "where task_id=$1 and kind='time_logged'", [t2]), 1);
+assert.equal(await count("task_activity", "where task_id=$1 and kind='time_updated'", [t2]), 1);
+assert.equal(Number((await first("select minutes from project_time_totals($1) where task_id=$2",[p2,t2])).minutes),120);
+await assert.rejects(()=>db.query("update task_time_logs set author=$2 where id=$1",[logId,excluded]),/permission denied/);
+await login(excluded);
+assert.equal(await count("task_time_logs","where id=$1",[logId]),1);
+assert.equal((await db.query("update task_time_logs set minutes=1 where id=$1 returning id",[logId])).rows.length,0);
+assert.equal((await db.query("delete from task_time_logs where id=$1 returning id",[logId])).rows.length,0);
+await login(admin);
+await db.query("update projects set visible_to=$2 where id=$1",[p2,[allowed]]);
+await login(excluded);
+assert.equal(await count("task_time_logs","where id=$1",[logId]),0);
+await login(admin);
+await db.query("update projects set time_tracking_enabled=false where id=$1",[p2]);
+await login(allowed);
+assert.equal(await count("task_time_logs","where id=$1",[logId]),1);
+assert.equal((await db.query("update task_time_logs set minutes=1 where id=$1 returning id",[logId])).rows.length,0);
+await assert.rejects(()=>db.query("insert into task_time_logs(task_id,work_date,minutes,note) values ($1,'2026-10-14',10,'More work')",[t2]),/row-level security/);
+await login(admin);
+await db.exec("reset role");
+await db.exec(await fs.readFile("supabase/migrations/20261022000000_time_log_activity.sql", "utf8"));
+await login(admin);
+assert.equal(await count("task_activity", "where task_id=$1 and kind='time_logged'", [t2]), 1);
+await db.query("update projects set time_tracking_enabled=true where id=$1",[p2]);
+await db.query("delete from task_time_logs where id=$1",[logId]);
+assert.equal(await count("task_activity", "where task_id=$1 and kind='time_deleted'", [t2]), 1);
+assert.equal((await db.query("select * from project_time_totals($1) where task_id=$2",[p2,t2])).rows.length,0);
+await login(allowed);
+const groupId=(await first("select start_private_conversation($1) as id",[[admin,excluded]])).id;
+assert.notEqual(groupId,dm);
+assert.equal((await first("select start_private_conversation($1) as id",[[excluded,admin]])).id,groupId);
+await assert.rejects(()=>db.query("select start_private_conversation($1)",[[admin,excluded,allowed,admin,excluded]]),/five people/);
+await login(admin);
+const deleteParent=(await first("insert into tasks(project_id,title) values ($1,'Delete parent') returning id",[p2])).id;
+const deleteChild=(await first("insert into tasks(project_id,title,parent_id) values ($1,'Delete child',$2) returning id",[p2,deleteParent])).id;
+await db.query("insert into task_time_logs(task_id,work_date,minutes,note) values ($1,'2026-10-14',30,'Child work')",[deleteChild]);
+await db.query("insert into task_comments(task_id,body) values ($1,'Child comment')",[deleteChild]);
+await db.query("delete from tasks where id=$1",[deleteParent]);
+assert.equal(await count("tasks","where id=$1 or id=$2",[deleteParent,deleteChild]),0);
+await login(admin);
+await assert.rejects(()=>db.query("select add_conversation_members($1,$2)",[dm,[admin]]),/not available/);
+await assert.rejects(()=>db.query("select delete_private_conversation($1)",[dm]),/not available/);
+await login(allowed);
+assert.equal((await first("select add_conversation_members($1,$2) as id",[dm,[admin]])).id,dm);
+await login(admin);
+assert.equal(await count("messages","where id=$1",[dmMessage]),1);
+assert.equal((await first("select delete_private_conversation($1) as removed",[dm])).removed,true);
+assert.equal(await count("channels","where id=$1",[dm]),0);
+assert.equal(await count("messages","where id=$1",[dmMessage]),0);
 await db.close();
 console.log(
   "PASS: full migrations and rerun; public defaults; admin-only controls; project/chat/content/file isolation; forged paths; notifications; custom statuses; revocation and restoration; outsider denial.",

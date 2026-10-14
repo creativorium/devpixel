@@ -10,7 +10,7 @@ export async function generateMetadata({
   params: Promise<{ channelId: string }>;
 }): Promise<Metadata> {
   const channel = await getChannel((await params).channelId);
-  return { title: channel ? `#${channel.name}` : "Channel" };
+  return { title: channel?.direct_members ? "Direct message" : channel ? `#${channel.name}` : "Channel" };
 }
 
 export default async function ChannelPage({
