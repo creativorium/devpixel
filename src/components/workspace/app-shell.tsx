@@ -519,7 +519,7 @@ function ProfileMenu({
               onNavigate();
             }}
           >
-            <Icon name="user" /> Your profile
+            <Icon name="user" /> {isAdmin(me) ? "Profile & team settings" : "Your profile"}
           </Link>
           <form action={signOut}>
             <button type="submit" role="menuitem" className="ws-menu-item">

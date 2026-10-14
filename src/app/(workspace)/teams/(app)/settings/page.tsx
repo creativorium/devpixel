@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import ProfileForm from "@/components/workspace/profile-form";
-import { initials } from "@/lib/workspace/model";
+import { initials, isAdmin } from "@/lib/workspace/model";
+import AdminMembers from "@/components/workspace/admin-members";
 import { projectColor } from "@/lib/workspace/note-format";
 import { requireMember } from "@/lib/workspace/session";
 
-export const metadata: Metadata = { title: "Profile" };
+export const metadata: Metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
   const { me, team } = await requireMember();
@@ -25,7 +26,7 @@ export default async function SettingsPage() {
         <ProfileForm email={me.email} displayName={me.display_name} />
       </section>
 
-      <section className="ws-panel" style={{ marginTop: 20 }}>
+      {isAdmin(me) ? <AdminMembers team={team} me={me}/> : <section className="ws-panel" style={{ marginTop: 20 }}>
         <div className="ws-panel-head">
           <h2>Team</h2>
           <span className="ws-meta">{team.length} members</span>
@@ -57,11 +58,9 @@ export default async function SettingsPage() {
           })}
         </ul>
         <p className="ws-meta" style={{ marginTop: 12 }}>
-          Each person sets their own name after signing in. Adding or removing
-          team members is done by the workspace owner in Supabase (see
-          WORKSPACE.md).
+          Each person can set their own display name. Ask a workspace admin to add teammates or change roles.
         </p>
-      </section>
+      </section>}
     </div>
   );
 }

@@ -185,6 +185,18 @@ a retry message. These are in-app notifications, not email or device push alerts
 
 ## Direct messages and optional time logs (local preview)
 
+### Admin team settings
+
+Apply `20261025000000_admin_members.sql` after migration 24. Profile menu →
+Profile & team settings lets admins add allowlisted Google sign-in emails and
+edit display names and roles. Invite teammate grants membership immediately;
+Copy invitation link produces the current site's Teams login URL to share
+manually. The recipient must sign in with the authorized Google email. No email
+is sent and no bearer invite token is used. Sign-in emails cannot be edited;
+task and chat ownership stays intact. Members cannot call the management RPC,
+and admins cannot demote themselves. The existing magic-link flow for accounts
+already provisioned in Supabase Auth is unchanged.
+
 Migration `20261024000000_chat_management.sql` supersedes the separate-conversation
 behavior below: Add people now extends the current conversation, preserving its
 ID and giving new participants access to existing messages and attachments. Any

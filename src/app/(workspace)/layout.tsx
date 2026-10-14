@@ -23,6 +23,7 @@ export const metadata: Metadata = {
   title: { default: "Teams", template: "%s · DevnPixel Teams" },
   robots: { index: false, follow: false, nocache: true },
   referrer: "no-referrer",
+  icons: { icon: [{ url: "/teams-icon.svg", type: "image/svg+xml" }] },
 };
 export const viewport: Viewport = { themeColor: "#ffffff" };
 

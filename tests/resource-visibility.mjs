@@ -488,6 +488,17 @@ assert.equal(await count("messages","where id=$1",[dmMessage]),1);
 assert.equal((await first("select delete_private_conversation($1) as removed",[dm])).removed,true);
 assert.equal(await count("channels","where id=$1",[dm]),0);
 assert.equal(await count("messages","where id=$1",[dmMessage]),0);
+await login(allowed);
+await assert.rejects(()=>db.query("select admin_save_member($1,'New','admin',true)",['new@example.test']),/Only admins/);
+await login(admin);
+await db.query("select admin_save_member($1,'New member','member',true)",['new@example.test']);
+assert.equal((await first("select role from members where email=$1",['new@example.test'])).role,'member');
+await assert.rejects(()=>db.query("select admin_save_member($1,'Duplicate','admin',true)",['new@example.test']),/already on the team/);
+await db.query("select admin_save_member($1,'Renamed','admin',false)",['new@example.test']);
+assert.equal((await first("select display_name from members where email=$1",['new@example.test'])).display_name,'Renamed');
+await assert.rejects(()=>db.query("select admin_save_member($1,'Admin','member',false)",[admin]),/own admin role/);
+await login('new@example.test');
+assert.equal((await first("select is_member() as member")).member,true);
 await db.close();
 console.log(
   "PASS: full migrations and rerun; public defaults; admin-only controls; project/chat/content/file isolation; forged paths; notifications; custom statuses; revocation and restoration; outsider denial.",

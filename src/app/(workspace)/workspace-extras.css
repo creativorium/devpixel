@@ -1,4 +1,13 @@
 /* Menus, labels, subtasks, files, note toolbar and loading states. */
+.ws-admin-members { margin-top: 24px; }
+.ws-member-form, .ws-member-invite { margin: 20px 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--ws-panel); }
+.ws-member-form h3 { font-size: 16px; margin: 0 0 16px; }
+.ws-member-form .ws-field { margin-bottom: 14px; }
+.ws-member-form .ws-input, .ws-member-invite .ws-input { width: 100%; }
+.ws-member-form .ws-form-actions { gap: 12px; }
+.ws-member-identity { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.ws-admin-members .ws-team-list li { flex-wrap: wrap; gap: 10px; }
+.ws-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
 .ws-dm-options > div > button { appearance: none; border: 0; background: transparent; color: var(--ink); border-radius: 8px; font-family: inherit; font-weight: 400; box-shadow: none; text-align: left; min-height: 34px; }
 .ws-dm-options > div > button:disabled { opacity: .4; cursor: default; }
 .ws-dm-options > div > button:not(:disabled):hover { background: var(--ws-soft); }
