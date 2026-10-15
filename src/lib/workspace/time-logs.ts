@@ -5,8 +5,28 @@ export const timeLogInput = z.object({
   taskId: z.uuid(),
   workDate: z.iso.date(),
   minutes: z.number().int().min(1).max(1440),
-  note: z.string().trim().min(1).max(2000),
+  note: z.string().trim().max(2000).default(""),
 });
+
+/** Sum direct logs once per task, including every level of subtasks. */
+export function taskLoggedMinutes(
+  task: { id: string; logged_minutes?: number },
+  tasks: { id: string; parent_id?: string | null; logged_minutes?: number }[],
+) {
+  let total = task.logged_minutes ?? 0;
+  const visited = new Set([task.id]);
+  const queue = [task.id];
+  while (queue.length) {
+    const parent = queue.pop()!;
+    for (const child of tasks) {
+      if (child.parent_id !== parent || visited.has(child.id)) continue;
+      visited.add(child.id);
+      total += child.logged_minutes ?? 0;
+      queue.push(child.id);
+    }
+  }
+  return total;
+}
 export type TimeLog = {
   id: string;
   task_id: string;

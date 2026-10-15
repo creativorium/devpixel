@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Settings" };
 export default async function SettingsPage() {
   const { me, team } = await requireMember();
   return (
-    <div className="ws-page ws-narrow">
+    <div className="ws-page ws-narrow ws-profile-settings">
       <header className="ws-page-head">
         <div>
           <p className="ws-eyebrow">Settings</p>

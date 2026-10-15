@@ -181,7 +181,7 @@ export default function TaskTimeLogs({ taskId }: { taskId: string }) {
               </label>
             </div>
             <label className="ws-field">
-              What did you work on?
+              What did you work on? (optional)
               <textarea
                 className="ws-input"
                 rows={3}
@@ -244,7 +244,7 @@ export default function TaskTimeLogs({ taskId }: { taskId: string }) {
                     <strong>{durationLabel(row.minutes)}</strong> ·{" "}
                     {row.work_date} · {memberName(team, row.author)}
                   </div>
-                  <p>{row.note}</p>
+                  {row.note && <p>{row.note}</p>}
                   {(row.author === me?.email || isAdmin(me)) && (
                     <div className="ws-form-actions">
                       <button

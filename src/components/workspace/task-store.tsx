@@ -42,7 +42,7 @@ import Icon from "./icons";
 import SubtaskTitle from "./subtask-title";
 import TaskFeed from "./task-feed";
 import TaskTimeLogs from "./task-time-logs";
-import { durationLabel } from "@/lib/workspace/time-logs";
+import { durationLabel, taskLoggedMinutes } from "@/lib/workspace/time-logs";
 import { useStatuses } from "./status-context";
 import LocalTime from "./local-time";
 import { useMentionPicker } from "./mention-picker";
@@ -343,8 +343,9 @@ export function Assignees({
   );
 }
 
-export function LabelChips({ task }: { task: Task }) {
-  if (!task.labels?.length && !task.logged_minutes) return null;
+export function LabelChips({ task, tasks }: { task: Task; tasks: Task[] }) {
+  const total = taskLoggedMinutes(task, tasks);
+  if (!task.labels?.length && !total) return null;
   return (
     <span className="ws-labels">
       {labelOptions
@@ -358,7 +359,7 @@ export function LabelChips({ task }: { task: Task }) {
             {l.label}
           </span>
         ))}
-      {!!task.logged_minutes && <span className="ws-label" title="Total time logged on this task">{durationLabel(task.logged_minutes)}</span>}
+      {!!total && <span className="ws-label" title="Total time logged on this task and its subtasks">{durationLabel(total)}</span>}
     </span>
   );
 }

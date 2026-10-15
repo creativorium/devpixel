@@ -69,7 +69,9 @@ export async function saveTimeLog(value: unknown, editing: boolean) {
   if (!parsed.success)
     return {
       error:
-        "Enter a valid date, 1–1440 minutes and a note (up to 2000 characters).",
+        parsed.error.issues.some(issue => issue.path[0] === "note")
+          ? "Notes must be 2000 characters or fewer. You can also leave them blank."
+          : "Enter a valid work date and a duration between 1 minute and 24 hours.",
     };
   const input = parsed.data;
   const fields = {
@@ -90,7 +92,9 @@ export async function saveTimeLog(value: unknown, editing: boolean) {
   if (error || !data)
     return {
       error:
-        "Could not save. Check whether time logging is still enabled and you have access. Refresh before retrying if the connection failed.",
+        error?.code === "23514" && !input.note
+          ? "Blank notes need the optional time-log notes database update. Add a note for now, or ask an admin to apply it."
+          : "Could not save. Check whether time logging is still enabled and you have access. Refresh before retrying if the connection failed.",
     };
   revalidatePath("/teams/dashboard");
   return { ok: true };

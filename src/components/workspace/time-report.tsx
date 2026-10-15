@@ -189,7 +189,7 @@ export default function TimeReport({ projectId }: { projectId?: string }) {
         <thead><tr><th scope="col">Work date</th><th scope="col">Task & work notes</th><th scope="col">Teammate</th><th scope="col">Time logged</th></tr></thead>
         <tbody>{shown.map(row => <tr key={row.id}>
           <td data-label="Work date"><time dateTime={row.work_date}>{readableDate(row.work_date)}</time></td>
-          <td data-label="Task & work notes"><Link href={`/teams/p/${row.tasks?.project_id}?task=${row.task_id}`}>{row.tasks?.title}</Link><span className="ws-time-project">{row.tasks?.projects?.name}</span><p>{row.note}</p></td>
+          <td data-label="Task & work notes"><Link href={`/teams/p/${row.tasks?.project_id}?task=${row.task_id}`}>{row.tasks?.title}</Link><span className="ws-time-project">{row.tasks?.projects?.name}</span>{row.note && <p>{row.note}</p>}</td>
           <td data-label="Teammate">{memberName(team,row.author)}</td>
           <td data-label="Time logged"><strong className="ws-time-duration">{durationLabel(row.minutes)}</strong></td>
         </tr>)}</tbody>

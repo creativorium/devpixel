@@ -235,7 +235,7 @@ export default function KanbanBoard({
                             draggable={false}
                           />
                         )}
-                        <LabelChips task={task} />
+                        <LabelChips task={task} tasks={store.tasks} />
                         <span className="ws-task-title">
                           {store.isBlocked(task) && task.status !== "done" && (
                             <span

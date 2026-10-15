@@ -12,7 +12,7 @@ export default function ProfileForm({
 }) {
   const [state, action, pending] = useActionState(updateMyName, null);
   return (
-    <form action={action} className="ws-form">
+    <form action={action} className="ws-form ws-profile-form">
       <label className="ws-field">
         Display name
         <input

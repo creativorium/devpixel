@@ -1,4 +1,9 @@
 /* Menus, labels, subtasks, files, note toolbar and loading states. */
+.ws-profile-form { display: grid; gap: 20px; max-width: 560px; }
+.ws-profile-form .ws-field { gap: 8px; }
+.ws-profile-form .ws-form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 4px; }
+.ws-profile-settings .ws-page-head { margin-bottom: 24px; }
+.ws-profile-settings .ws-lede { margin-top: 10px; max-width: 65ch; }
 .ws-admin-members { margin-top: 24px; }
 .ws-member-form, .ws-member-invite { margin: 20px 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--ws-panel); }
 .ws-member-form h3 { font-size: 16px; margin: 0 0 16px; }

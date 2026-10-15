@@ -152,7 +152,7 @@ export default function TaskList({
                               </span>
                             )}
                           </button>
-                          <LabelChips task={task} />
+                          <LabelChips task={task} tasks={store.tasks} />
                           <span className="ws-meta">
                             <SubtaskProgress task={task} tasks={store.tasks} />
                           </span>
