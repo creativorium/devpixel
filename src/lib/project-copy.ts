@@ -375,11 +375,24 @@ export const fzFilmCoCopy: Record<Locale, ClientCopy> = {
   },
 };
 
-export type ClientKind = "jw" | "wonderland" | "fzfilmco";
+const villaBumiCopy: ClientCopy = {
+  label: "CLIENT PROJECT / PECATU, BALI",
+  category: "Web development",
+  intro: "A website for Villa Bumi’s three-bedroom hillside retreat, bringing photography, room details and stay planning together in one calm, responsive experience.",
+  visit: "Explore the design preview",
+  scope: "A clear path from discovering the villa to planning a stay.",
+  sections: [
+    ["Website design", "Warm neutrals, editorial typography and a photo-led layout reflect the villa’s setting in Pecatu. The gallery, room details and location guide help guests explore at their own pace."],
+    ["Availability integration", "A server endpoint connects the calendar to published availability and nightly rates from the villa’s existing provider, with USD and IDR selection and a clear fallback when the provider is unavailable."],
+    ["Independent deployment", "The website is being prepared as a standalone Next.js app for villabumi.com on Hostinger, with its own assets, metadata and guest enquiry flow. The domain migration is pending."],
+  ],
+};
+export type ClientKind = "jw" | "wonderland" | "fzfilmco" | "villabumi";
 export function isClientProject(kind: string): kind is ClientKind {
-  return kind === "jw" || kind === "wonderland" || kind === "fzfilmco";
+  return kind === "jw" || kind === "wonderland" || kind === "fzfilmco" || kind === "villabumi";
 }
 export function clientCopyFor(kind: ClientKind, locale: Locale) {
+  if (kind === "villabumi") return villaBumiCopy;
   return kind === "jw"
     ? jwCopy[locale]
     : kind === "wonderland"

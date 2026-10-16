@@ -12,7 +12,7 @@ export default function Work() {
     <main id="main" className="section inner-page">
       <div className="work-hero">
         <div>
-          <p className="eyebrow">THE WORK INDEX / 01—06</p>
+          <p className="eyebrow">THE WORK INDEX / 01—{String(projects.length).padStart(2, "0")}</p>
           <h1>
             Ideas made
             <br />

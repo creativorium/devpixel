@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import type { CSSProperties } from "react";
 import { villaDirections } from "@/lib/villa-directions";
 import { ShowcaseVariant } from "./showcase-variants";
@@ -12,6 +13,8 @@ import {
   HotelExperience,
   VillaExperience,
 } from "./showcase-experiences";
+const EditorialShowcase = dynamic(() => import("./editorial-showcase").then(module => module.EditorialShowcase));
+const AeraShowcase = dynamic(() => import("./aera-showcase").then(module => module.AeraShowcase));
 
 export function ShowcaseDemo({
   concept: s,
@@ -20,6 +23,8 @@ export function ShowcaseDemo({
   concept: Showcase;
   rentalBrowse?: boolean;
 }) {
+  if (s.slug === "aera-ubud-sanctuary") return <AeraShowcase />;
+  if (s.slug === "nativ-bali-objects" || s.slug === "sora-uluwatu-villa") return <EditorialShowcase concept={s} />;
   const Experience =
     s.category === "Shops / Ecommerce"
       ? ShopExperience

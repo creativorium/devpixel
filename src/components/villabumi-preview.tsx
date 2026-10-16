@@ -478,7 +478,7 @@ export function VillaBumiPreview() {
         Skip to content
       </a>
       <div className="bumi-preview-bar">
-        <a href="/showcase">← Back to Showcase</a>
+        <a href="/work/villabumi">← Back to Project</a>
         <span>VILLA BUMI / DESIGN PREVIEW</span>
         <a href="/contact?service=web-design">
           By DevnPixel <Arrow diagonal />

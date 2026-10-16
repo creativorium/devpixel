@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { projects } from "@/lib/site";
 export function ProjectArt({ kind }: { kind: string }) {
+  if (kind === "villabumi") return <div className="project-art art-client"><Image src="/villabumi/sunset.webp" alt="Villa Bumi pool terrace in Pecatu, Bali" width={1800} height={1200} sizes="(max-width: 760px) 100vw, 50vw" /></div>;
   if (kind === "jw" || kind === "wonderland" || kind === "fzfilmco")
     return (
       <div

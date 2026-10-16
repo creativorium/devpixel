@@ -19,7 +19,7 @@ export function ClientCaseStudy({
       </Link>
       <p className="eyebrow">{c.label}</p>
       <h1>
-        {kind === "jw"
+        {kind === "villabumi" ? "Villa Bumi" : kind === "jw"
           ? "JW Trading Academy"
           : kind === "wonderland"
             ? "Wonderland Bali"
@@ -30,7 +30,7 @@ export function ClientCaseStudy({
         <a
           className="text-link"
           href={
-            kind === "jw"
+            kind === "villabumi" ? "/work/villabumi/preview" : kind === "jw"
               ? "https://jwtradingacademy.com/"
               : kind === "wonderland"
                 ? "https://wonderlandbali.com/"

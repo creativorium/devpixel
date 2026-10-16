@@ -108,32 +108,32 @@ export const showcases: Showcase[] = [
   },
   {
     slug: "nativ-bali-objects",
-    name: "NATIV objects",
+    name: "NATIV",
     category: "Shops / Ecommerce",
     location: "Bali, Indonesia",
-    style: "Sculptural design store",
+    style: "Warm editorial furniture store",
     layout: "editorial",
     palette: ["#f0ece6", "#3a342e", "#d5bba4"],
     serif: false,
-    headline: "Everyday, considered.",
+    headline: "Room for the everyday.",
     intro:
-      "Objects with a little more presence. A small collection for the places you call home.",
+      "Thoughtful furniture and natural materials for all the little moments that make a home.",
     story:
-      "A bowl you reach for each morning. A vessel that needs no flowers. NATIV is a homeware shop concept that lets shape, texture and useful details do the talking.",
-    image: "ceramics",
+      "A favourite chair, a gathering table and useful objects with a quieter presence. NATIV imagines a warm furniture collection for everyday living.",
+    image: "interior",
     items: [
       [
-        "Everyday vessel",
-        "A sculptural ceramic form in a warm sand finish.",
-        420000,
+        "The Sunday chair",
+        "An illustrative oak-frame chair with linen upholstery.",
+        2450000,
       ],
-      ["Low bowl", "A broad shallow bowl for fruit or a shared table.", 280000],
-      ["Quiet cup", "A compact handleless cup with a tactile finish.", 180000],
+      ["Gather coffee table", "A solid oak table with a natural oil finish.", 1850000],
+      ["Slow living sofa", "A warm leather sofa for an unhurried afternoon.", 7900000],
     ],
     features: ["Considered forms", "Small collections", "Objects to live with"],
-    seo: "Bali homeware ecommerce website design",
+    seo: "Bali furniture ecommerce website design",
     design:
-      "A Bali homeware store needs product information that supports a buying decision: dimensions, materials, care and delivery options. NATIV demonstrates a restrained catalogue and a working sample bag. A production ecommerce build would connect real inventory, payment processing and shipping rules, with product photography and maker claims supplied by the business.",
+      "A warm furniture-store direction with a photo-led hero, editorial material stories, collection filters, product details and a working sample bag. Subtle GSAP letter reveals and section entrances add movement without interrupting shopping. A live store would connect verified product specifications, inventory, payments and delivery rules.",
   },
   {
     slug: "sora-uluwatu-villa",
@@ -254,6 +254,24 @@ showcases.push({
 });
 
 showcases.push(...additionalShowcases);
+showcases.push({
+  slug: "aera-ubud-sanctuary",
+  name: "AERA",
+  category: "Villa",
+  location: "Ubud, Bali",
+  style: "Immersive nature-led sanctuary",
+  layout: "immersive",
+  palette: ["#2c3c34", "#d7dccb", "#a8baa0"],
+  serif: false,
+  headline: "Return to what matters.",
+  intro: "A private villa concept shaped by nature, considered spaces and a gentler rhythm in Ubud.",
+  story: "AERA imagines a two-bedroom private sanctuary among tropical trees, with room for a slow swim, a shared meal and a little quiet.",
+  image: "retreat",
+  items: [["The private house", "Two-bedroom villa concept for up to four guests.", 4200000], ["A slower chapter", "Illustrative extended-stay option, by enquiry.", 0], ["Your own rhythm", "Plan a quiet getaway, time together or a creative pause.", 0]],
+  features: ["A private house", "Close to nature", "Your own rhythm"],
+  seo: "Immersive Ubud villa website design",
+  design: "A nature-led villa direction inspired by immersive editorial hospitality websites: muted green surfaces, full-width photography, light typography, restrained GSAP letter reveals and an interactive chapter navigator. The concept presents one private house with clear practical details and a sample enquiry. A live property would confirm its exact amenities, location and booking process.",
+});
 
 const moodboards: Record<ShowcaseCategory, [string, string, string]> = {
   Hospitality: ["retreat", "pool", "interior"],

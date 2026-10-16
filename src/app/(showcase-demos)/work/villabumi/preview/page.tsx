@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { VillaBumiPreview } from "@/components/villabumi-preview";
-import "./villabumi.css";
+import "@/app/(showcase-demos)/showcase/villabumi/villabumi.css";
 
 export const metadata: Metadata = {
   title: "Villa Bumi — A hillside retreat above the Bukit | Design preview",
   description:
     "Explore the Villa Bumi website redesign preview: three bedrooms, a private pool and ocean views in Pecatu, Bali.",
   robots: { index: false, follow: false },
-  alternates: { canonical: "/showcase/villabumi" },
+  alternates: { canonical: "/work/villabumi/preview" },
   openGraph: {
     title: "Villa Bumi — Website design preview",
     description:

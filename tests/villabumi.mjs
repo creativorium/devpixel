@@ -32,7 +32,7 @@ try {
           },
     });
   });
-  await page.goto(`${base}/showcase/villabumi`);
+  await page.goto(`${base}/work/villabumi/preview`);
   await expect(page.locator(".bumi-calendar-month")).toHaveCount(6);
   await expect(page.locator('[data-date="2026-10-10"]')).toBeDisabled();
   await expect(page.locator('[data-date="2026-10-12"]')).toBeEnabled();

@@ -20,6 +20,11 @@ const config: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/showcase/villabumi",
+        destination: "/work/villabumi/preview",
+        permanent: true,
+      },
+      {
         source: "/services/digital-experiences",
         destination: "/services/advertising",
         permanent: true,

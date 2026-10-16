@@ -5,6 +5,9 @@ import "./showcase-demo.css";
 import "./showcase-experiences.css";
 import "./showcase-variants.css";
 import "./villa-directions.css";
+import "./editorial-showcase.css";
+import "./showcase-specialists.css";
+import "./aera-showcase.css";
 const sans = localFont({
   src: "../../../node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2",
   variable: "--demo-sans",

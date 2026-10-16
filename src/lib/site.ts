@@ -9,6 +9,15 @@ export const site = {
 };
 export const projects = [
   {
+    slug: "villabumi",
+    name: "Villa Bumi",
+    category: "Web development",
+    year: "Client project",
+    kind: "villabumi",
+    description: "Website design and Next.js development for Villa Bumi in Pecatu, Bali, with a photo gallery, live availability, currency selection and a guest enquiry flow.",
+    services: "Website design / Next.js development / Availability integration / Hostinger deployment preparation",
+  },
+  {
     slug: "jw-trading-academy",
     name: "JW Trading Academy",
     category: "Web development",

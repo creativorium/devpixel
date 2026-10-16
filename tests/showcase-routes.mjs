@@ -16,7 +16,7 @@ function links(html) {
 
 // Follow the actual links visitors see, including nested rental pages.
 const demos = [...new Set(links(await load("/showcase")))];
-assert.equal(demos.length, 30, "All showcase cards must link to demos");
+assert.equal(demos.length, 31, "All showcase cards must link to demos");
 const rentals = new Set();
 for (let offset = 0; offset < demos.length; offset += 6) {
   await Promise.all(
